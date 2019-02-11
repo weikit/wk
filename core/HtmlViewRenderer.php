@@ -5,6 +5,7 @@ namespace weikit\core;
 use Yii;
 use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
+use yii\view\ViewNotFoundException;
 
 class HtmlViewRenderer extends ViewRenderer
 {
@@ -37,18 +38,80 @@ class HtmlViewRenderer extends ViewRenderer
      */
     public function render($view, $file, $params)
     {
-        $filename = md5($file);
-        $cacheFile = $this->getCachePath() . '/' . substr($filename , 0, 2) . '/' . md5($file) . '.php';
-        if (!is_file($cacheFile) || filemtime($file) > filemtime($cacheFile)) {
-            $this->compile($file, $cacheFile);
-        }
-
-        return $view->renderPhpFile($cacheFile, $params);
+        $cacheFile = $this->getCacheFile($file);
+        $this->checkFile($file, $cacheFile);
+        return $this->renderPhpFile($cacheFile, $params);
     }
 
-    public function template($filename, $flag = TEMPLATE_DISPLAY)
+    protected function getCacheFile($file)
     {
-        // todo
+        $filename = md5($file);
+        return $this->getCachePath() . '/' . substr($filename , 0, 2) . '/' . md5($file) . '.php';
+    }
+
+    protected function renderPhpFile($_file_, $_params_ = [])
+    {
+        $_obInitialLevel_ = ob_get_level();
+        ob_start();
+        ob_implicit_flush(false);
+        extract($GLOBALS, EXTR_SKIP);
+        extract($_params_, EXTR_OVERWRITE);
+        try {
+            require $_file_;
+            return ob_get_clean();
+        } catch (\Exception $e) {
+            while (ob_get_level() > $_obInitialLevel_) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        } catch (\Throwable $e) {
+            while (ob_get_level() > $_obInitialLevel_) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        }
+    }
+
+    protected function checkFile($sourceFile, $targetFile)
+    {
+        if (!is_file($sourceFile)) {
+            throw new ViewNotFoundException("The view file does not exist: $sourceFile");
+        }
+
+        if (!is_file($targetFile) || filemtime($sourceFile) > filemtime($targetFile)) {
+            $this->compile($sourceFile, $targetFile);
+        }
+    }
+
+    public function template($filename, $flag = TEMPLATE_DISPLAY) // TODO 更好的统一$this->render
+    {
+        /* @var $controller yii\web\Controller */
+        $controller = Yii::$app->controller;
+        /* @var $view yii\web\View */
+        $view = $controller->getView();
+
+        // TODO 应该通过View::findViewFile来同意返回路径
+        $file = $controller->getViewPath() . DIRECTORY_SEPARATOR . $filename . '.' . $view->defaultExtension;
+        $cacheFile = $this->getCacheFile($file);
+        $this->checkFile($file, $cacheFile);
+
+        switch ($flag) {
+            case TEMPLATE_DISPLAY:
+            default:
+                extract($GLOBALS, EXTR_SKIP);
+                include $this->getCacheFile($cacheFile);
+                break;
+            case TEMPLATE_FETCH:
+                return $this->renderPhpFile($cacheFile);
+                break;
+            case TEMPLATE_INCLUDEPATH:
+                return $cacheFile;
+                break;
+        }
     }
 
     public function compile($source, $target, $inModule = false)
@@ -60,8 +123,8 @@ class HtmlViewRenderer extends ViewRenderer
 
     public function parse($str, $inModule = false) {
         $str = preg_replace('/<!--{(.+?)}-->/s', '{$1}', $str);
-        $str = preg_replace('/{template\s+(.+?)}/',
-            '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
+        $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
+            '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
             $str);
         $str = preg_replace('/{php\s+(.+?)}/', '<?php $1?>', $str);
         $str = preg_replace('/{if\s+(.+?)}/', '<?php if($1) { ?>', $str);
