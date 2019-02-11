@@ -14,37 +14,42 @@ class Plugin
         setcookie($auth_cookie_name, $auth_cookie, $expire, SITECOOKIEPATH . 'web', COOKIE_DOMAIN, $secure, true);
     }
 
+    public static $copies = [
+        WEIKIT_DIR . '/we8/app/resource' => ABSPATH . 'app/resource',
+        WEIKIT_DIR . '/we8/app/index.php' => ABSPATH . 'app/index.php',
+
+
+        WEIKIT_DIR . '/we8/web/resource' => ABSPATH . 'web/resource',
+        WEIKIT_DIR . '/we8/web/index.php' => ABSPATH . 'web/index.php',
+    ];
+
     public static function activate()
     {
-        $dirs = ['web', 'app'];
-
-        array_walk($dirs, function($name) {
-            $path = ABSPATH . $name;
-            FileHelper::createDirectory($path);
-
-            $file = $path . '/index.php';
-            $content = <<<EOF
-<?php
-define('SHORTINIT', true);
-
-require '../wp-load.php';
-require '../wp-content/plugins/wk/init.php';
-EOF;
-
-            if (($fp = @fopen($file, 'w')) === false) {
-                throw new InvalidConfigException("Unable to append to log file: {$file}");
+        foreach(static::$copies as $source => $target) {
+            if (is_file($source)) {
+                FileHelper::createDirectory(dirname($target));
+                if (!file_exists($target)) {
+                    copy($source, $target);
+                }
+            } else {
+                FileHelper::copyDirectory($source, $target);
             }
-            @fwrite($fp, $content);
-            @fclose($fp);
-        });
+        };
     }
+
+    public static $delete = [
+        ABSPATH . 'app',
+        ABSPATH . 'web',
+    ];
 
     public static function deactivate()
     {
-        $dirs = ['web', 'app'];
-        array_walk($dirs, function($name) {
-            $path = ABSPATH . $name;
-            FileHelper::removeDirectory($path);
-        });
+        foreach(static::$delete as $target) {
+            if (is_file($target)) {
+                FileHelper::unlink($target);
+            } else {
+                FileHelper::removeDirectory($target);
+            }
+        };
     }
 }

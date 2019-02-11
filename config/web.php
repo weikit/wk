@@ -5,15 +5,16 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'weikit',
-    'basePath' => dirname(__DIR__),
+    'basePath' => WEIKIT_PATH,
     'bootstrap' => ['log'],
     'aliases' => [
-        '@weikit_path' => ABSPATH . 'wp-content/plugins/wk',
-        '@weikit' => home_url() . '/wp-content/plugins/wk',
+        '@weikit_path' => WEIKIT_PATH,
+        '@weikit' => home_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
+        '@wp_path' => ABSPATH,
+        '@wp' => home_url(),
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
-    'viewPath' => '@weikit_path/views',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -49,8 +50,25 @@ $config = [
             'basePath' => '@weikit_path/web/assets',
             'baseUrl' => '@weikit/web/assets',
         ],
+        'view' => [
+            'defaultExtension' => 'html',
+            'renderers' => [
+                'html' => [
+                    'class' => 'weikit\core\HtmlViewRenderer',
+                ],
+                // ...
+            ],
+        ],
     ],
     'params' => $params,
+    'modules' => [
+        'app' => [
+            'class' => 'weikit\modules\app\Module',
+        ],
+        'web' => [
+            'class' => 'weikit\modules\web\Module',
+        ],
+    ]
 ];
 
 if (YII_ENV_DEV) {

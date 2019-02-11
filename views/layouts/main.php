@@ -3,14 +3,17 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use app\widgets\Alert;
+
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
+use weikit\widgets\Alert;
 use weikit\assets\AppAsset;
+use weikit\assets\IframeResizerContentAsset;
 
 AppAsset::register($this);
+IframeResizerContentAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>

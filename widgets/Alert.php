@@ -1,5 +1,5 @@
 <?php
-namespace app\widgets;
+namespace weikit\widgets;
 
 use Yii;
 

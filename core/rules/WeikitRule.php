@@ -15,13 +15,10 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
     public function parseRequest($manager, $request)
     {
         $c = $request->get('c');
-        if (!empty($c)) {
-            $a = $request->get('a');
-            $do = $request->get('do', $a ? 'display' : null);
+        $a = $request->get('a');
+        $do = $request->get('do', $a ? 'display' : null);
 
-            $route = trim(implode('/', [$c, $a, $do]), '/');
-            return [$route, []];
-        }
-        return false;
+        $route = trim(implode('/', [is_admin() ? 'web' : 'app', $c, $a, $do]), '/');
+        return [$route, []];
     }
 }

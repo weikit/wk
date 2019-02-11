@@ -1,0 +1,36 @@
+{template 'common/header'}
+<p>
+	<a href="{php echo wurl('module/manage-system')}">管理模块</a>
+</p>
+<table class="table table-bordered">
+	<thead>
+	<tr>
+		<th width="60">#</th>
+		<th>模块</th>
+	</tr>
+	</thead>
+	<tbody>
+	{loop $user_module $module}
+	<tr>
+		<th scope="row"></th>
+		<td>
+			<div class="media">
+				<div class="media-left">
+					<a href="#">
+						<img width="60" class="media-object" src="{$module['logo']}">
+					</a>
+				</div>
+				<div class="media-body">
+					<h5 class="media-heading">{$module['title']}</h5>
+					<p>
+						<a href="#">进入</a> | <a href="#">启用</a>
+					</p>
+				</div>
+			</div>
+		</td>
+	</tr>
+	{/loop}
+	</tbody>
+</table>
+
+{template 'common/footer'}

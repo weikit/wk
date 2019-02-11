@@ -1,6 +1,9 @@
 <?php
 defined('ABSPATH') || exit;
 
+require_once ( __DIR__ . '/defines.php' );
+require_once ( __DIR__ . '/vendor/autoload.php' );
+
 if (SHORTINIT) {
     require_once ( ABSPATH . WPINC . '/class-wp-user.php' );
     require_once ( ABSPATH . WPINC . '/class-wp-roles.php' );
@@ -26,13 +29,9 @@ if (SHORTINIT) {
     define('YII_DEBUG', WP_DEBUG);
     define('YII_ENV', WP_DEBUG ? 'dev' : 'prod');
 
-    require __DIR__ . '/vendor/autoload.php';
     require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
 
-    $config = require __DIR__ . '/config/web.php';
+    $config = require ( __DIR__ . '/config/web.php' );
 
     (new weikit\core\Application($config))->run();
 })();
-
-// run需要wp的SHORTINIT模式来精简运行
-exit();
