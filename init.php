@@ -25,10 +25,11 @@ if (SHORTINIT) {
     require_once ( ABSPATH . WPINC . '/pluggable.php' );
 }
 
-(function() {
-    define('YII_DEBUG', WP_DEBUG);
-    define('YII_ENV', WP_DEBUG ? 'dev' : 'prod');
+define('YII_DEBUG', WP_DEBUG);
+define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
+define('YII_BEGIN_TIME', $timestart);
 
+(function() {
     require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
 
     $config = require ( __DIR__ . '/config/web.php' );

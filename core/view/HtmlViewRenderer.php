@@ -9,6 +9,7 @@ use yii\base\ViewNotFoundException;
 use yii\base\Controller;
 use yii\web\View;
 
+// TODO not used, remove?
 class HtmlViewRenderer extends ViewRenderer
 {
     /**

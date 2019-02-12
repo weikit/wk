@@ -58,13 +58,14 @@ $config = [
             ],
         ],
         'view' => [
-            'defaultExtension' => 'html',
-            'renderers' => [
-                'html' => [
-                    'class' => 'weikit\core\HtmlViewRenderer',
-                ],
-                // ...
-            ],
+            'class' => 'weikit\core\View',
+//            'defaultExtension' => 'html',
+//            'renderers' => [
+//                'html' => [
+//                    'class' => 'weikit\core\HtmlViewRenderer',
+//                ],
+//                // ...
+//            ],
         ],
     ],
     'params' => $params,
