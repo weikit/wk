@@ -5,7 +5,9 @@ namespace weikit\core;
 use Yii;
 use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
-use yii\view\ViewNotFoundException;
+use yii\base\ViewNotFoundException;
+use yii\base\Controller;
+use yii\web\View;
 
 class HtmlViewRenderer extends ViewRenderer
 {
@@ -17,7 +19,7 @@ class HtmlViewRenderer extends ViewRenderer
     /**
      * @return string
      */
-    public function getCachePath()
+    public function getCachePath(): string
     {
         if ($this->_cachePath === null) {
             $this->setCachePath(Yii::getAlias('@runtime/tpl'));
@@ -31,6 +33,22 @@ class HtmlViewRenderer extends ViewRenderer
     public function setCachePath(string $cachePath)
     {
         $this->cachePath = $cachePath;
+    }
+
+    /**
+     * @return Controller
+     */
+    public function getContext(): Controller
+    {
+        return Yii::$app->controller;
+    }
+
+    /**
+     * @return View
+     */
+    public function getView(): View
+    {
+        return $this->getContext()->getView();
     }
 
     /**
@@ -89,13 +107,8 @@ class HtmlViewRenderer extends ViewRenderer
 
     public function template($filename, $flag = TEMPLATE_DISPLAY) // TODO 更好的统一$this->render
     {
-        /* @var $controller yii\web\Controller */
-        $controller = Yii::$app->controller;
-        /* @var $view yii\web\View */
-        $view = $controller->getView();
-
         // TODO 应该通过View::findViewFile来同意返回路径
-        $file = $controller->getViewPath() . DIRECTORY_SEPARATOR . $filename . '.' . $view->defaultExtension;
+        $file = $this->getContext()->module->getViewPath() . '/' . $filename . '.' . $this->getView()->defaultExtension;
         $cacheFile = $this->getCacheFile($file);
         $this->checkFile($file, $cacheFile);
 

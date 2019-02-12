@@ -1,7 +1,4 @@
-
-{php do_action( 'admin_footer', '' );}
-{php do_action( 'admin_print_footer_scripts-' . $hook_suffix );}
-{php do_action( 'admin_print_footer_scripts' );}
-{php do_action( 'admin_footer-' . $hook_suffix );}
+{php $this->view->endBody() }
 </body>
 </html>
+{php $this->view->endPage() }

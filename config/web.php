@@ -49,6 +49,13 @@ $config = [
         'assetManager' => [
             'basePath' => '@weikit_path/web/assets',
             'baseUrl' => '@weikit/web/assets',
+            'bundles' => [
+                'yii\bootstrap\BootstrapPluginAsset' => [
+                    'jsOptions' => [
+                        'position' => yii\web\View::POS_HEAD
+                    ]
+                ],
+            ],
         ],
         'view' => [
             'defaultExtension' => 'html',

@@ -3,6 +3,7 @@
 namespace weikit\assets;
 
 use yii\web\AssetBundle;
+use yii\web\View;
 
 class IframeResizerContentAsset extends AssetBundle
 {
@@ -12,5 +13,8 @@ class IframeResizerContentAsset extends AssetBundle
     ];
     public $js = [
         'components/iframe-resizer/iframeResizer.contentWindow.js',
+    ];
+    public $jsOptions = [
+        'position' => View::POS_HEAD
     ];
 }

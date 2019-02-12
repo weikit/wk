@@ -16,6 +16,10 @@ class Application extends \yii\web\Application
      * @var string
      */
     public $controllerNamespace = 'weikit\controllers';
+    /**
+     * @var string|bool
+     */
+    public $layout = false;
 
     /**
      * Handles the specified request.
