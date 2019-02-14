@@ -12,8 +12,7 @@ use weikit\core\hooks\Plugin;
 
 defined('ABSPATH') || exit;
 
-require_once ( __DIR__ . '/defines.php' );
-require_once ( __DIR__ . '/vendor/autoload.php' );
+require_once ( __DIR__ . '/weikit.php' );
 
 if (is_admin()) {
     // web目录加入后台cookie中

@@ -15,11 +15,7 @@
 				alert('您使用的 IE 浏览器版本过低, 推荐使用 Chrome 浏览器或 IE8 及以上版本浏览器.');
 			}
 		}
-		{if !YII_DEBUG}
-		if(!parent.document.getElementById('adminmenu') && !parent.parent.document.getElementById('adminmenu')) {
-			location.href = "{php echo admin_url('admin.php?page=weikit')}";
-		}
-		{/if}
+
 	</script>
 	{php $this->head() }
 </head>

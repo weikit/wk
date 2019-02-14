@@ -1,10 +1,25 @@
 <?php
 defined('ABSPATH') || exit;
 
+define('YII_DEBUG', !WP_DEBUG);
+define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
+define('YII_BEGIN_TIME', $timestart);
+
 require_once ( __DIR__ . '/defines.php' );
 require_once ( __DIR__ . '/vendor/autoload.php' );
+require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
 
-if (SHORTINIT) {
+add_action('wk_init', function() { // 初始化Weikit
+    new weikit\core\Application(
+        apply_filters( 'wk_config', require ( __DIR__ . '/config/web.php' ) )
+    );
+});
+
+if (SHORTINIT) { // Wordpress精简运行模式(SHORTINIT)加载基本wordpress功能保证WeiKit最优性能运行
+    add_action('wk_run', function() { // 精简模式直接输出
+        Yii::$app->run();
+    });
+
     require_once ( ABSPATH . WPINC . '/class-wp-user.php' );
     require_once ( ABSPATH . WPINC . '/class-wp-roles.php' );
     require_once ( ABSPATH . WPINC . '/class-wp-role.php' );
@@ -23,16 +38,12 @@ if (SHORTINIT) {
     require_once ( ABSPATH . WPINC . '/kses.php' );
     require_once ( ABSPATH . WPINC . '/rest-api.php' );
     require_once ( ABSPATH . WPINC . '/pluggable.php' );
+
+    do_action( 'wk_init' );
+
+    do_action( 'wk_run' );
+} else { // 正常运行模式将在插件全部加载后运行
+    add_action('plugins_loaded', function() {
+        do_action('wk_init');
+    });
 }
-
-define('YII_DEBUG', WP_DEBUG);
-define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
-define('YII_BEGIN_TIME', $timestart);
-
-(function() {
-    require __DIR__ . '/vendor/yiisoft/yii2/Yii.php';
-
-    $config = require ( __DIR__ . '/config/web.php' );
-
-    (new weikit\core\Application($config))->run();
-})();
