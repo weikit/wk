@@ -5,13 +5,14 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'weikit',
+    'name' => 'Weikit',
     'basePath' => WEIKIT_PATH,
     'bootstrap' => ['log'],
     'aliases' => [
-        '@weikit_path' => WEIKIT_PATH,
-        '@weikit' => home_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
-        '@wp_path' => ABSPATH,
-        '@wp' => home_url(),
+        '@weikit' => WEIKIT_PATH,
+        '@weikit_url' => home_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
+        '@wp' => ABSPATH,
+        '@wp_url' => home_url(),
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
@@ -47,15 +48,19 @@ $config = [
             ],
         ],
         'assetManager' => [
-            'basePath' => '@weikit_path/web/assets',
-            'baseUrl' => '@weikit/web/assets',
+            'basePath' => '@weikit/web/assets',
+            'baseUrl' => '@weikit_url/web/assets',
             'bundles' => [
-                'yii\bootstrap\BootstrapPluginAsset' => [
-                    'jsOptions' => [
-                        'position' => yii\web\View::POS_HEAD
+                'yii\gii\GiiAsset' => [
+                    'depends' => [
+                        'yii\web\YiiAsset',
+                        'yii\bootstrap\BootstrapAsset',
+                        'yii\bootstrap\BootstrapPluginAsset',
+                        'yii\gii\TypeAheadAsset',
+                        'weikit\assets\IframeResizerContentAsset'
                     ]
-                ],
-            ],
+                ]
+            ]
         ],
         'view' => [
             'class' => 'weikit\core\View',
@@ -87,18 +92,13 @@ if (YII_ENV_DEV) {
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
         'panels' => [
-            'config' => ['class' => 'yii\debug\panels\ConfigPanel'],
-            'request' => ['class' => 'yii\debug\panels\RequestPanel'],
-            'log' => ['class' => 'yii\debug\panels\LogPanel'],
-            'profiling' => ['class' => 'yii\debug\panels\ProfilingPanel'],
-            'db' => ['class' => 'yii\debug\panels\DbPanel'],
-            'event' => ['class' => 'yii\debug\panels\EventPanel'],
-            'assets' => ['class' => 'yii\debug\panels\AssetPanel'],
-            'mail' => ['class' => 'yii\debug\panels\MailPanel'],
-            'timeline' => ['class' => 'yii\debug\panels\TimelinePanel'],
             'user' => null, // TODO wp user support
-            'router' => ['class' => 'yii\debug\panels\RouterPanel'],
         ]
+    ];
+
+    $config['bootstrap'][] = 'gii';
+    $config['modules']['gii'] = [
+        'class' => 'yii\gii\Module',
     ];
 }
 

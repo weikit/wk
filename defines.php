@@ -1,9 +1,5 @@
 <?php
 
-define('WEIKIT_FILE', __FILE__);
-define('WEIKIT_PATH', __DIR__);
-
-
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
 define('REGULAR_MOBILE', '/^\d{6,15}$/');
 define('REGULAR_USERNAME', '/^[\x{4e00}-\x{9fa5}a-z\d_\.]{3,15}$/iu');

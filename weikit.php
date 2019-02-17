@@ -1,13 +1,16 @@
 <?php
 defined('ABSPATH') || exit;
 
-define('YII_DEBUG', !WP_DEBUG);
+define('WEIKIT_FILE', __FILE__);
+define('WEIKIT_PATH', __DIR__);
+define('YII_DEBUG', WP_DEBUG);
 define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
 define('YII_BEGIN_TIME', $timestart);
 
 require_once ( __DIR__ . '/defines.php' );
 require_once ( __DIR__ . '/vendor/autoload.php' );
 require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
+require_once ( __DIR__ . '/core/helper.php');
 
 add_action('wk_init', function() { // 初始化Weikit
     new weikit\core\Application(

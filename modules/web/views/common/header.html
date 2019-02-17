@@ -2,7 +2,48 @@
 <div data-skin="default" class="skin-default">
     <div class="main">
         <div class="container-fluid">
-            <div class="page-header">
-                <h3>{php echo $this->title } <button class="btn btn-default btn-sm">123</button></h3>
-            </div>
+            <nav class="navbar navbar-default" style="margin-top: 15px;">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">{php echo Yii::$app->name}</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="active"><a href="#">平台 <span class="sr-only">(current)</span></a></li>
+                            <li><a href="{php echo wurl('module/index')}">模块</a></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a href="#">系统</a></li>
+                            <li><a href="/web/index.php/gii">Gii</a></li>
+                        </ul>
+
+                    </div>
+                </div>
+            </nav>
+
+            <ol class="breadcrumb">
+                <li><a href="#">平台</a></li>
+                <li class="active">公众号</li>
+            </ol>
+
             <div class="page-content">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item active">
+                                Cras justo odio
+                            </a>
+                            <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
+                            <a href="#" class="list-group-item">Morbi leo risus</a>
+                            <a href="#" class="list-group-item">Porta ac consectetur ac</a>
+                            <a href="#" class="list-group-item">Vestibulum at eros</a>
+                        </div>
+                    </div>
+                    <div class="col-md-9">

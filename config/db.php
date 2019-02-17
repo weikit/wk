@@ -8,7 +8,6 @@ return [
     'charset' => DB_CHARSET,
 
     // Schema cache options (for production environment)
-    //'enableSchemaCache' => true,
-    //'schemaCacheDuration' => 60,
+    'enableSchemaCache' => true,
     //'schemaCache' => 'cache',
 ];

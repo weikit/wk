@@ -84,7 +84,7 @@ trait HtmlViewTrait
         $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
             '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
             $str);
-        $str = preg_replace('/{php\s+(.+?)}/', '<?php $1?>', $str);
+        $str = preg_replace('/{php\s+([^}]+)*}/', '<?php $1?>', $str);
         $str = preg_replace('/{if\s+(.+?)}/', '<?php if($1) { ?>', $str);
         $str = preg_replace('/{else}/', '<?php } else { ?>', $str);
         $str = preg_replace('/{else ?if\s+(.+?)}/', '<?php } else if($1) { ?>', $str);
@@ -98,14 +98,13 @@ trait HtmlViewTrait
         $str = preg_replace('/{url\s+(\S+)\s+(array\(.+?\))}/', '<?php echo url($1, $2);?>', $str);
         $str = preg_replace('/{media\s+(\S+)}/', '<?php echo tomedia($1);?>', $str);
         $str = preg_replace_callback('/<\?php([^\?]+)\?>/s', [ $this, 'templateAddQuote' ], $str);
-        $str = preg_replace_callback('/{hook\s+(.+?)}/s', [ $this, 'templateModuleHookParser' ], $str);
-        $str = preg_replace('/{\/hook}/', '<?php ; ?>', $str);
         $str = preg_replace('/{([A-Z_\x7f-\xff][A-Z0-9_\x7f-\xff]*)}/s', '<?php echo $1;?>', $str);
         $str = str_replace('{##', '{', $str);
         $str = str_replace('##}', '}', $str);
         $str = "<?php defined('ABSPATH') || exit;?>\n" . $str;
 
         return $str;
+
     }
 
     public function templateAddQuote($matches)
@@ -114,10 +113,5 @@ trait HtmlViewTrait
         $code = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $code);
 
         return str_replace('\\\"', '\"', $code);
-    }
-
-    public function templateModuleHookParser($params = [])
-    {
-        return ''; // TODO
     }
 }

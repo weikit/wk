@@ -1,0 +1,46 @@
+{template 'common/header'}
+<div class="module-index">
+
+    <h1>{php echo yii\helpers\Html::encode($this->title) }</h1>
+
+    <p>
+        {php echo yii\helpers\Html::a('Create Module', ['create'], ['class' => 'btn btn-success']) }
+    </p>
+
+    {php echo yii\grid\GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => [
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'mid',
+            'name',
+            'type',
+            'title',
+            'version',
+            //'ability',
+            //'description',
+            //'author',
+            //'url:url',
+            //'settings',
+            //'subscribes',
+            //'handles',
+            //'isrulefields',
+            //'issystem',
+            //'target',
+            //'iscard',
+            //'permissions',
+            //'title_initial',
+            //'wxapp_support',
+            //'welcome_support',
+            //'oauth_type',
+            //'webapp_support',
+            //'phoneapp_support',
+            //'account_support',
+            //'xzapp_support',
+
+            ['class' => 'yii\grid\ActionColumn'],
+        ],
+    ]); }
+</div>
+{template 'common/footer'}

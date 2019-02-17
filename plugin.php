@@ -31,14 +31,13 @@ if (is_admin()) {
             'weikit',
             function() {
                 // 插件地址
-                $url = home_url('/web/index.php');
+                $url = home_url('/web/');
                 wp_enqueue_script('iframe-resizer', site_url('web/resource/components/iframe-resizer/iframeResizer.min.js'))
 ?>
+<style type="text/css">#wpcontent { margin-left: 140px; }</style>
 <iframe src="<?= $url ?>" id="wk_iframe" name="wk_iframe" frameborder="0" width="100%" scrolling="no"></iframe>
 <script type="text/javascript">
-  jQuery(function($) {
-    iFrameResize();
-  })
+  jQuery(function() { iFrameResize({ log: true, heightCalculationMethod: 'bodyScroll' }); })
 </script>
 <?php
             },
