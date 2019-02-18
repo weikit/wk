@@ -1,4 +1,15 @@
 {template 'common/header-base'}
+{php $menu = get_option('wk_web_menu', [
+    'account' => [
+        'label' => '平台',
+        'url' => ['/web/account/index'],
+    ],
+    'module' => [
+        'label' => '模块',
+        'url' => ['/web/module/index']
+    ]
+
+])}
 <div data-skin="default" class="skin-default">
     <div class="main">
         <div class="container-fluid">
@@ -13,17 +24,15 @@
                         </button>
                         <a class="navbar-brand" href="#">{php echo Yii::$app->name}</a>
                     </div>
-
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
-                            <li class="active"><a href="#">平台 <span class="sr-only">(current)</span></a></li>
-                            <li><a href="{php echo wurl('module/index')}">模块</a></li>
-                        </ul>
+                        {php echo yii\bootstrap\Nav::widget([
+                            'options' => ['class' => 'navbar-nav'],
+                            'items' => $menu,
+                        ]); }
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="#">系统</a></li>
                             <li><a href="/web/index.php/gii">Gii</a></li>
                         </ul>
-
                     </div>
                 </div>
             </nav>

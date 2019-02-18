@@ -7,9 +7,10 @@
         {php echo yii\helpers\Html::a('Create Module', ['create'], ['class' => 'btn btn-success']) }
     </p>
 
-    {php echo yii\grid\GridView::widget([
+    {php echo weikit\core\widgets\bootstrap\GridPanel::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 

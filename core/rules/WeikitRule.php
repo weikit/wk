@@ -13,6 +13,16 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
      */
     public function createUrl($manager, $route, $params)
     {
+        // TODO 解决UrlManager不能设置baseUrl的问题
+        $segments = explode('/', $route);
+        if (isset($segments[0]) && in_array($segments[0], ['web', 'app'])) {
+            $params = array_merge($params, [
+                'c' => $segments[1] ?? null,
+                'a' => $segments[2] ?? null,
+                'do' => $segments[3] ?? null,
+            ]);
+            return home_url('/' . $segments[0] . '/?' . http_build_query($params));
+        }
         return false;
     }
 

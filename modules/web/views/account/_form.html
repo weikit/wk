@@ -1,0 +1,26 @@
+
+    {php $form = yii\bootstrap\ActiveForm::begin([
+        'layout' => 'horizontal',
+    ]); }
+
+    {php echo  $form->field($model, 'uniacid')->textInput() }
+
+    {php echo  $form->field($model, 'hash')->textInput(['maxlength' => true]) }
+
+    {php echo  $form->field($model, 'type')->textInput() }
+
+    {php echo  $form->field($model, 'isconnect')->textInput() }
+
+    {php echo  $form->field($model, 'isdeleted')->textInput() }
+
+    {php echo  $form->field($model, 'endtime')->textInput() }
+
+    <div class="form-group ">
+        <div class="col-sm-offset-3 col-sm-9">
+            {php echo yii\helpers\Html::submitButton('Save', ['class' => 'btn btn-success']) }
+        </div>
+    </div>
+
+    {php yii\bootstrap\ActiveForm::end(); }
+
+
