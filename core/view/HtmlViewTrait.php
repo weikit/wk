@@ -84,7 +84,7 @@ trait HtmlViewTrait
         $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
             '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
             $str);
-        $str = preg_replace('/{php\s+([^}]+)*}/', '<?php $1?>', $str);
+        $str = preg_replace('/{php(\s([^{}]|{([^{}]*(?2))*})*)}/suU', '<?php$1?>', $str);
         $str = preg_replace('/{if\s+(.+?)}/', '<?php if($1) { ?>', $str);
         $str = preg_replace('/{else}/', '<?php } else { ?>', $str);
         $str = preg_replace('/{else ?if\s+(.+?)}/', '<?php } else if($1) { ?>', $str);

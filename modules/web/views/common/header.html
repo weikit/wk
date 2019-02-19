@@ -3,13 +3,26 @@
     'account' => [
         'label' => '平台',
         'url' => ['/web/account/index'],
+        'items' => [
+            'wechat' => [
+                'label' => '微信公众号',
+                'url' => ['/web/account/index'],
+            ],
+            'wxapp' => [
+                'label' => '微信小程序',
+                'url' => ['/web/account/wxapp'],
+            ],
+            'aliapp' => [
+                'label' => '支付宝小程序',
+                'url' => ['/web/account/aliapp'],
+            ],
+        ],
     ],
     'module' => [
         'label' => '模块',
-        'url' => ['/web/module/index']
+        'url' => ['/web/module/index'],
     ]
-
-])}
+]);}
 <div data-skin="default" class="skin-default">
     <div class="main">
         <div class="container-fluid">
@@ -27,8 +40,11 @@
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         {php echo yii\bootstrap\Nav::widget([
                             'options' => ['class' => 'navbar-nav'],
-                            'items' => $menu,
-                        ]); }
+                            'items' => array_map(function($data) {
+                                unset($data['items']);
+                                return $data;
+                            }, $menu),
+                        ]);}
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="#">系统</a></li>
                             <li><a href="/web/index.php/gii">Gii</a></li>
@@ -37,22 +53,13 @@
                 </div>
             </nav>
 
-            <ol class="breadcrumb">
-                <li><a href="#">平台</a></li>
-                <li class="active">公众号</li>
-            </ol>
-
             <div class="page-content">
                 <div class="row">
+                {if array_key_exists($this->context->id, $menu) && !empty($menu[$this->context->id]['items'])}
                     <div class="col-md-2">
-                        <div class="list-group">
-                            <a href="#" class="list-group-item active">
-                                Cras justo odio
-                            </a>
-                            <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
-                            <a href="#" class="list-group-item">Morbi leo risus</a>
-                            <a href="#" class="list-group-item">Porta ac consectetur ac</a>
-                            <a href="#" class="list-group-item">Vestibulum at eros</a>
-                        </div>
+                        {php echo yii\bootstrap\Nav::widget(['items' => $menu[$this->context->id]['items']])}
                     </div>
                     <div class="col-md-9">
+                {else}
+                    <div class="col-md-12">
+                {/if}
