@@ -3,5 +3,5 @@
 define( 'WP_ADMIN', true );
 define( 'SHORTINIT', true );
 
-require '../wp-load.php';
-require '../wp-content/plugins/wk/weikit.php';
+require dirname($_SERVER['SCRIPT_FILENAME'], 2) . '/wp-load.php';
+require ABSPATH . '/wp-content/plugins/wk/weikit.php';

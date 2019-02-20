@@ -15,22 +15,23 @@ class Plugin
     }
 
     public static $copies = [
-        WEIKIT_DIR . '/copy/app' => ABSPATH . 'app',
+        WEIKIT_PATH . '/copy/app' => ABSPATH . 'app',
 
-        WEIKIT_DIR . '/copy/web' => ABSPATH . 'web',
+        WEIKIT_PATH . '/copy/web' => ABSPATH . 'web',
     ];
 
     public static function activate()
     {
         foreach(static::$copies as $source => $target) {
-            if (is_file($source)) {
-                FileHelper::createDirectory(dirname($target));
-                if (!file_exists($target)) {
-                    copy($source, $target);
-                }
-            } else {
-                FileHelper::copyDirectory($source, $target);
-            }
+            @symlink($target, $source); // TODO 支持软连接和拷贝
+//            if (is_file($source)) {
+//                FileHelper::createDirectory(dirname($target));
+//                if (!file_exists($target)) {
+//                    copy($source, $target);
+//                }
+//            } else {
+//                FileHelper::copyDirectory($source, $target);
+//            }
         };
     }
 

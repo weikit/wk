@@ -6,8 +6,7 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
-use weikit\models\AccountWechat;
-use weikit\modules\web\services\AccountWechatService;
+use weikit\services\AccountWechatService;
 
 /**
  * AccountController implements the CRUD actions for Account model.
@@ -22,7 +21,7 @@ class WechatController extends Controller
     /**
      * @inheritdoc
      */
-    public function __construct(AccountWechatService $service, $id, $module, $config = [])
+    public function __construct($id, $module, AccountWechatService $service, $config = [])
     {
         $this->service = $service;
         parent::__construct($id, $module, $config);

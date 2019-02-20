@@ -4,14 +4,14 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model weikit\models\Account */
+/* @var $model weikit\models\AccountWechat */
 
-$this->title = $model->acid;
-$this->params['breadcrumbs'][] = ['label' => 'Accounts', 'url' => ['index']];
+$this->title = $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'Account Wechats', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="account-view">
+<div class="account-wechat-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -31,11 +31,24 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'acid',
             'uniacid',
-            'hash',
-            'type',
-            'isconnect',
-            'isdeleted',
-            'endtime:datetime',
+            'token',
+            'encodingaeskey',
+            'level',
+            'name',
+            'account',
+            'original',
+            'signature',
+            'country',
+            'province',
+            'city',
+            'username',
+            'password',
+            'lastupdate',
+            'key',
+            'secret',
+            'styleid',
+            'subscribeurl',
+            'auth_refresh_token',
         ],
     ]) ?>
 

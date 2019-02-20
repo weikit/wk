@@ -16,7 +16,7 @@ class ModuleService extends Service
     public function search(array $query)
     {
         $searchModel = new ModuleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search($query);
         return compact('searchModel', 'dataProvider');
     }
 
@@ -35,7 +35,7 @@ class ModuleService extends Service
      *
      * @return Module
      */
-    public function addIfRequest($requestOrData)
+    public function add($requestOrData)
     {
         $model = new Module();
 
@@ -56,7 +56,7 @@ class ModuleService extends Service
      *
      * @return Module|null
      */
-    public function editIfRequestById($id, $requestOrData)
+    public function editById($id, $requestOrData)
     {
         $model = $this->findById($id);
         if (

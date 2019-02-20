@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model weikit\modules\web\models\AccountSearch */
+/* @var $model weikit\models\AccountWechatSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="account-search">
+<div class="account-wechat-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -19,15 +19,41 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'uniacid') ?>
 
-    <?= $form->field($model, 'hash') ?>
+    <?= $form->field($model, 'token') ?>
 
-    <?= $form->field($model, 'type') ?>
+    <?= $form->field($model, 'encodingaeskey') ?>
 
-    <?= $form->field($model, 'isconnect') ?>
+    <?= $form->field($model, 'level') ?>
 
-    <?php // echo $form->field($model, 'isdeleted') ?>
+    <?php // echo $form->field($model, 'name') ?>
 
-    <?php // echo $form->field($model, 'endtime') ?>
+    <?php // echo $form->field($model, 'account') ?>
+
+    <?php // echo $form->field($model, 'original') ?>
+
+    <?php // echo $form->field($model, 'signature') ?>
+
+    <?php // echo $form->field($model, 'country') ?>
+
+    <?php // echo $form->field($model, 'province') ?>
+
+    <?php // echo $form->field($model, 'city') ?>
+
+    <?php // echo $form->field($model, 'username') ?>
+
+    <?php // echo $form->field($model, 'password') ?>
+
+    <?php // echo $form->field($model, 'lastupdate') ?>
+
+    <?php // echo $form->field($model, 'key') ?>
+
+    <?php // echo $form->field($model, 'secret') ?>
+
+    <?php // echo $form->field($model, 'styleid') ?>
+
+    <?php // echo $form->field($model, 'subscribeurl') ?>
+
+    <?php // echo $form->field($model, 'auth_refresh_token') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

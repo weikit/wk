@@ -5,6 +5,7 @@ namespace weikit\services;
 use yii\web\Request;
 use weikit\core\Service;
 use weikit\models\AccountWechat;
+use weikit\models\AccountWechatSearch;
 
 class AccountWechatService extends Service
 {
@@ -15,8 +16,8 @@ class AccountWechatService extends Service
      */
     public function search(array $query)
     {
-        $searchModel = new AccountSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $searchModel = new AccountWechatSearch();
+        $dataProvider = $searchModel->search($query);
         return compact('searchModel', 'dataProvider');
     }
 
@@ -35,7 +36,7 @@ class AccountWechatService extends Service
      *
      * @return AccountWechat
      */
-    public function addIfRequest($requestOrData)
+    public function add($requestOrData)
     {
         $model = new AccountWechat();
 
@@ -56,7 +57,7 @@ class AccountWechatService extends Service
      *
      * @return AccountWechat|null
      */
-    public function editIfRequestById($id, $requestOrData)
+    public function editById($id, $requestOrData)
     {
         $model = $this->findById($id);
         if (

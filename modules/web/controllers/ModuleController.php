@@ -2,13 +2,12 @@
 
 namespace weikit\modules\web\controllers;
 
-use weikit\modules\web\repositories\ModuleRepository;
+
 use Yii;
-use weikit\models\Module;
-use weikit\models\ModuleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use weikit\services\ModuleService;
 
 /**
  * ModuleController implements the CRUD actions for Module model.
@@ -23,7 +22,7 @@ class ModuleController extends Controller
     /**
      * @inheritdoc
      */
-    public function __construct(ModuleService $service, $id, $module, $config = [])
+    public function __construct($id, $module, ModuleService $service, $config = [])
     {
         $this->service = $service;
         parent::__construct($id, $module, $config);
@@ -76,7 +75,7 @@ class ModuleController extends Controller
      */
     public function actionCreate()
     {
-        $model = $this->service->addIfRequest(Yii::$app->getRequest());
+        $model = $this->service->add(Yii::$app->getRequest());
 
         if (!$model->getIsNewRecord()) {
             return $this->redirect(['view', 'id' => $model->acid]);
@@ -96,7 +95,7 @@ class ModuleController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->service->editIfRequestById($id, Yii::$app->getRequest());
+        $model = $this->service->editById($id, Yii::$app->getRequest());
 
         if ($model === null) {
             throw new NotFoundHttpException('The requested page does not exist.');

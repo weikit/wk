@@ -3,17 +3,45 @@
         'layout' => 'horizontal',
     ]); }
 
-    {php echo  $form->field($model, 'uniacid')->textInput() }
+    {php echo $form->field($model, 'acid')->textInput()}
 
-    {php echo  $form->field($model, 'hash')->textInput(['maxlength' => true]) }
+    {php echo $form->field($model, 'uniacid')->textInput()}
 
-    {php echo  $form->field($model, 'type')->textInput() }
+    {php echo $form->field($model, 'token')->textInput(['maxlength' => true])}
 
-    {php echo  $form->field($model, 'isconnect')->textInput() }
+    {php echo $form->field($model, 'encodingaeskey')->textInput(['maxlength' => true])}
 
-    {php echo  $form->field($model, 'isdeleted')->textInput() }
+    {php echo $form->field($model, 'level')->textInput()}
 
-    {php echo  $form->field($model, 'endtime')->textInput() }
+    {php echo $form->field($model, 'name')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'account')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'original')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'signature')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'country')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'province')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'city')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'username')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'password')->passwordInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'lastupdate')->textInput()}
+
+    {php echo $form->field($model, 'key')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'secret')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'styleid')->textInput()}
+
+    {php echo $form->field($model, 'subscribeurl')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'auth_refresh_token')->textInput(['maxlength' => true])}
 
     <div class="form-group ">
         <div class="col-sm-offset-3 col-sm-9">
