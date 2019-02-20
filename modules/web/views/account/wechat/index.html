@@ -1,16 +1,10 @@
 {template 'common/header'}
     <p>
-        {php echo yii\helpers\Html::a('Create Module', wurl('account/create'), ['class' => 'btn btn-success']) }
+        {php echo yii\helpers\Html::a('添加公众号', wurl('account/wechat/create'), ['class' => 'btn btn-success']) }
     </p>
     {php echo yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'options' => [
-            'class' => 'panel panel-default grid-view'
-        ],
-        'summaryOptions' => [
-            'class' => 'panel-heading summary'
-        ],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 

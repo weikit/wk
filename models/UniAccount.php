@@ -5,7 +5,7 @@ namespace weikit\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%ims_uni_account}}".
+ * This is the model class for table "{{%uni_account}}".
  *
  * @property int $uniacid
  * @property int $groupid
@@ -22,7 +22,7 @@ class UniAccount extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{ims_uni_account}}';
+        return '{{%uni_account}}';
     }
 
     /**

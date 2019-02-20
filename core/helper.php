@@ -8,13 +8,8 @@
  * @return string|void
  */
 function wurl($segment, $params = []) {
-    $segments = explode('/', $segment);
-    $params = array_merge($params, [
-        'c' => $segments[0] ?? null,
-        'a' => $segments[1] ?? null,
-        'do' => $segments[2] ?? null,
-    ]);
-    return home_url('/web/?' . http_build_query($params));
+    $params[0] = $segment;
+    return yii\helpers\Url::to($params);
 }
 
 function murl($segment, $params = [], $noRedirect = true, $addHost = false)

@@ -15,12 +15,9 @@ class Plugin
     }
 
     public static $copies = [
-        WEIKIT_DIR . '/we8/app/resource' => ABSPATH . 'app/resource',
-        WEIKIT_DIR . '/we8/app/index.php' => ABSPATH . 'app/index.php',
+        WEIKIT_DIR . '/copy/app' => ABSPATH . 'app',
 
-
-        WEIKIT_DIR . '/we8/web/resource' => ABSPATH . 'web/resource',
-        WEIKIT_DIR . '/we8/web/index.php' => ABSPATH . 'web/index.php',
+        WEIKIT_DIR . '/copy/web' => ABSPATH . 'web',
     ];
 
     public static function activate()

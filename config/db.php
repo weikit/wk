@@ -6,6 +6,7 @@ return [
     'username' => DB_USER,
     'password' => DB_PASSWORD,
     'charset' => DB_CHARSET,
+    'tablePrefix' => 'ims_',
 
     // Schema cache options (for production environment)
     'enableSchemaCache' => true,

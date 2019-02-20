@@ -1,12 +1,12 @@
 {template 'common/header-base'}
-{php $menu = get_option('wk_web_menu', [
+{php $__menu = get_option('wk_web_menu', [
     'account' => [
         'label' => '平台',
-        'url' => ['/web/account/index'],
+        'url' => ['/web/account/wechat/index'],
         'items' => [
             'wechat' => [
                 'label' => '微信公众号',
-                'url' => ['/web/account/index'],
+                'url' => ['/web/account/wechat/index'],
             ],
             'wxapp' => [
                 'label' => '微信小程序',
@@ -15,6 +15,12 @@
             'aliapp' => [
                 'label' => '支付宝小程序',
                 'url' => ['/web/account/aliapp'],
+                'items' => [
+                    'aliapp' => [
+                        'label' => '支付宝小程序',
+                        'url' => ['/web/account/aliapp'],
+                    ],
+                ]
             ],
         ],
     ],
@@ -35,7 +41,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="#">{php echo Yii::$app->name}</a>
+                        <a class="navbar-brand" href="{php echo Yii::$app->request->baseUrl}">{php echo Yii::$app->name}</a>
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         {php echo yii\bootstrap\Nav::widget([
@@ -43,7 +49,7 @@
                             'items' => array_map(function($data) {
                                 unset($data['items']);
                                 return $data;
-                            }, $menu),
+                            }, $__menu),
                         ]);}
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="#">系统</a></li>
@@ -54,12 +60,14 @@
             </nav>
 
             <div class="page-content">
-                <div class="row">
-                {if array_key_exists($this->context->id, $menu) && !empty($menu[$this->context->id]['items'])}
-                    <div class="col-md-2">
-                        {php echo yii\bootstrap\Nav::widget(['items' => $menu[$this->context->id]['items']])}
+                {php $__currentMenuId = explode('/', $this->context->id)[0]}
+                {if !empty($__menu[$__currentMenuId]['items'])}
+                    <div class="mb20">
+                        {php echo yii\bootstrap\Nav::widget([
+                            'options' => [
+                                'class' => 'nav-underline',
+                            ],
+                            'items' => $__menu[$__currentMenuId]['items']
+                        ])}
                     </div>
-                    <div class="col-md-9">
-                {else}
-                    <div class="col-md-12">
                 {/if}

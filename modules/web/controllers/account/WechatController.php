@@ -1,19 +1,32 @@
 <?php
 
-namespace weikit\modules\web\controllers;
+namespace weikit\modules\web\controllers\account;
 
 use Yii;
-use weikit\models\Account;
-use weikit\modules\web\models\AccountSearch;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
+use weikit\models\AccountWechat;
+use weikit\modules\web\services\AccountWechatService;
 
 /**
  * AccountController implements the CRUD actions for Account model.
  */
-class AccountController extends Controller
+class WechatController extends Controller
 {
+    /**
+     * @var AccountWechatService
+     */
+    protected $service;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct(AccountWechatService $service, $id, $module, $config = [])
+    {
+        $this->service = $service;
+        parent::__construct($id, $module, $config);
+    }
     /**
      * {@inheritdoc}
      */
@@ -35,13 +48,7 @@ class AccountController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new AccountSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        return $this->render('index', $this->service->search(Yii::$app->getRequest()->queryParams));
     }
 
     /**
@@ -52,8 +59,12 @@ class AccountController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->service->findById($id);
+        if ($model === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -64,9 +75,9 @@ class AccountController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Account();
+        $model = $this->service->addIfRequest(Yii::$app->getRequest());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if (!$model->getIsNewRecord()) {
             return $this->redirect(['view', 'id' => $model->acid]);
         }
 
@@ -84,10 +95,10 @@ class AccountController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->service->editIfRequestById($id, Yii::$app->getRequest());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->acid]);
+        if ($model === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
         }
 
         return $this->render('update', [
@@ -104,24 +115,8 @@ class AccountController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $this->service->deleteById($id);
 
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Account model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Account the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Account::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

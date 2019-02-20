@@ -48,8 +48,6 @@ $config = [
             ],
         ],
         'assetManager' => [
-            'basePath' => '@weikit/web/assets',
-            'baseUrl' => '@weikit_url/web/assets',
             'bundles' => [
                 'yii\gii\GiiAsset' => [
                     'depends' => [

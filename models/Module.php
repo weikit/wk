@@ -5,7 +5,7 @@ namespace weikit\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%ims_modules}}".
+ * This is the model class for table "{{%modules}}".
  *
  * @property int $mid
  * @property string $name
@@ -40,7 +40,7 @@ class Module extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{ims_modules}}';
+        return '{{%modules}}';
     }
 
     /**
