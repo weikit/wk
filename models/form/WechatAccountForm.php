@@ -74,7 +74,7 @@ class WechatAccountForm extends Model
     /**
      * 创建微信公众号账号
      *
-     * @return Account
+     * @return WechatAccount
      * @throws ModelValidationException
      * @throws \Throwable
      * @throws \yii\base\InvalidConfigException
@@ -85,8 +85,7 @@ class WechatAccountForm extends Model
             throw new ModelValidationException($this);
         }
 
-        /* @var $uniAccount UniAccount */
-        $uniAccount = Yii::createObject(UniAccount::class);
+        $uniAccount = new UniAccount();
         return $uniAccount->getDb()->transaction(function() use ($uniAccount) {
 
             // 1. 创建UniAccount
@@ -101,8 +100,7 @@ class WechatAccountForm extends Model
             $uniAccount->save(false);
 
             // 2. 创建Account
-            /* @var $account Account */
-            $account = Yii::createObject(Account::class);
+            $account = new Account();
             $account->setAttributes([
                 'uniacid' => $uniAccount->uniacid,
                 'type' => '',
@@ -118,7 +116,7 @@ class WechatAccountForm extends Model
             $account->save(false);
 
             // 3. 创建AccountWechat
-            $wechatAccount = Yii::createObject(WechatAccount::class);
+            $wechatAccount = new WechatAccount();
             $wechatAccount->setAttributes([
                 'acid' => $account->acid,
                 'uniacid' => $uniAccount->uniacid,

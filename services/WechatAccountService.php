@@ -12,6 +12,17 @@ use weikit\models\form\WechatAccountForm;
 class WechatAccountService extends BaseService
 {
     /**
+     * @param $acid
+     *
+     * @return WechatAccount|null
+     * @throws weikit\core\exceptions\ModelValidationException
+     */
+    public function findByAcid($id)
+    {
+        return WechatAccount::tryFindOne($id);
+    }
+
+    /**
      * @param array $query
      *
      * @return array
@@ -32,7 +43,7 @@ class WechatAccountService extends BaseService
      */
     public function add($requestOrData)
     {
-        $model = Yii::createObject(WechatAccountForm::class);
+        $model = new WechatAccountForm();
 
         if (
             $requestOrData instanceof Request ?
@@ -46,16 +57,16 @@ class WechatAccountService extends BaseService
     }
 
     /**
-     * @param $id
+     * @param $acid
      * @param $requestOrData
      *
      * @return WechatAccount
      * @throws \weikit\core\exceptions\ModelNotFoundException
      * @throws \weikit\core\exceptions\ModelValidationException
      */
-    public function editById($id, $requestOrData)
+    public function editByAcid($acid, $requestOrData)
     {
-        $model = WechatAccount::tryFindOne($id);
+        $model = $this->findByAcid($acid);
         if (
             $requestOrData instanceof Request ?
             $model->load($requestOrData->post()) :
@@ -67,16 +78,16 @@ class WechatAccountService extends BaseService
     }
 
     /**
-     * @param $id
+     * @param $acid
      *
      * @return false|int
      * @throws \weikit\core\exceptions\ModelNotFoundException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function deleteById($id)
+    public function deleteByAcid($acid)
     {
-        $model = WechatAccount::tryFindOne($id);
+        $model = $this->findByAcid($acid);
 
         return $model->delete();
     }

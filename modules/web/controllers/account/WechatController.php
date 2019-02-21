@@ -58,9 +58,9 @@ class WechatController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($acid)
     {
-        $model = $this->service->findById($id);
+        $model = $this->service->findByAcid($acid);
         if ($model === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
@@ -79,7 +79,7 @@ class WechatController extends Controller
         $model = $this->service->add(Yii::$app->getRequest());
 
         if ($model instanceof WechatAccount) {
-            return $this->redirect(['view', 'id' => $model->acid]);
+            return $this->redirect(['view', 'acid' => $model->acid]);
         }
 
         return $this->render('create', [
@@ -90,13 +90,13 @@ class WechatController extends Controller
     /**
      * Updates an existing Account model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param integer $acid
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($acid)
     {
-        $model = $this->service->editById($id, Yii::$app->getRequest());
+        $model = $this->service->editByAcid($acid, Yii::$app->getRequest());
 
         if ($model === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -114,10 +114,25 @@ class WechatController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($acid)
     {
-        $this->service->deleteById($id);
+        $this->service->editByAcid($acid);
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     *
+     * @param $acid
+     *
+     * @return string
+     */
+    public function actionGuide($acid)
+    {
+        $model = $this->service->findByAcid($acid);
+
+        return $this->render('guide', [
+            'model' => $model,
+        ]);
     }
 }
