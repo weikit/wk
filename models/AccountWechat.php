@@ -2,6 +2,7 @@
 
 namespace weikit\models;
 
+use weikit\core\db\ActiveRecord;
 use Yii;
 
 /**
@@ -28,8 +29,36 @@ use Yii;
  * @property string $subscribeurl
  * @property string $auth_refresh_token
  */
-class AccountWechat extends \yii\db\ActiveRecord
+class AccountWechat extends ActiveRecord
 {
+    /**
+     * 普通订阅号
+     */
+    const LEVEL_SUBSCRIBE = 1;
+    /**
+     * 普通服务号
+     */
+    const LEVEL_SERVICE = 2;
+    /**
+     * 认证订阅号
+     */
+    const LEVEL_SUBSCRIBE_VERIFY = 3;
+    /**
+     * 认证服务号
+     */
+    const TYPE_SERVICE_VERIFY = 4;
+
+    /**
+     * 公众号类型列表
+     * @var array
+     */
+    public static $levels = [
+        self::LEVEL_SUBSCRIBE => '订阅号',
+        self::LEVEL_SERVICE => '认证订阅号',
+        self::LEVEL_SUBSCRIBE_VERIFY => '认证订阅号',
+        self::TYPE_SERVICE_VERIFY => '认证服务号/认证媒体/政府订阅号',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -42,19 +71,14 @@ class AccountWechat extends \yii\db\ActiveRecord
      * {@inheritdoc}
      */
     public function rules()
-    {
+    { // TODO 清除无用字段
         return [
-            [['acid', 'uniacid', 'token', 'encodingaeskey', 'level', 'name', 'account', 'original', 'signature', 'country', 'province', 'city', 'username', 'password', 'lastupdate', 'key', 'secret', 'styleid', 'subscribeurl', 'auth_refresh_token'], 'required'],
-            [['acid', 'uniacid', 'level', 'lastupdate', 'styleid'], 'integer'],
-            [['token', 'password'], 'string', 'max' => 32],
-            [['encodingaeskey', 'auth_refresh_token'], 'string', 'max' => 255],
-            [['name', 'account', 'username'], 'string', 'max' => 30],
-            [['original', 'key', 'secret'], 'string', 'max' => 50],
+            [['acid', 'uniacid', 'name', 'account', 'original', 'level', 'key', 'secret'], 'required'],
+            [['acid', 'uniacid', 'level', 'styleid'], 'integer'],
+            [['token'], 'string', 'max' => 32],
             [['signature'], 'string', 'max' => 100],
-            [['country'], 'string', 'max' => 10],
-            [['province'], 'string', 'max' => 3],
-            [['city'], 'string', 'max' => 15],
-            [['subscribeurl'], 'string', 'max' => 120],
+            [['original', 'key', 'secret'], 'string', 'max' => 50],
+            [['encodingaeskey'], 'string', 'max' => 255],
             [['acid'], 'unique'],
         ];
     }
@@ -69,10 +93,10 @@ class AccountWechat extends \yii\db\ActiveRecord
             'uniacid' => 'Uniacid',
             'token' => 'Token',
             'encodingaeskey' => 'Encodingaeskey',
-            'level' => 'Level',
-            'name' => 'Name',
-            'account' => 'Account',
-            'original' => 'Original',
+            'level' => '公众号类型',
+            'name' => '公众号名称',
+            'account' => '公众号账号',
+            'original' => '原始ID',
             'signature' => 'Signature',
             'country' => 'Country',
             'province' => 'Province',
@@ -80,8 +104,8 @@ class AccountWechat extends \yii\db\ActiveRecord
             'username' => 'Username',
             'password' => 'Password',
             'lastupdate' => 'Lastupdate',
-            'key' => 'Key',
-            'secret' => 'Secret',
+            'key' => 'AppID',
+            'secret' => 'AppSecret',
             'styleid' => 'Styleid',
             'subscribeurl' => 'Subscribeurl',
             'auth_refresh_token' => 'Auth Refresh Token',

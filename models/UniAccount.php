@@ -2,6 +2,7 @@
 
 namespace weikit\models;
 
+use weikit\core\db\ActiveRecord;
 use Yii;
 
 /**
@@ -15,7 +16,7 @@ use Yii;
  * @property int $rank
  * @property string $title_initial
  */
-class UniAccount extends \yii\db\ActiveRecord
+class UniAccount extends ActiveRecord
 {
     /**
      * {@inheritdoc}

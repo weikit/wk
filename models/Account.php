@@ -2,6 +2,7 @@
 
 namespace weikit\models;
 
+use weikit\core\db\ActiveRecord;
 use Yii;
 
 /**
@@ -15,7 +16,7 @@ use Yii;
  * @property int $isdeleted
  * @property int $endtime
  */
-class Account extends \yii\db\ActiveRecord
+class Account extends ActiveRecord
 {
     /**
      * {@inheritdoc}

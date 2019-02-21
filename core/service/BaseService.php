@@ -2,8 +2,7 @@
 
 namespace weikit\core\service;
 
-
-abstract class Repository
+abstract class Service
 {
 
 }

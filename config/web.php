@@ -8,6 +8,7 @@ $config = [
     'name' => 'Weikit',
     'basePath' => WEIKIT_PATH,
     'bootstrap' => ['log'],
+    'language' => 'zh-CN',
     'aliases' => [
         '@weikit' => WEIKIT_PATH,
         '@weikit_url' => home_url(str_replace(ABSPATH, '', WEIKIT_PATH)),

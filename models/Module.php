@@ -2,6 +2,7 @@
 
 namespace weikit\models;
 
+use weikit\core\db\ActiveRecord;
 use Yii;
 
 /**
@@ -33,7 +34,7 @@ use Yii;
  * @property int $account_support
  * @property int $xzapp_support
  */
-class Module extends \yii\db\ActiveRecord
+class Module extends ActiveRecord
 {
     /**
      * {@inheritdoc}

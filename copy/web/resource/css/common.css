@@ -17,6 +17,14 @@ body {
 }
 
 /* BOOTSTRAP RESET */
+.form-group.required .control-label:after {
+    color: #d00;
+    content: "*";
+    position: absolute;
+    margin-left: 2px;
+    top: 8px;
+
+}
 .nav-underline {
     border-bottom: 1px solid #d1d5da;
     margin-bottom: -1px;

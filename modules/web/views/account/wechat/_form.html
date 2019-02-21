@@ -3,6 +3,18 @@
         'layout' => 'horizontal',
     ]); }
 
+    {php echo $form->field($model, 'name')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'account')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'original')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'level')->dropdownList(weikit\models\AccountWechat::$levels)}
+
+    {php echo $form->field($model, 'key')->textInput(['maxlength' => true])}
+
+    {php echo $form->field($model, 'secret')->textInput(['maxlength' => true])}
+
     {php echo $form->field($model, 'acid')->textInput()}
 
     {php echo $form->field($model, 'uniacid')->textInput()}
@@ -10,14 +22,6 @@
     {php echo $form->field($model, 'token')->textInput(['maxlength' => true])}
 
     {php echo $form->field($model, 'encodingaeskey')->textInput(['maxlength' => true])}
-
-    {php echo $form->field($model, 'level')->textInput()}
-
-    {php echo $form->field($model, 'name')->textInput(['maxlength' => true])}
-
-    {php echo $form->field($model, 'account')->textInput(['maxlength' => true])}
-
-    {php echo $form->field($model, 'original')->textInput(['maxlength' => true])}
 
     {php echo $form->field($model, 'signature')->textInput(['maxlength' => true])}
 
@@ -32,10 +36,6 @@
     {php echo $form->field($model, 'password')->passwordInput(['maxlength' => true])}
 
     {php echo $form->field($model, 'lastupdate')->textInput()}
-
-    {php echo $form->field($model, 'key')->textInput(['maxlength' => true])}
-
-    {php echo $form->field($model, 'secret')->textInput(['maxlength' => true])}
 
     {php echo $form->field($model, 'styleid')->textInput()}
 

@@ -74,7 +74,7 @@ class WechatController extends Controller
      */
     public function actionCreate()
     {
-        $model = $this->service->addIfRequest(Yii::$app->getRequest());
+        $model = $this->service->add(Yii::$app->getRequest());
 
         if (!$model->getIsNewRecord()) {
             return $this->redirect(['view', 'id' => $model->acid]);
@@ -94,7 +94,7 @@ class WechatController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->service->editIfRequestById($id, Yii::$app->getRequest());
+        $model = $this->service->editById($id, Yii::$app->getRequest());
 
         if ($model === null) {
             throw new NotFoundHttpException('The requested page does not exist.');
