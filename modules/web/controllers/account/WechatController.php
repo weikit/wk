@@ -2,11 +2,12 @@
 
 namespace weikit\modules\web\controllers\account;
 
+use weikit\models\WechatAccount;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
-use weikit\services\AccountWechatService;
+use weikit\services\WechatAccountService;
 
 /**
  * AccountController implements the CRUD actions for Account model.
@@ -14,18 +15,19 @@ use weikit\services\AccountWechatService;
 class WechatController extends Controller
 {
     /**
-     * @var AccountWechatService
+     * @var WechatAccountService
      */
     protected $service;
 
     /**
      * @inheritdoc
      */
-    public function __construct($id, $module, AccountWechatService $service, $config = [])
+    public function __construct($id, $module, WechatAccountService $service, $config = [])
     {
         $this->service = $service;
         parent::__construct($id, $module, $config);
     }
+
     /**
      * {@inheritdoc}
      */
@@ -76,7 +78,7 @@ class WechatController extends Controller
     {
         $model = $this->service->add(Yii::$app->getRequest());
 
-        if (!$model->getIsNewRecord()) {
+        if ($model instanceof WechatAccount) {
             return $this->redirect(['view', 'id' => $model->acid]);
         }
 

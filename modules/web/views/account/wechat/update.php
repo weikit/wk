@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model weikit\models\AccountWechat */
+/* @var $model weikit\models\WechatAccount */
 
 $this->title = 'Update Account Wechat: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Account Wechats', 'url' => ['index']];

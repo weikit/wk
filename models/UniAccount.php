@@ -9,8 +9,8 @@ use Yii;
  * This is the model class for table "{{%uni_account}}".
  *
  * @property int $uniacid
- * @property int $groupid
- * @property string $name
+ * @property int $groupid // TODO 字段非空, 待优化移除
+ * @property string $name // TODO 字段非空, 待优化移除
  * @property string $description
  * @property int $default_acid
  * @property int $rank
@@ -32,12 +32,20 @@ class UniAccount extends ActiveRecord
     public function rules()
     {
         return [
-            [['groupid', 'name', 'description', 'default_acid', 'title_initial'], 'required'],
-            [['groupid', 'default_acid', 'rank'], 'integer'],
-            [['name'], 'string', 'max' => 100],
-            [['description'], 'string', 'max' => 255],
+            [['name'], 'required'],
+            [['rank'], 'integer'],
+            [['title_initial'], 'default', 'value' => [$this, 'defaultTitleInitial']],
             [['title_initial'], 'string', 'max' => 1],
+            [['description'], 'string', 'max' => 255],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function defaultTitleInitial($name)
+    {
+        return strtoupper(Yii::$app->pinyin->firstChar($name ?? $this->name));
     }
 
     /**

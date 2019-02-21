@@ -4,6 +4,7 @@ namespace weikit\core;
 
 use Yii;
 use yii\web\Request;
+use yii\web\Response;
 use yii\web\NotFoundHttpException;
 use yii\web\UrlNormalizerRedirectException;
 use yii\helpers\Url;

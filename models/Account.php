@@ -53,4 +53,28 @@ class Account extends ActiveRecord
             'endtime' => 'Endtime',
         ];
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUniAccount()
+    {
+        return $this->hasOne(UniAccount::class, ['uniacid' => 'uniacid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWechatAccount()
+    {
+        return $this->hasOne(WechatAccount::class, ['acid' => 'acid']);
+    }
+
+    /**
+     * @return string
+     */
+    public static function generateHash()
+    {
+        return Yii::$app->security->generateRandomString(8);
+    }
 }

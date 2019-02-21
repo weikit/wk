@@ -26,20 +26,24 @@ class ActiveRecord extends \yii\db\ActiveRecord
     /**
      * @see ActiveRecord::save
      *
+     * @return bool
+     * @throws ModelValidationException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
-    public function trySave($runValidation = true, $attributeNames = null)
+    public function trySave($attributeNames = null)
     {
-        if ($runValidation) {
-            if(!$this->validate($attributeNames)) {
-                $title = $this->getIsNewRecord() ? 'inserted' : 'updated';
-                Yii::info('Model not ' . $title . ' to validation error.', __METHOD__);
-                throw new ModelValidationException($this);
-            }
+        $isNewRecord = $this->getIsNewRecord();
 
-            $runValidation = false;
+        if(!$this->validate($attributeNames)) {
+            $title = $isNewRecord ? 'inserted' : 'updated';
+            Yii::info('Model not ' . $title . ' to validation error.', __METHOD__);
+            throw new ModelValidationException($this);
         }
 
-        if ($this->getIsNewRecord()) {
+        $runValidation = false;
+
+        if ($isNewRecord) {
             return $this->insert($runValidation, $attributeNames);
         }
 

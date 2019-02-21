@@ -29,7 +29,7 @@ use Yii;
  * @property string $subscribeurl
  * @property string $auth_refresh_token
  */
-class AccountWechat extends ActiveRecord
+class WechatAccount extends ActiveRecord
 {
     /**
      * 普通订阅号
@@ -53,7 +53,7 @@ class AccountWechat extends ActiveRecord
      * @var array
      */
     public static $levels = [
-        self::LEVEL_SUBSCRIBE => '订阅号',
+        self::LEVEL_SUBSCRIBE => '普通订阅号',
         self::LEVEL_SERVICE => '认证订阅号',
         self::LEVEL_SUBSCRIBE_VERIFY => '认证订阅号',
         self::TYPE_SERVICE_VERIFY => '认证服务号/认证媒体/政府订阅号',
@@ -71,7 +71,7 @@ class AccountWechat extends ActiveRecord
      * {@inheritdoc}
      */
     public function rules()
-    { // TODO 清除无用字段
+    {
         return [
             [['acid', 'uniacid', 'name', 'account', 'original', 'level', 'key', 'secret'], 'required'],
             [['acid', 'uniacid', 'level', 'styleid'], 'integer'],
@@ -97,6 +97,8 @@ class AccountWechat extends ActiveRecord
             'name' => '公众号名称',
             'account' => '公众号账号',
             'original' => '原始ID',
+            'key' => 'AppID',
+            'secret' => 'AppSecret',
             'signature' => 'Signature',
             'country' => 'Country',
             'province' => 'Province',
@@ -104,11 +106,45 @@ class AccountWechat extends ActiveRecord
             'username' => 'Username',
             'password' => 'Password',
             'lastupdate' => 'Lastupdate',
-            'key' => 'AppID',
-            'secret' => 'AppSecret',
+
             'styleid' => 'Styleid',
             'subscribeurl' => 'Subscribeurl',
             'auth_refresh_token' => 'Auth Refresh Token',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUniAccount()
+    {
+        return $this->hasOne(UniAccount::class, ['uniacid' => 'uniacid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAccount()
+    {
+        return $this->hasOne(WechatAccount::class, ['acid' => 'acid']);
+    }
+
+    /**
+     *
+     * @return string
+     * @throws \yii\base\Exception
+     */
+    public static function generateToken()
+    {
+        return Yii::$app->security->generateRandomString(32);
+    }
+
+    /**
+     * @return string
+     * @throws \yii\base\Exception
+     */
+    public static function generateEncodingAesKey()
+    {
+        return Yii::$app->security->generateRandomString(43);
     }
 }

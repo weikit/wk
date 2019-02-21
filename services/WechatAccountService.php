@@ -4,11 +4,12 @@ namespace weikit\services;
 
 use Yii;
 use yii\web\Request;
-use weikit\models\AccountWechat;
-use weikit\core\service\Service;
-use weikit\models\AccountWechatSearch;
+use weikit\models\WechatAccount;
+use weikit\core\service\BaseService;
+use weikit\models\WechatAccountSearch;
+use weikit\models\form\WechatAccountForm;
 
-class AccountWechatService extends Service
+class WechatAccountService extends BaseService
 {
     /**
      * @param array $query
@@ -17,47 +18,28 @@ class AccountWechatService extends Service
      */
     public function search(array $query)
     {
-        $searchModel = new AccountWechatSearch();
+        $searchModel = new WechatAccountSearch();
         $dataProvider = $searchModel->search($query);
         return compact('searchModel', 'dataProvider');
     }
 
     /**
-     * @param Request|array $request
+     * 添加微信公众号账户
      *
-     * @return AccountWechat
+     * @param Request|array $requestOrData
+     *
+     * @return AccountWechatForm|WechatAccount 添加成功返回Account, 失败返回AccountWechatForm
      */
     public function add($requestOrData)
     {
-        $model = new AccountWechat();
+        $model = Yii::createObject(WechatAccountForm::class);
 
         if (
             $requestOrData instanceof Request ?
             $model->load($requestOrData->post()) :
             $model->load($requestOrData, '')
         ) {
-            $model->getDb()->transaction(function() use ($model) {
-                /* @var $accountService AccountService */
-                $accountService = Yii::createObject(AccountService::class);
-
-                $uniAccount = $accountService->addUniAccount([
-                    'name' => $model->name,
-                ]);
-                if (!$uniAccount->isNewRecord) {
-                    // TODO throw error if save fail
-                }
-
-                $account = $accountService->add([
-                    'uniacid' => $uniAccount->uniacid,
-                ]);
-                if (!$account->isNewRecord) {
-                    // TODO throw error if save fail
-                }
-
-                $model->uniacid = $account->uniacid;
-                $model->acid = $account->acid;
-                $model->save();
-            });
+            return $model->tryAdd();
         }
 
         return $model;
@@ -67,13 +49,13 @@ class AccountWechatService extends Service
      * @param $id
      * @param $requestOrData
      *
-     * @return AccountWechat
+     * @return WechatAccount
      * @throws \weikit\core\exceptions\ModelNotFoundException
      * @throws \weikit\core\exceptions\ModelValidationException
      */
     public function editById($id, $requestOrData)
     {
-        $model = AccountWechat::tryFindOne($id);
+        $model = WechatAccount::tryFindOne($id);
         if (
             $requestOrData instanceof Request ?
             $model->load($requestOrData->post()) :
@@ -94,7 +76,7 @@ class AccountWechatService extends Service
      */
     public function deleteById($id)
     {
-        $model = AccountWechat::tryFindOne($id);
+        $model = WechatAccount::tryFindOne($id);
 
         return $model->delete();
     }

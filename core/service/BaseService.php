@@ -2,7 +2,7 @@
 
 namespace weikit\core\service;
 
-abstract class Service
+abstract class BaseService
 {
 
 }

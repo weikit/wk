@@ -4,12 +4,12 @@ namespace weikit\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use weikit\models\AccountWechat;
+use weikit\models\WechatAccount;
 
 /**
  * AccountWechatSearch represents the model behind the search form of `weikit\models\AccountWechat`.
  */
-class AccountWechatSearch extends AccountWechat
+class WechatAccountSearch extends WechatAccount
 {
     /**
      * {@inheritdoc}
@@ -40,7 +40,7 @@ class AccountWechatSearch extends AccountWechat
      */
     public function search($params)
     {
-        $query = AccountWechat::find();
+        $query = WechatAccount::find();
 
         // add conditions that should always apply here
 

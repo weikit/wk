@@ -2,42 +2,10 @@
 
 namespace weikit\services;
 
-use yii\web\Request;
-use weikit\models\Account;
-use weikit\models\UniAccount;
-use weikit\core\service\Service;
+use weikit\core\service\BaseService;
 
-class AccountService extends Service
+class AccountService extends BaseService
 {
 
-    public function add($requestOrData)
-    {
-        $model = new Account();
-
-        if (
-            $requestOrData instanceof Request ?
-            $model->load($requestOrData->post()) :
-            $model->load($requestOrData, '')
-        ) {
-            $model->trySave();
-        }
-
-        return $model;
-    }
-
-    public function addUniAccount($requestOrData)
-    {
-        $model = new UniAccount();
-
-        if (
-            $requestOrData instanceof Request ?
-            $model->load($requestOrData->post()) :
-            $model->load($requestOrData, '')
-        ) {
-            $model->trySave();
-        }
-
-        return $model;
-    }
 
 }

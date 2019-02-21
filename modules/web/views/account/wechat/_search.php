@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model weikit\models\AccountWechatSearch */
+/* @var $model weikit\models\WechatAccountSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
