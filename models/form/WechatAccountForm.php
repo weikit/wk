@@ -2,15 +2,14 @@
 
 namespace weikit\models\form;
 
-use Yii;
 use yii\base\Model;
-use weikit\models\Account;
-use weikit\models\UniAccount;
 use weikit\models\WechatAccount;
-use weikit\core\exceptions\ModelValidationException;
+use weikit\core\db\ModelTryTrait;
 
 class WechatAccountForm extends Model
 {
+    use ModelTryTrait;
+
     /**
      * @var string
      */
@@ -69,84 +68,5 @@ class WechatAccountForm extends Model
             'key' => 'AppID',
             'secret' => 'AppSecret',
         ];
-    }
-
-    /**
-     * 创建微信公众号账号
-     *
-     * @return WechatAccount
-     * @throws ModelValidationException
-     * @throws \Throwable
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function tryAdd()
-    {
-        if (!$this->validate()) {
-            throw new ModelValidationException($this);
-        }
-
-        $uniAccount = new UniAccount();
-        return $uniAccount->getDb()->transaction(function() use ($uniAccount) {
-
-            // 1. 创建UniAccount
-            $uniAccount->setAttributes([
-                'name' => $this->name,
-                'description' => $this->description,
-                'title_initial' => $uniAccount->defaultTitleInitial($this->name),
-
-                'groupid' => 0, // TODO remove
-                'default_acid' => 0, // TODO remove
-            ], false);
-            $uniAccount->save(false);
-
-            // 2. 创建Account
-            $account = new Account();
-            $account->setAttributes([
-                'uniacid' => $uniAccount->uniacid,
-                'type' => '',
-                'hash' => Account::generateHash(),
-
-                'isconnect' => 0, // TODO fix
-                'isdeleted' => 0, // TODO fix
-                'endtime' => 0, // TODO fix
-
-                'type' => 1, // TODO remove or fix
-
-            ], false);
-            $account->save(false);
-
-            // 3. 创建AccountWechat
-            $wechatAccount = new WechatAccount();
-            $wechatAccount->setAttributes([
-                'acid' => $account->acid,
-                'uniacid' => $uniAccount->uniacid,
-                'name' => $this->name,
-                'account' => $this->account,
-                'original' => $this->original,
-                'level' => $this->level,
-                'key' => $this->key,
-                'secret' => $this->secret,
-                'token' => WechatAccount::generateToken(),
-                'encodingaeskey' => WechatAccount::generateEncodingAesKey(),
-
-                'signature' => '', // TODO remove or fix
-                'country' => '', // TODO remove or fix
-                'province' => '', // TODO remove or fix
-                'city' => '', // TODO remove or fix
-                'username' => '', // TODO remove or fix
-                'password' => '', // TODO remove or fix
-                'lastupdate' => 0, // TODO fix
-                'styleid' => 0, // TODO remove or fix
-                'subscribeurl' => '', // TODO remove or fix
-                'auth_refresh_token' => '', // TODO remove or fix
-            ], false);
-            $wechatAccount->save(false);
-
-            $account->populateRelation('uniAccount', $uniAccount);
-            $account->populateRelation('wechatAccount', $wechatAccount);
-
-            // 成功返回WechatAccount
-            return $wechatAccount;
-        });
     }
 }

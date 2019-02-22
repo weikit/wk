@@ -2,12 +2,12 @@
 
 namespace weikit\core\db;
 
-use weikit\core\exceptions\ModelValidationException;
-use Yii;
 use weikit\core\exceptions\ModelNotFoundException;
 
 class ActiveRecord extends \yii\db\ActiveRecord
 {
+    use ModelTryTrait;
+
     /**
      * @see ActiveRecord::save
      * @throws ModelNotFoundException if model not find
@@ -27,23 +27,17 @@ class ActiveRecord extends \yii\db\ActiveRecord
      * @see ActiveRecord::save
      *
      * @return bool
-     * @throws ModelValidationException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
+     * @throws weikit\core\exceptions\ModelValidationException
      */
     public function trySave($attributeNames = null)
     {
-        $isNewRecord = $this->getIsNewRecord();
-
-        if(!$this->validate($attributeNames)) {
-            $title = $isNewRecord ? 'inserted' : 'updated';
-            Yii::info('Model not ' . $title . ' to validation error.', __METHOD__);
-            throw new ModelValidationException($this);
-        }
+        $this->tryValidate($attributeNames);
 
         $runValidation = false;
 
-        if ($isNewRecord) {
+        if ($this->getIsNewRecord()) {
             return $this->insert($runValidation, $attributeNames);
         }
 
