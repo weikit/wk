@@ -84,18 +84,28 @@ trait HtmlViewTrait
         $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
             '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
             $str);
+
+        $str = preg_replace('/{encode\s+(.+?)}/', '<?php echo \yii\helpers\Html::encode($1) ?>', $str);
+        $str = preg_replace('/{to\s+(.+?)}/', '<?php echo \yii\helpers\Url::to($1) ?>', $str);
+
         $str = preg_replace('/{php(\s([^{}]|{([^{}]*(?2))*})*)}/suU', '<?php$1?>', $str);
+
         $str = preg_replace('/{if\s+(.+?)}/', '<?php if($1) { ?>', $str);
         $str = preg_replace('/{else}/', '<?php } else { ?>', $str);
         $str = preg_replace('/{else ?if\s+(.+?)}/', '<?php } else if($1) { ?>', $str);
         $str = preg_replace('/{\/if}/', '<?php } ?>', $str);
+
         $str = preg_replace('/{loop\s+(\S+)\s+(\S+)}/', '<?php if(is_array($1)) { foreach($1 as $2) { ?>', $str);
         $str = preg_replace('/{loop\s+(\S+)\s+(\S+)\s+(\S+)}/', '<?php if(is_array($1)) { foreach($1 as $2 => $3) { ?>', $str);
         $str = preg_replace('/{\/loop}/', '<?php } } ?>', $str);
+
         $str = preg_replace('/{(\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)}/', '<?php echo $1;?>', $str);
         $str = preg_replace('/{(\$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\[\]\'\"\$]*)}/', '<?php echo $1;?>', $str);
+
         $str = preg_replace('/{url\s+(\S+)}/', '<?php echo url($1);?>', $str);
         $str = preg_replace('/{url\s+(\S+)\s+(array\(.+?\))}/', '<?php echo url($1, $2);?>', $str);
+        $str = preg_replace('/{url\s+(\S+)\s+(\[.+?\])}/', '<?php echo url($1, $2);?>', $str);
+
         $str = preg_replace('/{media\s+(\S+)}/', '<?php echo tomedia($1);?>', $str);
         $str = preg_replace_callback('/<\?php([^\?]+)\?>/s', [ $this, 'templateAddQuote' ], $str);
         $str = preg_replace('/{([A-Z_\x7f-\xff][A-Z0-9_\x7f-\xff]*)}/s', '<?php echo $1;?>', $str);

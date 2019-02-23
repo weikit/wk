@@ -124,9 +124,9 @@ class WechatAccount extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAccount()
+    public function getRelationAccount()
     {
-        return $this->hasOne(WechatAccount::class, ['acid' => 'acid']);
+        return $this->hasOne(Account::class, ['acid' => 'acid']);
     }
 
     /**

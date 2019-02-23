@@ -1,5 +1,8 @@
 <?php
 
+function url($segment, $params = []) {
+    return wurl($segment, $params);
+}
 /**
  * 生成web站点地址
  * @param $segment

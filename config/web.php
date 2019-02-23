@@ -73,6 +73,9 @@ $config = [
         ],
         'pinyin' => [
             'class' => 'weikit\core\Pinyin'
+        ],
+        'addon' => [
+            'class' => 'weikit\core\addon\Addon',
         ]
     ],
     'params' => $params,
@@ -83,6 +86,10 @@ $config = [
         'web' => [
             'class' => 'weikit\modules\web\Module',
         ],
+
+        'gridview' => [
+            'class' => 'kartik\grid\Module'
+        ]
     ]
 ];
 

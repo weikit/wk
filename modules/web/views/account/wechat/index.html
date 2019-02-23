@@ -2,18 +2,39 @@
     <p>
         {php echo yii\helpers\Html::a('添加公众号', wurl('account/wechat/create'), ['class' => 'btn btn-success']) }
     </p>
-    {php echo yii\grid\GridView::widget([
+    {php echo kartik\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'acid',
-            'uniacid',
-            'token',
-            'encodingaeskey',
-            'level',
-            //'name',
+            [
+                'attribute' => 'acid',
+                'filter' => false,
+                'options' => [
+                    'width' => 60
+                ]
+            ],
+            [
+                'attribute' => 'uniacid',
+                'filter' => false,
+                'options' => [
+                    'width' => 60
+                ]
+            ],
+            [
+                'attribute' => 'name',
+            ],
+            [
+                'attribute' => 'level',
+                'filter' => weikit\models\WechatAccount::$levels,
+                'value' => function($model) {
+                    return weikit\models\WechatAccount::$levels[$model->level];
+                },
+                'options' => [
+                    'width' => 240
+                ]
+            ],
+            //'token',
+            //'encodingaeskey',
             //'account',
             //'original',
             //'signature',

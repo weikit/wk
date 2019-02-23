@@ -51,6 +51,11 @@ class ModuleController extends Controller
         return $this->render('index', $this->service->search(Yii::$app->getRequest()->queryParams));
     }
 
+    public function actionInactive()
+    {
+        return $this->render('inactive', $this->service->inactive(Yii::$app->getRequest()->queryParams));
+    }
+
     /**
      * Displays a single Account model.
      * @param integer $id

@@ -17,6 +17,16 @@ body {
 }
 
 /* BOOTSTRAP RESET */
+a.asc:after{
+    content: "↑";
+    color: #777;
+    margin-left: 3px;
+}
+a.desc:after {
+    content: "↓";
+    color: #777;
+    margin-left: 3px;
+}
 .form-group.required .control-label:after {
     color: #d00;
     content: "*";
