@@ -51,9 +51,20 @@ class ModuleController extends Controller
         return $this->render('index', $this->service->search(Yii::$app->getRequest()->queryParams));
     }
 
+    /**
+     * 可安装模块
+     *
+     * @return string
+     */
     public function actionInactive()
     {
-        return $this->render('inactive', $this->service->inactive(Yii::$app->getRequest()->queryParams));
+        return $this->render('inactive', $this->service->searchInactive(Yii::$app->getRequest()->queryParams));
+    }
+
+    public function actionActivate($name)
+    {
+        $this->service->activate($name);
+        return $this->redirect(['index']);
     }
 
     /**

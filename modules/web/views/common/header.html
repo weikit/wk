@@ -44,7 +44,7 @@
                         <a class="navbar-brand" href="{php echo Yii::$app->request->baseUrl}">{php echo Yii::$app->name}</a>
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        {php echo yii\bootstrap\Nav::widget([
+                        {php echo \yii\bootstrap\Nav::widget([
                             'options' => ['class' => 'navbar-nav'],
                             'items' => array_map(function($data) {
                                 unset($data['items']);
@@ -63,7 +63,7 @@
                 {php $__currentMenuId = explode('/', $this->context->id)[0]}
                 {if !empty($__menu[$__currentMenuId]['items'])}
                     <div class="mb20">
-                        {php echo yii\bootstrap\Nav::widget([
+                        {php echo \yii\bootstrap\Nav::widget([
                             'options' => [
                                 'class' => 'nav-underline',
                             ],

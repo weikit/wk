@@ -2,9 +2,13 @@
 
 namespace weikit\core\addon;
 
+use DOMDocument;
+use DOMElement;
 use Yii;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class Addon extends Component
 {
@@ -20,7 +24,9 @@ class Addon extends Component
      * @var string
      */
     public $configFile = 'manifest.xml';
-
+    /**
+     * @var array
+     */
     public $bindings = [
         'cover'          => [
             'name'  => 'cover',
@@ -79,160 +85,201 @@ class Addon extends Component
         ],
     ];
 
+    /**
+     * 获取可用扩展模块列表
+     *
+     * @return array
+     */
     public function findAvailable()
     {
         return $this->scanAvailable();
     }
 
-    protected function scanAvailable()
+    /**
+     * 获取指定可用扩展模块
+     *
+     * @param string $name
+     *
+     * @return array|null
+     */
+    public function findAvailableByName(string $name)
+    {
+        $addon = $this->scanAvailable($name);
+
+        return empty($addon) ? null : $addon;
+    }
+
+    /**
+     * 获取扩展模块路径
+     *
+     * @param $name
+     *
+     * @return string
+     */
+    public function getPath($name)
+    {
+        return Yii::getAlias($this->path)  . '/' . $name;
+    }
+
+    /**
+     * @param null|string $name
+     *
+     * @return array
+     */
+    protected function scanAvailable($name = null)
     {
         $list = [];
         $path = Yii::getAlias($this->path);
 
         if (is_dir($path)) {
+            /* @var $configFile SplFileInfo */
             foreach (Finder::create()->in($path)->files()->depth(1)->name($this->configFile) as $configFile) {
-                $config = $this->parse($configFile->getContents());
-                if (empty($config)) {
+                $manifest = $this->parse($configFile->getContents());
+                if (empty($manifest)) {
                     continue;
                 }
-
-                $list[] = [
-                    'path'   => $configFile->getPath(),
-                    'file'   => $configFile->getRealPath(),
-                    'config' => $config,
+                $data = [
+                    'path'     => $configFile->getPath(),
+                    'manifest' => $manifest,
                 ];
+                if ($name && basename($data['path'])) {
+                    return $data;
+                }
+                $list[] = $data;
             }
         }
 
         return $list;
     }
 
-
+    /**
+     * 解析设置
+     *
+     * @param string $content
+     *
+     * @return array
+     */
     public function parse(string $content)
     {   // TODO 待调整优化
         if (stripos($content, '<manifest') === false) {
             return [];
         }
 
-        $dom = new \DOMDocument();
+        $dom = new DOMDocument();
         $dom->loadXML($content);
         $root = $dom->getElementsByTagName('manifest')->item(0);
         if (empty($root)) {
             return [];
         }
-        $manifest = [];
-        $version = explode(',', $root->getAttribute('versionCode'));
-        $manifest['versions'] = [];
-        if (is_array($version)) {
-            foreach ($version as $v) {
-                $v = trim($v);
-                if ( ! empty($v)) {
-                    $manifest['versions'][] = $v;
-                }
-            }
-            $manifest['versions'][] = '0.52';
-            $manifest['versions'][] = '0.6';
-            $manifest['versions'] = array_unique($manifest['versions']);
-        }
-        $manifest['install'] = $root->getElementsByTagName('install')->item(0)->textContent;
-        $manifest['uninstall'] = $root->getElementsByTagName('uninstall')->item(0)->textContent;
-        $manifest['upgrade'] = $root->getElementsByTagName('upgrade')->item(0)->textContent;
+
         $application = $root->getElementsByTagName('application')->item(0);
         if (empty($application)) {
             return [];
         }
-        $manifest['application'] = [
-            'name'        => trim($application->getElementsByTagName('name')->item(0)->textContent),
-            'identifie'   => trim($application->getElementsByTagName('identifie')->item(0)->textContent),
-            'version'     => trim($application->getElementsByTagName('version')->item(0)->textContent),
-            'type'        => trim($application->getElementsByTagName('type')->item(0)->textContent),
-            'ability'     => trim($application->getElementsByTagName('ability')->item(0)->textContent),
-            'description' => trim($application->getElementsByTagName('description')->item(0)->textContent),
-            'author'      => trim($application->getElementsByTagName('author')->item(0)->textContent),
-            'url'         => trim($application->getElementsByTagName('url')->item(0)->textContent),
-            'setting'     => trim($application->getAttribute('setting')) == 'true',
+
+        $manifest = [
+            'name'        => trim($this->getDomTextContent($application, 'identifie')),
+            'title'       => trim($this->getDomTextContent($application, 'title')),
+            'version'     => trim($this->getDomTextContent($application, 'version')),
+            'type'        => trim($this->getDomTextContent($application, 'type')),
+            'ability'     => trim($this->getDomTextContent($application, 'ability')),
+            'author'      => trim($this->getDomTextContent($application, 'author')),
+            'url'         => trim($this->getDomTextContent($application, 'url')),
+            'description' => trim($this->getDomTextContent($application, 'description')),
+
+            'setting'   => trim($application->getAttribute('setting')) == 'true',
+
+            'subscribes'   => [],
+            'handles'      => [],
+            'isrulefields' => false,
+            'iscard'       => false,
+            'supports'     => [],
+            'oauth_type'   => OAUTH_TYPE_BASE,
+
+            'install'   => $this->getDomTextContent($root, 'install'),
+            'uninstall' => $this->getDomTextContent($root, 'uninstall'),
+            'upgrade'   => $this->getDomTextContent($root, 'upgrade'),
+
+            'plugins'     => [],
+            'bindings'    => [],
+            'permissions' => [],
         ];
+
         $platform = $root->getElementsByTagName('platform')->item(0);
         if ( ! empty($platform)) {
-            $manifest['platform'] = [
-                'subscribes'   => [],
-                'handles'      => [],
-                'isrulefields' => false,
-                'iscard'       => false,
-                'supports'     => [],
-                'oauth_type'   => OAUTH_TYPE_BASE,
-            ];
+
             $subscribes = $platform->getElementsByTagName('subscribes')->item(0);
             if ( ! empty($subscribes)) {
                 $messages = $subscribes->getElementsByTagName('message');
                 for ($i = 0; $i < $messages->length; $i++) {
                     $t = $messages->item($i)->getAttribute('type');
                     if ( ! empty($t)) {
-                        $manifest['platform']['subscribes'][] = $t;
+                        $manifest['subscribes'][] = $t;
                     }
                 }
             }
+
             $handles = $platform->getElementsByTagName('handles')->item(0);
             if ( ! empty($handles)) {
                 $messages = $handles->getElementsByTagName('message');
                 for ($i = 0; $i < $messages->length; $i++) {
                     $t = $messages->item($i)->getAttribute('type');
                     if ( ! empty($t)) {
-                        $manifest['platform']['handles'][] = $t;
+                        $manifest['handles'][] = $t;
                     }
                 }
             }
+
             $rule = $platform->getElementsByTagName('rule')->item(0);
             if ( ! empty($rule) && $rule->getAttribute('embed') == 'true') {
-                $manifest['platform']['isrulefields'] = true;
+                $manifest['isrulefields'] = true;
             }
+
             $card = $platform->getElementsByTagName('card')->item(0);
             if ( ! empty($card) && $card->getAttribute('embed') == 'true') {
-                $manifest['platform']['iscard'] = true;
+                $manifest['iscard'] = true;
             }
+
             $oauth_type = $platform->getElementsByTagName('oauth')->item(0);
             if ( ! empty($oauth_type) && $oauth_type->getAttribute('type') == OAUTH_TYPE_USERINFO) {
-                $manifest['platform']['oauth_type'] = OAUTH_TYPE_USERINFO;
+                $manifest['oauth_type'] = OAUTH_TYPE_USERINFO;
             }
+
             $supports = $platform->getElementsByTagName('supports')->item(0);
             if ( ! empty($supports)) {
                 $support_type = $supports->getElementsByTagName('item');
                 for ($i = 0; $i < $support_type->length; $i++) {
                     $t = $support_type->item($i)->getAttribute('type');
                     if ( ! empty($t)) {
-                        $manifest['platform']['supports'][] = $t;
+                        $manifest['supports'][] = $t;
                     }
                 }
             }
+
             $plugins = $platform->getElementsByTagName('plugins')->item(0);
             if ( ! empty($plugins)) {
                 $plugin_list = $plugins->getElementsByTagName('item');
                 for ($i = 0; $i < $plugin_list->length; $i++) {
                     $plugin = $plugin_list->item($i)->getAttribute('name');
                     if ( ! empty($plugin)) {
-                        $manifest['platform']['plugin_list'][] = $plugin;
+                        $manifest['plugins'][] = $plugin;
                     }
                 }
             }
-            $plugin_main = $platform->getElementsByTagName('plugin-main')->item(0);
-            if ( ! empty($plugin_main)) {
-                $plugin_main = $plugin_main->getAttribute('name');
-                if ( ! empty($plugin_main)) {
-                    $manifest['platform']['main_module'] = $plugin_main;
-                }
-            }
         }
+
         $bindings = $root->getElementsByTagName('bindings')->item(0);
         if ( ! empty($bindings)) {
             if ( ! empty($this->bindings)) {
-                $ps = array_keys($this->bindings);
-                $manifest['bindings'] = [];
-                foreach ($ps as $p) {
-                    $define = $bindings->getElementsByTagName($p)->item(0);
-                    $manifest['bindings'][$p] = $this->parseEntries($define);
+                foreach (array_keys($this->bindings) as $name) {
+                    $binding = $bindings->getElementsByTagName($name)->item(0);
+                    if ( ! empty($binding)) {
+                        $manifest['bindings'][$name] = $this->parseBinding($binding);
+                    }
                 }
             }
         }
+
         $permissions = $root->getElementsByTagName('permissions')->item(0);
         if ( ! empty($permissions)) {
             $manifest['permissions'] = [];
@@ -252,32 +299,48 @@ class Addon extends Component
         return $manifest;
     }
 
-    protected function parseEntries($elm)
+    /**
+     * @param DOMNodeList $dom
+     * @param string $name
+     * @param int $index
+     *
+     * @return string|null
+     */
+    protected function getDomTextContent(DOMElement $dom, string $name, int $index = 0)
     {
-        $ret = [];
-        if ( ! empty($elm)) {
-            $call = $elm->getAttribute('call');
-            if ( ! empty($call)) {
-                $ret[] = ['call' => $call];
-            }
-            $entries = $elm->getElementsByTagName('entry');
-            for ($i = 0; $i < $entries->length; $i++) {
-                $entry = $entries->item($i);
-                $direct = $entry->getAttribute('direct');
-                $row = [
-                    'title'  => $entry->getAttribute('title'),
-                    'do'     => $entry->getAttribute('do'),
-                    'direct' => ! empty($direct) && $direct != 'false' ? true : false,
-                    'state'  => $entry->getAttribute('state'),
-                    'icon'   => $entry->getAttribute('icon'),
-                ];
-                if ( ! empty($row['title']) && ! empty($row['do'])) {
-                    $ret[] = $row;
-                }
+        return ArrayHelper::getValue($dom->getElementsByTagName($name)->item($index), 'textContent');
+    }
+
+    /**
+     * @param DOMNodeList $dom
+     *
+     * @return array
+     */
+    protected function parseBinding(DOMElement $dom)
+    {
+        $binding = [];
+
+        $call = $dom->getAttribute('call');
+        if ( ! empty($call)) {
+            $binding[] = ['call' => $call];
+        }
+        $entries = $dom->getElementsByTagName('entry');
+        for ($i = 0; $i < $entries->length; $i++) {
+            $entry = $entries->item($i);
+            $direct = $entry->getAttribute('direct');
+            $row = [
+                'title'  => $entry->getAttribute('title'),
+                'do'     => $entry->getAttribute('do'),
+                'direct' => ! empty($direct) && $direct != 'false',
+                'state'  => $entry->getAttribute('state'),
+                'icon'   => $entry->getAttribute('icon'),
+            ];
+            if ( ! empty($row['title']) && ! empty($row['do'])) {
+                $binding[] = $row;
             }
         }
 
-        return $ret;
+        return $binding;
     }
 
 }

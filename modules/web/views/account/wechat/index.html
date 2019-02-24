@@ -1,8 +1,8 @@
 {template 'common/header'}
     <p>
-        {php echo yii\helpers\Html::a('添加公众号', wurl('account/wechat/create'), ['class' => 'btn btn-success']) }
+        {php echo \yii\helpers\Html::a('添加公众号', wurl('account/wechat/create'), ['class' => 'btn btn-success']) }
     </p>
-    {php echo kartik\grid\GridView::widget([
+    {php echo \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -25,9 +25,9 @@
             ],
             [
                 'attribute' => 'level',
-                'filter' => weikit\models\WechatAccount::$levels,
+                'filter' => \weikit\models\WechatAccount::$levels,
                 'value' => function($model) {
-                    return weikit\models\WechatAccount::$levels[$model->level];
+                    return \weikit\models\WechatAccount::$levels[$model->level];
                 },
                 'options' => [
                     'width' => 240
