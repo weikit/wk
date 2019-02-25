@@ -24,7 +24,7 @@ class WeikitMigration extends Migration
         if ($this->_tableOptions === false) {
             // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
             $this->setTableOptions(
-                $this->db->driverName === 'mysql' ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB' : null
+                $this->db->driverName === 'mysql' ? 'CHARACTER SET utf8 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB' : null
             );
         }
 
@@ -44,8 +44,12 @@ class WeikitMigration extends Migration
         $this->createUniTable();
         $this->createAccountTable();
         $this->createModuleTable();
+
     }
 
+    /**
+     * @return bool|false|string
+     */
     public function down()
     {
         $this->dropUniTable();
@@ -101,7 +105,7 @@ class WeikitMigration extends Migration
             'city' => $this->string(20)->notNull()->defaultValue(''),
             'unsername' => $this->string(30)->notNull()->defaultValue(''),
             'password' => $this->string(32)->notNull()->defaultValue(''),
-            'styleid' => $this->integer()->notNull()->defaultValue(''),
+            'styleid' => $this->integer()->notNull()->defaultValue(0),
             'subscribeurl' => $this->string(120)->notNull()->defaultValue(''),
             'auth_refresh_token' => $this->string()->notNull()->defaultValue(''),
         ], $this->tableOptions);

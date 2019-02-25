@@ -14,7 +14,6 @@ class WeikitService extends BaseService
      */
     public $copies = [
         WEIKIT_PATH . '/copy/app' => ABSPATH . 'app',
-
         WEIKIT_PATH . '/copy/web' => ABSPATH . 'web',
     ];
 
@@ -23,12 +22,13 @@ class WeikitService extends BaseService
      */
     public function activate()
     {
-        foreach(static::$copies as $source => $target) {
-            if (!symlink($source, $target)) {
+        foreach($this->copies as $source => $target) {
+            if (!is_dir(($source)) && !symlink($source, $target)) {
                 FileHelper::copyDirectory($source, $target);
             }
         };
-        $this->getMigration()->up();
+
+        $this->migrateUp();
     }
 
     /**
@@ -46,15 +46,17 @@ class WeikitService extends BaseService
      */
     public function deactivate()
     {
-        foreach(static::$delete as $target) {
+        foreach($this->delete as $target) {
             FileHelper::removeDirectory($target);
         };
+
+        $this->migrateDown();
     }
 
     public function uninstall()
     {
         $this->deactivate();
-        $this->getMigration()->down();
+        $this->migrateDown();
     }
 
     public $migrationClass = 'weikit\migrations\WeikitMigration';
@@ -66,5 +68,33 @@ class WeikitService extends BaseService
     protected function getMigration()
     {
         return Yii::createObject($this->migrationClass);
+    }
+
+    protected function migrateUp()
+    {
+        $this->beforeContent();
+
+        $this->getMigration()->up();
+
+        return $this->afterContent();
+    }
+
+    protected function migrateDown()
+    {
+        $this->beforeContent();
+
+        $this->getMigration()->down();
+
+        return $this->afterContent();
+    }
+
+    protected function beforeContent() {
+        ob_start();
+        ob_implicit_flush(false);
+    }
+
+    protected function afterContent()
+    {
+        return ob_get_clean();
     }
 }

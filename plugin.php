@@ -9,7 +9,6 @@
  * License URI: http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-use weikit\core\hooks\Plugin;
 use weikit\services\WeikitService;
 
 defined('ABSPATH') || exit;
@@ -28,15 +27,14 @@ if (is_admin()) {
     // TODO install uninstall hook?
     // 插件启用
     register_activation_hook(__FILE__, function() {
-        return Yii::createObject(WeikitService::class)->activate();
+        do_action('wk_init');
+        return \Yii::createObject(WeikitService::class)->activate();
     });
     // 插件禁用
     register_deactivation_hook(__FILE__, function() {
-        return Yii::createObject(WeikitService::class)->deactivate();
+        do_action('wk_init');
+        return \Yii::createObject(WeikitService::class)->deactivate();
     });
-    register_uninstall_hook( __FILE__, function() {
-        return Yii::createObject(WeikitService::class)->uninstall();
-    } );
 
     // 注册后台入口菜单
     add_action('admin_menu', function() {
