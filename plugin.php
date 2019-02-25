@@ -8,20 +8,36 @@
  * Author URI: https://github.com/callmez
  * License URI: http://www.gnu.org/licenses/gpl-3.0.txt
  */
+
 use weikit\core\hooks\Plugin;
+use weikit\services\WeikitService;
 
 defined('ABSPATH') || exit;
 
 require_once ( __DIR__ . '/weikit.php' );
 
 if (is_admin()) {
+
     // web目录加入后台cookie中
-    add_action('set_auth_cookie', [Plugin::class, 'setAuthCookie'], 10, 6);
+    add_action('set_auth_cookie', function($auth_cookie, $expire, $expiration, $user_id, $scheme) {
+        $secure = apply_filters( 'secure_auth_cookie', is_ssl(), $user_id );
+        $auth_cookie_name = $secure ? SECURE_AUTH_COOKIE : AUTH_COOKIE;
+        setcookie($auth_cookie_name, $auth_cookie, $expire, SITECOOKIEPATH . 'web', COOKIE_DOMAIN, $secure, true);
+    }, 10, 6);
+
     // TODO install uninstall hook?
     // 插件启用
-    register_activation_hook(__FILE__, [Plugin::class, 'activate']);
+    register_activation_hook(__FILE__, function() {
+        return Yii::createObject(WeikitService::class)->activate();
+    });
     // 插件禁用
-    register_deactivation_hook(__FILE__, [Plugin::class, 'deactivate']);
+    register_deactivation_hook(__FILE__, function() {
+        return Yii::createObject(WeikitService::class)->deactivate();
+    });
+    register_uninstall_hook( __FILE__, function() {
+        return Yii::createObject(WeikitService::class)->uninstall();
+    } );
+
     // 注册后台入口菜单
     add_action('admin_menu', function() {
         add_menu_page(

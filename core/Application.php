@@ -10,7 +10,6 @@ use yii\web\UrlNormalizerRedirectException;
 use yii\helpers\Url;
 use yii\base\InvalidRouteException;
 
-
 class Application extends \yii\web\Application
 {
     /**

@@ -101,7 +101,6 @@ class WechatAccountService extends BaseService
             $account = Yii::createObject(Account::class);
             $account->setAttributes([
                 'uniacid' => $uniAccount->uniacid,
-                'type' => '',
                 'hash' => Account::generateHash(),
 
                 'isconnect' => 0, // TODO fix
