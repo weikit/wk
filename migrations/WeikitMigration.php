@@ -44,7 +44,6 @@ class WeikitMigration extends Migration
         $this->createUniTable();
         $this->createAccountTable();
         $this->createModuleTable();
-
     }
 
     /**
@@ -59,83 +58,143 @@ class WeikitMigration extends Migration
 
     protected function createUniTable()
     {
-        $this->createTable('{{%uni_account}}', [
-            'uniacid' => $this->primaryKey()->comment('Uniacid'),
-            'groupid' => $this->integer()->unsigned()->notNull()->defaultValue(0),
-            'name' => $this->string(100)->notNull()->defaultValue('')->comment('唯一账户名称'),
-            'description' => $this->string()->notNull()->defaultValue('')->comment('唯一账户描述'),
-            'default_acid' => $this->integer()->unsigned()->notNull()->defaultValue(0),
-            'rank' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('排序'),
-            'title_initial' => $this->string(1)->notNull()->defaultValue('')->comment('首字母'),
-        ], $this->tableOptions);
+        if ( ! $this->isTableExists('{{%uni_account}}')) {
+            $this->createTable('{{%uni_account}}', [
+                'uniacid'       => $this->primaryKey()->comment('Uniacid'),
+                'groupid'       => $this->integer()->unsigned()->notNull()->defaultValue(0),
+                'name'          => $this->string(100)->notNull()->defaultValue('')->comment('唯一账户名称'),
+                'description'   => $this->string()->notNull()->defaultValue('')->comment('唯一账户描述'),
+                'default_acid'  => $this->integer()->unsigned()->notNull()->defaultValue(0),
+                'rank'          => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('排序'),
+                'title_initial' => $this->string(1)->notNull()->defaultValue('')->comment('首字母'),
+            ], $this->tableOptions);
+        }
     }
 
     protected function dropUniTable()
     {
-        $this->dropTable('{{%uni_account}}');
+        if ($this->isTableExists('{{%uni_account}}')) {
+            $this->dropTable('{{%uni_account}}');
+        }
     }
 
     protected function createAccountTable()
     {
-        $this->createTable('{{%account}}', [
-            'acid' => $this->primaryKey()->comment('Acid'),
-            'uniacid' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
-            'hash' => $this->string(8)->notNull()->defaultValue('')->comment('Hash'),
-            'type' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('账户类型'),
-            'isconnect' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('是否激活'),
-            'isdeleted' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('已删除'),
-            'endtime' => $this->integer(11)->unsigned(),
-        ], $this->tableOptions);
-        $this->createIndex('idx_uniacid', '{{%account}}', ['uniacid']);
+        if ( ! $this->isTableExists('{{%account}}')) {
+            $this->createTable('{{%account}}', [
+                'acid'      => $this->primaryKey()->comment('Acid'),
+                'uniacid'   => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
+                'hash'      => $this->string(8)->notNull()->defaultValue('')->comment('Hash'),
+                'type'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('账户类型'),
+                'isconnect' => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('是否激活'),
+                'isdeleted' => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('已删除'),
+                'endtime'   => $this->integer(11)->unsigned(),
+            ], $this->tableOptions);
+            $this->createIndex('idx_uniacid', '{{%account}}', ['uniacid']);
+        }
 
-        $this->createTable('{{%account_wechats}}', [
-            'acid' => $this->primaryKey()->comment('Acid'),
-            'uniacid' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
-            'token' => $this->string(32)->notNull()->defaultValue('')->comment('Token'),
-            'encodingaeskey' => $this->string()->notNull()->defaultValue('')->comment('EncodingAESKey'),
-            'level' => $this->tinyInteger(1)->notNull()->defaultValue(1)->comment('公众号类型'),
-            'name' => $this->string(30)->notNull()->defaultValue('')->comment('公众号名称'),
-            'account' => $this->string(30)->notNull()->defaultValue('')->comment('公众号账号'),
-            'original' => $this->string(50)->notNull()->defaultValue('')->comment('公众号原始ID'),
-            'signature' => $this->string(100)->notNull()->defaultValue('')->comment('签名'),
-            'key' => $this->string(50)->notNull()->defaultValue('')->comment('Key'),
-            'secret' => $this->string(50)->notNull()->defaultValue('')->comment('公众号原始ID'),
-            'country' => $this->string(20)->notNull()->defaultValue(''),
-            'province' => $this->string(20)->notNull()->defaultValue(''),
-            'city' => $this->string(20)->notNull()->defaultValue(''),
-            'unsername' => $this->string(30)->notNull()->defaultValue(''),
-            'password' => $this->string(32)->notNull()->defaultValue(''),
-            'styleid' => $this->integer()->notNull()->defaultValue(0),
-            'subscribeurl' => $this->string(120)->notNull()->defaultValue(''),
-            'auth_refresh_token' => $this->string()->notNull()->defaultValue(''),
-        ], $this->tableOptions);
-        $this->createIndex('idx_key', '{{%account_wechats}}', ['key']);
+        if ( ! $this->isTableExists('{{%account_wechats}}')) {
+            $this->createTable('{{%account_wechats}}', [
+                'acid'               => $this->primaryKey()->comment('Acid'),
+                'uniacid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
+                'token'              => $this->string(32)->notNull()->defaultValue('')->comment('Token'),
+                'encodingaeskey'     => $this->string()->notNull()->defaultValue('')->comment('EncodingAESKey'),
+                'level'              => $this->tinyInteger(1)->notNull()->defaultValue(1)->comment('公众号类型'),
+                'name'               => $this->string(30)->notNull()->defaultValue('')->comment('公众号名称'),
+                'account'            => $this->string(30)->notNull()->defaultValue('')->comment('公众号账号'),
+                'original'           => $this->string(50)->notNull()->defaultValue('')->comment('公众号原始ID'),
+                'signature'          => $this->string(100)->notNull()->defaultValue('')->comment('签名'),
+                'key'                => $this->string(50)->notNull()->defaultValue('')->comment('Key'),
+                'secret'             => $this->string(50)->notNull()->defaultValue('')->comment('公众号原始ID'),
+                'country'            => $this->string(20)->notNull()->defaultValue(''),
+                'province'           => $this->string(20)->notNull()->defaultValue(''),
+                'city'               => $this->string(20)->notNull()->defaultValue(''),
+                'username'           => $this->string(30)->notNull()->defaultValue(''),
+                'password'           => $this->string(32)->notNull()->defaultValue(''),
+                'styleid'            => $this->integer()->notNull()->defaultValue(0),
+                'subscribeurl'       => $this->string(120)->notNull()->defaultValue(''),
+                'auth_refresh_token' => $this->string()->notNull()->defaultValue(''),
+                'lastupdate'         => $this->integer()->notNull()->defaultValue(0),
+            ], $this->tableOptions);
+            $this->createIndex('idx_key', '{{%account_wechats}}', ['key']);
+        }
     }
 
     protected function dropAccountTable()
     {
-        $this->dropTable('{{%account}}');
-        $this->dropTable('{{%account_wechats}}');
+        if ($this->isTableExists('{{%account}}')) {
+            $this->dropTable('{{%account}}');
+        }
+
+        if ( ! $this->isTableExists('{{%account_wechats}}')) {
+            $this->dropTable('{{%account_wechats}}');
+        }
     }
 
     protected function createModuleTable()
     {
-        $this->createTable('{{%modules}}', [
-            'id'                   => $this->primaryKey(),
-            'username'             => $this->string()->notNull()->unique(),
-            'auth_key'             => $this->string(32)->notNull(),
-            'password_hash'        => $this->string()->notNull(),
-            'password_reset_token' => $this->string()->unique(),
-            'email'                => $this->string()->notNull()->unique(),
+        if ( ! $this->isTableExists('{{%modules}}')) {
+            $this->createTable('{{%modules}}', [
+                'mid'                  => $this->primaryKey()->comment('Mid'),
+                'name'                 => $this->string(100)->notNull()->defaultValue('')->comment('模块标识'),
+                'type'                 => $this->string(20)->notNull()->defaultValue('')->comment('模块类型'),
+                'version'              => $this->string(15)->notNull()->defaultValue('')->comment('版本'),
+                'ability'              => $this->string(500)->notNull()->defaultValue('')->comment('简述'),
+                'description'          => $this->string(1000)->notNull()->defaultValue('')->comment('模块描述'),
+                'author'               => $this->string(50)->notNull()->defaultValue('')->comment('作者'),
+                'url'                  => $this->string()->notNull()->defaultValue('')->comment('模块链接'),
+                'settings'             => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('是否含有设置页'),
+                'subscribes'           => $this->string(500)->notNull()->defaultValue('')->comment('订阅项'),
+                'handles'              => $this->string(500)->notNull()->defaultValue('')->comment('事件订阅项'),
+                'isrulefields'         => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('是都关键字规则订阅项'),
+                'issystem'             => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('是否系统模块'),
+                'target'               => $this->string(10)->notNull()->defaultValue(''),
+                'iscard'               => $this->tinyInteger(3)->notNull()->defaultValue(''),
+                'permissions'          => $this->text()->notNull()->defaultValue(''),
+                'title_initial'        => $this->string(1)->defaultValue('')->comment('模块首字母'),
+                'oauth_type'           => $this->boolean()->notNull()->defaultValue(0),
+                'oauth_typeoauth_type' => $this->boolean()->notNull()->defaultValue(0),
+                'wxapp_support'        => $this->boolean()->defaultValue(0)->comment('支持微信小程序'),
+                'welcome_support'      => $this->boolean()->defaultValue(0)->comment(''),
+                'phoneapp_support'     => $this->boolean()->defaultValue(0)->comment('支持手机App'),
+                'account_support'      => $this->boolean()->defaultValue(0)->comment(''),
+                'xzapp_support'        => $this->boolean()->defaultValue(0)->comment('支持熊掌号'),
+            ], $this->tableOptions);
+            $this->createIndex('idx_name', '{{%modules}}', ['name']);
+        }
 
-            'status'     => $this->smallInteger()->notNull()->defaultValue(10),
-            'created_at' => $this->integer()->notNull(),
-            'updated_at' => $this->integer()->notNull(),
-        ], $this->tableOptions);
+        if ( ! $this->isTableExists('{{%modules_bindings}}')) {
+            $this->createTable('{{%modules_bindings}}', [
+                'eid'          => $this->primaryKey()->comment('Eid'),
+                'module'       => $this->string(100)->notNull()->defaultValue('')->comment('关联模块'),
+                'entry'        => $this->string(30)->notNull()->defaultValue('')->comment('功能入口'),
+                'call'         => $this->string(50)->notNull()->defaultValue(''),
+                'title'        => $this->string(50)->notNull()->defaultValue('')->comment('功能名称'),
+                'do'           => $this->string(200)->notNull()->defaultValue(''),
+                'state'        => $this->string(200)->notNull()->defaultValue('')->comment('状态'),
+                'direct'       => $this->integer()->unsigned()->notNull()->defaultValue(0),
+                'url'          => $this->string(100)->unsigned()->notNull()->defaultValue(0)->comment('是否含有设置页'),
+                'icon'         => $this->string(50)->notNull()->defaultValue('')->comment('功能图标'),
+                'displayorder' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('排序'),
+            ], $this->tableOptions);
+            $this->createIndex('idx_module', '{{%modules_bindings}}', ['module']);
+        }
     }
 
     protected function dropModuleTable()
     {
-        $this->dropTable('{{%modules}}');
+        if ($this->isTableExists('{{%modules}}')) {
+            $this->dropTable('{{%modules}}');
+        }
+    }
+
+    /**
+     * @param $tablename
+     *
+     * @return bool
+     */
+    public function isTableExists($tablename)
+    {
+        return $this->db->schema->getTableSchema($tablename, true) !== null;
     }
 }

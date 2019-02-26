@@ -23,7 +23,7 @@ class WeikitService extends BaseService
     public function activate()
     {
         foreach($this->copies as $source => $target) {
-            if (!is_dir(($source)) && !symlink($source, $target)) {
+            if (!is_dir(($target)) && !@symlink($source, $target)) {
                 FileHelper::copyDirectory($source, $target);
             }
         };
@@ -49,8 +49,6 @@ class WeikitService extends BaseService
         foreach($this->delete as $target) {
             FileHelper::removeDirectory($target);
         };
-
-        $this->migrateDown();
     }
 
     public function uninstall()

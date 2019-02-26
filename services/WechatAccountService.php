@@ -91,8 +91,8 @@ class WechatAccountService extends BaseService
                 'description' => $form->description,
                 'title_initial' => $uniAccount->defaultTitleInitial($form->name),
 
-                'groupid' => 0, // TODO remove
-                'default_acid' => 0, // TODO remove
+//                'groupid' => 0, // TODO remove
+//                'default_acid' => 0, // TODO remove
             ], false);
             $uniAccount->save(false);
 
@@ -103,9 +103,9 @@ class WechatAccountService extends BaseService
                 'uniacid' => $uniAccount->uniacid,
                 'hash' => Account::generateHash(),
 
-                'isconnect' => 0, // TODO fix
-                'isdeleted' => 0, // TODO fix
-                'endtime' => 0, // TODO fix
+//                'isconnect' => 0, // TODO fix
+//                'isdeleted' => 0, // TODO fix
+//                'endtime' => 0, // TODO fix
 
                 'type' => 1, // TODO remove or fix
 
@@ -127,16 +127,16 @@ class WechatAccountService extends BaseService
                 'token' => WechatAccount::generateToken(),
                 'encodingaeskey' => WechatAccount::generateEncodingAesKey(),
 
-                'signature' => '', // TODO remove or fix
-                'country' => '', // TODO remove or fix
-                'province' => '', // TODO remove or fix
-                'city' => '', // TODO remove or fix
-                'username' => '', // TODO remove or fix
-                'password' => '', // TODO remove or fix
-                'lastupdate' => 0, // TODO fix
-                'styleid' => 0, // TODO remove or fix
-                'subscribeurl' => '', // TODO remove or fix
-                'auth_refresh_token' => '', // TODO remove or fix
+//                'signature' => '', // TODO remove or fix
+//                'country' => '', // TODO remove or fix
+//                'province' => '', // TODO remove or fix
+//                'city' => '', // TODO remove or fix
+//                'username' => '', // TODO remove or fix
+//                'password' => '', // TODO remove or fix
+//                'lastupdate' => 0, // TODO fix
+//                'styleid' => 0, // TODO remove or fix
+//                'subscribeurl' => '', // TODO remove or fix
+//                'auth_refresh_token' => '', // TODO remove or fix
             ], false);
             $wechatAccount->save(false);
 
