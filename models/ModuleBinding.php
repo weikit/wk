@@ -36,12 +36,13 @@ class ModuleBinding extends ActiveRecord
     public function rules()
     {
         return [
-            [['module', 'title', 'call', 'entry', 'do'], 'required'],
-            [['direct', 'displayorder'], 'integer'],
+            [['module', 'title', 'entry', 'do'], 'required'],
+            [['call', 'title', 'icon'], 'string', 'max' => 50],
             [['module', 'url'], 'string', 'max' => 100],
             [['entry'], 'string', 'max' => 30],
-            [['call', 'title', 'icon'], 'string', 'max' => 50],
             [['do', 'state'], 'string', 'max' => 200],
+            [['direct'], 'boolean'],
+            [['displayorder'], 'integer'],
         ];
     }
 

@@ -117,9 +117,12 @@ class ModuleService extends BaseService
         /* @var $module Module */
         $module = Yii::createObject(Module::class);
         $module->getDb()->transaction(function () use ($module, $addon) {
+
+            // 1. 添加扩展模块
             $module->setAttributes($addon);
             $module->trySave();
 
+            // 2. 注册扩展模块功能入口
             foreach ($addon['bindings'] as $entry => $bindings) {
                 foreach($bindings as $binding) {
                     $bindingModel = Yii::createObject(ModuleBinding::class);
@@ -129,6 +132,11 @@ class ModuleService extends BaseService
                     ], $binding));
                     $bindingModel->trySave();
                 }
+            }
+
+            // 3. 扩展模块生成数据
+
+            foreach([$addon['install'], $addon['upgrade']] as $script) {
             }
         });
 

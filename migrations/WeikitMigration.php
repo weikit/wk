@@ -175,7 +175,7 @@ class WeikitMigration extends Migration
                 'do'           => $this->string(200)->notNull()->defaultValue(''),
                 'state'        => $this->string(200)->notNull()->defaultValue('')->comment('状态'),
                 'direct'       => $this->integer()->unsigned()->notNull()->defaultValue(0),
-                'url'          => $this->string(100)->unsigned()->notNull()->defaultValue(0)->comment('是否含有设置页'),
+                'url'          => $this->string(100)->unsigned()->notNull()->defaultValue('')->comment('是否含有设置页'),
                 'icon'         => $this->string(50)->notNull()->defaultValue('')->comment('功能图标'),
                 'displayorder' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('排序'),
             ], $this->tableOptions);
