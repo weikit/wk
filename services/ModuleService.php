@@ -2,7 +2,7 @@
 
 namespace weikit\services;
 
-use weikit\models\ModuleBinding;
+
 use Yii;
 use weikit\models\Module;
 use yii\data\ArrayDataProvider;
@@ -11,6 +11,7 @@ use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;
 use weikit\models\form\InactiveModuleForm;
 use weikit\exceptions\AddonModuleNotFoundException;
+use weikit\models\ModuleBinding;
 
 class ModuleService extends BaseService
 {
@@ -135,9 +136,31 @@ class ModuleService extends BaseService
             }
 
             // 3. 扩展模块生成数据
+            $scripts = [$addon['install'], $addon['upgrade']];
+            array_walk($scripts, function($script, $key, $db) use ($addon) {
+                /* @var $db \yii\db\Connection */
+                if (!empty($script)) {
+                    if (strtolower(substr($script, -4)) === '.php') {
+                        $path = Yii::$app->addon->getPath($addon['name'], $script);
 
-            foreach([$addon['install'], $addon['upgrade']] as $script) {
-            }
+                        if (file_exists($path)) {
+                            require $path;
+                        }
+                    } else {
+                        // @see https://stackoverflow.com/questions/7690380/regular-expression-to-match-all-comments-in-a-t-sql-script/13821950#13821950 移除注释
+                        $script = preg_replace( '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms', '$1', $script );
+                        // 替换前缀
+                        $script = str_replace(' ims_', ' ' . $db->tablePrefix, $script);
+                        $script = str_replace(' `ims_', ' `' . $db->tablePrefix, $script);
+
+                        foreach(explode(';', $script) as $sql) {
+                            if (!empty($sql)) {
+                                $db->createCommand($sql)->query();
+                            }
+                        }
+                    }
+                }
+            }, $module->getDb());
         });
 
         return $module;

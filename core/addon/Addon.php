@@ -86,6 +86,22 @@ class Addon extends Component
     ];
 
     /**
+     * 获取扩展模块路径
+     *
+     * @param $name
+     *
+     * @return string
+     */
+    public function getPath($name, $file = null)
+    {
+        $path = $this->path . '/' . $name;
+        if ($file !== null) {
+            $path .= '/' . $file;
+        }
+        return Yii::getAlias($path);
+    }
+
+    /**
      * 获取可用扩展模块列表
      *
      * @return array
@@ -107,18 +123,6 @@ class Addon extends Component
         $addon = $this->scanAvailable($name);
 
         return empty($addon) ? null : $addon;
-    }
-
-    /**
-     * 获取扩展模块路径
-     *
-     * @param $name
-     *
-     * @return string
-     */
-    public function getPath($name)
-    {
-        return Yii::getAlias($this->path . '/' . $name);
     }
 
     /**
