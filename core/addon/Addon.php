@@ -118,7 +118,7 @@ class Addon extends Component
      */
     public function getPath($name)
     {
-        return Yii::getAlias($this->path)  . '/' . $name;
+        return Yii::getAlias($this->path . '/' . $name);
     }
 
     /**
@@ -138,14 +138,10 @@ class Addon extends Component
                 if (empty($manifest)) {
                     continue;
                 }
-                $data = [
-                    'path'     => $configFile->getPath(),
-                    'manifest' => $manifest,
-                ];
-                if ($name && basename($data['path'])) {
-                    return $data;
+                if ($name !== null && $manifest['name'] === $name) {
+                    return $manifest;
                 }
-                $list[] = $data;
+                $list[] = $manifest;
             }
         }
 
@@ -179,7 +175,7 @@ class Addon extends Component
 
         $manifest = [
             'name'        => trim($this->getDomTextContent($application, 'identifie')),
-            'title'       => trim($this->getDomTextContent($application, 'title')),
+            'title'       => trim($this->getDomTextContent($application, 'name')),
             'version'     => trim($this->getDomTextContent($application, 'version')),
             'type'        => trim($this->getDomTextContent($application, 'type')),
             'ability'     => trim($this->getDomTextContent($application, 'ability')),

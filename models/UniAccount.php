@@ -34,7 +34,9 @@ class UniAccount extends ActiveRecord
         return [
             [['name'], 'required'],
             [['rank'], 'integer'],
-            [['title_initial'], 'default', 'value' => [$this, 'defaultTitleInitial']],
+            [['title_initial'], 'default',  'value' => function() {
+                return $this->defaultTitleInitial();
+            }],
             [['title_initial'], 'string', 'max' => 1],
             [['description'], 'string', 'max' => 255],
         ];
@@ -43,7 +45,7 @@ class UniAccount extends ActiveRecord
     /**
      * @return string
      */
-    public function defaultTitleInitial($name)
+    public function defaultTitleInitial($name = null)
     {
         return strtoupper(Yii::$app->pinyin->firstChar($name ?? $this->name));
     }

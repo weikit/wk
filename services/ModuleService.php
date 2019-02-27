@@ -2,6 +2,7 @@
 
 namespace weikit\services;
 
+use weikit\models\ModuleBinding;
 use Yii;
 use weikit\models\Module;
 use yii\data\ArrayDataProvider;
@@ -36,9 +37,10 @@ class ModuleService extends BaseService
         if ($addon === null) {
             throw new AddonModuleNotFoundException($name);
         }
+
         return $addon;
     }
-    
+
     /**
      * @param Request|array $requestOrData
      *
@@ -55,37 +57,37 @@ class ModuleService extends BaseService
         $this->isModelLoad($model, $requestOrData);
         if ($model->validate()) {
             $query->andFilterWhere([
-                'mid' => $model->mid,
-                'settings' => $model->settings,
-                'isrulefields' => $model->isrulefields,
-                'issystem' => $model->issystem,
-                'target' => $model->target,
-                'iscard' => $model->iscard,
-                'wxapp_support' => $model->wxapp_support,
-                'welcome_support' => $model->welcome_support,
-                'oauth_type' => $model->oauth_type,
-                'webapp_support' => $model->webapp_support,
+                'mid'              => $model->mid,
+                'settings'         => $model->settings,
+                'isrulefields'     => $model->isrulefields,
+                'issystem'         => $model->issystem,
+                'target'           => $model->target,
+                'iscard'           => $model->iscard,
+                'wxapp_support'    => $model->wxapp_support,
+                'welcome_support'  => $model->welcome_support,
+                'oauth_type'       => $model->oauth_type,
+                'webapp_support'   => $model->webapp_support,
                 'phoneapp_support' => $model->phoneapp_support,
-                'account_support' => $model->account_support,
-                'xzapp_support' => $model->xzapp_support,
+                'account_support'  => $model->account_support,
+                'xzapp_support'    => $model->xzapp_support,
             ])
-            ->andFilterWhere(['like', 'name', $model->name])
-            ->andFilterWhere(['like', 'type', $model->type])
-            ->andFilterWhere(['like', 'title', $model->title])
-            ->andFilterWhere(['like', 'version', $model->version])
-            ->andFilterWhere(['like', 'ability', $model->ability])
-            ->andFilterWhere(['like', 'description', $model->description])
-            ->andFilterWhere(['like', 'author', $model->author])
-            ->andFilterWhere(['like', 'url', $model->url])
-            ->andFilterWhere(['like', 'subscribes', $model->subscribes])
-            ->andFilterWhere(['like', 'handles', $model->handles])
-            ->andFilterWhere(['like', 'permissions', $model->permissions])
-            ->andFilterWhere(['like', 'title_initial', $model->title_initial]);
+                  ->andFilterWhere(['like', 'name', $model->name])
+                  ->andFilterWhere(['like', 'type', $model->type])
+                  ->andFilterWhere(['like', 'title', $model->title])
+                  ->andFilterWhere(['like', 'version', $model->version])
+                  ->andFilterWhere(['like', 'ability', $model->ability])
+                  ->andFilterWhere(['like', 'description', $model->description])
+                  ->andFilterWhere(['like', 'author', $model->author])
+                  ->andFilterWhere(['like', 'url', $model->url])
+                  ->andFilterWhere(['like', 'subscribes', $model->subscribes])
+                  ->andFilterWhere(['like', 'handles', $model->handles])
+                  ->andFilterWhere(['like', 'permissions', $model->permissions])
+                  ->andFilterWhere(['like', 'title_initial', $model->title_initial]);
         }
 
         return [
-            'searchModel' => $model,
-            'dataProvider' => $dataProvider
+            'searchModel'  => $model,
+            'dataProvider' => $dataProvider,
         ];
     }
 
@@ -97,10 +99,10 @@ class ModuleService extends BaseService
     public function searchInactive()
     {
         $dataProvider = new ArrayDataProvider([
-            'allModels' => Yii::$app->addon->findAvailable()
+            'allModels' => Yii::$app->addon->findAvailable(),
         ]);
 
-        return [ 'dataProvider' => $dataProvider ];
+        return ['dataProvider' => $dataProvider];
     }
 
     /**
@@ -110,22 +112,26 @@ class ModuleService extends BaseService
      */
     public function activate(string $name)
     {
-//        try {
-//            $activatedModule = Module::findOne(['name' => $name]);
-//            if ($activatedModule) {
-//                throw new AddonModuleActivatedExceptions($activatedModule->name);
-//            }
-//        } catch (\Exception $e) {}
-
         $addon = $this->findInactiveByName($name);
 
         /* @var $module Module */
         $module = Yii::createObject(Module::class);
-        $module->setAttributes($addon);
-        $module->trySave();
+        $module->getDb()->transaction(function () use ($module, $addon) {
+            $module->setAttributes($addon);
+            $module->trySave();
+
+            foreach ($addon['bindings'] as $entry => $bindings) {
+                foreach($bindings as $binding) {
+                    $bindingModel = Yii::createObject(ModuleBinding::class);
+                    $bindingModel->setAttributes(array_merge([
+                        'entry' => $entry,
+                        'module' => $module->name,
+                    ], $binding));
+                    $bindingModel->trySave();
+                }
+            }
+        });
 
         return $module;
     }
-
-
 }

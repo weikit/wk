@@ -48,20 +48,33 @@ class Module extends ActiveRecord
      * {@inheritdoc}
      */
     public function rules()
-    {
+    { // TODO 增加模块安装必要验证
         return [
-            [['name', 'type', 'title', 'version', 'ability', 'description', 'author', 'url', 'settings', 'subscribes', 'handles', 'isrulefields', 'issystem', 'target', 'iscard', 'permissions', 'title_initial', 'wxapp_support', 'welcome_support', 'oauth_type', 'webapp_support', 'phoneapp_support', 'account_support', 'xzapp_support'], 'required'],
-            [['settings', 'isrulefields', 'issystem', 'target', 'iscard', 'wxapp_support', 'welcome_support', 'oauth_type', 'webapp_support', 'phoneapp_support', 'account_support', 'xzapp_support'], 'integer'],
+            [['name', 'title', 'type', 'version', 'ability'], 'required'],
             [['name', 'title'], 'string', 'max' => 100],
+            [['name'], 'unique'],
+            [['target', 'oauth_type'], 'integer'],
+            [['settings', 'isrulefields', 'iscard', 'issystem', 'wxapp_support', 'welcome_support', 'webapp_support', 'phoneapp_support', 'account_support', 'xzapp_support'], 'boolean'],
             [['type'], 'string', 'max' => 20],
             [['version'], 'string', 'max' => 15],
-            [['ability', 'subscribes', 'handles'], 'string', 'max' => 500],
+            [['ability'], 'string', 'max' => 500],
             [['description'], 'string', 'max' => 1000],
             [['author'], 'string', 'max' => 50],
             [['url'], 'string', 'max' => 255],
-            [['permissions'], 'string', 'max' => 5000],
+            [['title_initial'], 'default',  'value' => function() {
+                return $this->defaultTitleInitial();
+            }],
             [['title_initial'], 'string', 'max' => 1],
+            [['subscribes', 'handles', 'permissions'], 'safe'],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function defaultTitleInitial($name = null)
+    {
+        return strtoupper(Yii::$app->pinyin->firstChar($name ?? $this->name));
     }
 
     /**
