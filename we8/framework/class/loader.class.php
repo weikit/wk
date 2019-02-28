@@ -1,58 +1,6 @@
 <?php
 
-function load()
-{
-    static $loader;
-    if ($loader === null) {
-        $loader = new Loader();
-    }
-
-    return $loader;
-}
-
-
-function table($name)
-{
-    $table_classname = "\\We7\\Table\\";
-    $subsection_name = explode('_', $name);
-    if (count($subsection_name) == 1) {
-        $table_classname .= ucfirst($subsection_name[0]) . "\\" . ucfirst($subsection_name[0]);
-    } else {
-        foreach ($subsection_name as $key => $val) {
-            if ($key == 0) {
-                $table_classname .= ucfirst($val) . '\\';
-            } else {
-                $table_classname .= ucfirst($val);
-            }
-        }
-    }
-
-    if (in_array($name, [
-        'modules_rank',
-        'modules_bindings',
-        'modules_plugin',
-        'modules_cloud',
-        'modules_recycle',
-        'modules',
-        'modules_ignore',
-        'account_xzapp',
-        'uni_account_modules',
-    ])) {
-        return new $table_classname;
-    }
-
-    load()->classs('table');
-    load()->table($name);
-    $service = false;
-
-    $class_name = "{$name}Table";
-    if (class_exists($class_name)) {
-        $service = new $class_name();
-    }
-
-    return $service;
-}
-
+use weikit\core\exceptions\UnsupportedException;
 
 class Loader
 {
@@ -84,39 +32,6 @@ class Loader
         'app'     => '/app/common/%s.func.php',
     ];
 
-    public function __construct()
-    {
-        $this->registerAutoload();
-    }
-
-    public function registerAutoload()
-    {
-        spl_autoload_register([$this, 'autoload']);
-    }
-
-    public function autoload($class)
-    {
-        $section  = [
-            'Table' => '/framework/table/',
-        ];
-        $classmap = [
-            'We7Table' => 'table',
-        ];
-        if (isset($classmap[$class])) {
-            load()->classs($classmap[$class]);
-        } elseif (preg_match('/^[0-9a-zA-Z\-\\\\_]+$/', $class)
-                  && (stripos($class, 'We7') === 0 || stripos($class, '\We7') === 0)) {
-            $group = explode("\\", $class);
-            $path  = IA_ROOT . $section[$group[1]];
-            unset($group[0]);
-            unset($group[1]);
-            $path .= implode('/', $group) . '.php';
-            if (is_file($path)) {
-                include $path;
-            }
-        }
-    }
-
     public function __call($type, $params)
     {
         $name = $cachekey = array_shift($params);
@@ -130,8 +45,8 @@ class Loader
             $name = $this->libraryMap[$name];
         }
         $file = sprintf($this->loadTypeMap[$type], $name);
-        if (file_exists(IA_ROOT . $file)) {
-            include IA_ROOT . $file;
+        if (file_exists(WE8_PATH . $file)) {
+            include WE8_PATH . $file;
             $this->cache[$type][$cachekey] = true;
 
             return true;
@@ -158,3 +73,22 @@ class Loader
         return class_exists($name) ? new $name() : false;
     }
 }
+
+
+function load()
+{
+    static $loader;
+
+    if ($loader === null) {
+        $loader = new Loader();
+    }
+
+    return $loader;
+}
+
+
+function table($name)
+{
+    throw new UnsupportedException();
+}
+

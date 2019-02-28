@@ -2,7 +2,7 @@
 
 namespace weikit\modules\web;
 
-use yii\base\Behavior;
+use weikit\core\We8;
 
 class Module extends \yii\base\Module
 {
@@ -11,15 +11,8 @@ class Module extends \yii\base\Module
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function init()
     {
-        return [
-            'we8' => [
-                'class' => Behavior::class,
-                'events' => [
-                    self::EVENT_BEFORE_ACTION => ['\weikit\core\We8', 'initWeb']
-                ]
-            ]
-        ];
+        We8::initWeb();
     }
 }

@@ -1,12 +1,140 @@
 <?php
 
-class SqlPaser
+// TODO 优化
+class SqlParser
 {
+    private static $checkcmd = ['SELECT', 'UPDATE', 'INSERT', 'REPLAC', 'DELETE'];
+    private static $disable = [
+        'function' => [
+            'load_file',
+            'floor',
+            'hex',
+            'substring',
+            'if',
+            'ord',
+            'char',
+            'benchmark',
+            'reverse',
+            'strcmp',
+            'datadir',
+            'updatexml',
+            'extractvalue',
+            'name_const',
+            'multipoint',
+            'database',
+            'user',
+        ],
+        'action'   => [
+            '@',
+            'intooutfile',
+            'intodumpfile',
+            'unionselect',
+            'uniondistinct',
+            'information_schema',
+            'current_user',
+            'current_date',
+        ],
+        'note'     => ['/*', '*/', '#', '--'],
+    ];
+
+    public static function checkQuery($sql)
+    {
+        $cmd = strtoupper(substr(trim($sql), 0, 6));
+        if (in_array($cmd, self::$checkcmd)) {
+            $mark = $clean = '';
+            $sql = str_replace(['\\\\', '\\\'', '\\"', '\'\''], '', $sql);
+            if (strpos($sql, '/') === false && strpos($sql, '#') === false && strpos($sql,
+                    '-- ') === false && strpos($sql, '@') === false && strpos($sql, '`') === false) {
+                $cleansql = preg_replace("/'(.+?)'/s", '', $sql);
+            } else {
+                $cleansql = self::stripSafeChar($sql);
+            }
+
+            $cleansql = preg_replace("/[^a-z0-9_\-\(\)#\*\/\"]+/is", "", strtolower($cleansql));
+            if (is_array(self::$disable['function'])) {
+                foreach (self::$disable['function'] as $fun) {
+                    if (strpos($cleansql, $fun . '(') !== false) {
+                        throw new \yii\base\InvalidArgumentException("DB function [{$fun}] is not allow");
+                    }
+                }
+            }
+
+            if (is_array(self::$disable['action'])) {
+                foreach (self::$disable['action'] as $action) {
+                    if (strpos($cleansql, $action) !== false) {
+                        throw new \yii\base\InvalidArgumentException("DB action [{$action}] is not allow");
+                    }
+                }
+            }
+
+            if (is_array(self::$disable['note'])) {
+                foreach (self::$disable['note'] as $note) {
+                    if (strpos($cleansql, $note) !== false) {
+                        throw new \yii\base\InvalidArgumentException("DB comments is not allow");
+                    }
+                }
+            }
+        } elseif (substr($cmd, 0, 2) === '/*') {
+            throw new \yii\base\InvalidArgumentException("DB comments is not allow");
+        }
+    }
+
+    private static function stripSafeChar($sql)
+    {
+        $len = strlen($sql);
+        $mark = $clean = '';
+        for ($i = 0; $i < $len; $i++) {
+            $str = $sql[$i];
+            switch ($str) {
+                case '\'':
+                    if ( ! $mark) {
+                        $mark = '\'';
+                        $clean .= $str;
+                    } elseif ($mark == '\'') {
+                        $mark = '';
+                    }
+                    break;
+                case '/':
+                    if (empty($mark) && $sql[$i + 1] == '*') {
+                        $mark = '/*';
+                        $clean .= $mark;
+                        $i++;
+                    } elseif ($mark == '/*' && $sql[$i - 1] == '*') {
+                        $mark = '';
+                        $clean .= '*';
+                    }
+                    break;
+                case '#':
+                    if (empty($mark)) {
+                        $mark = $str;
+                        $clean .= $str;
+                    }
+                    break;
+                case "\n":
+                    if ($mark == '#' || $mark == '--') {
+                        $mark = '';
+                    }
+                    break;
+                case '-':
+                    if (empty($mark) && substr($sql, $i, 3) == '-- ') {
+                        $mark = '-- ';
+                        $clean .= $mark;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            $clean .= $mark ? '' : $str;
+        }
+
+        return $clean;
+    }
+
     public static function parseParameter($params, $glue = ',', $alias = '')
     {
-        $result         = ['fields' => ' 1 ', 'params' => []];
-        $split          = '';
-        $suffix         = '';
+        $result = ['fields' => ' 1 ', 'params' => []];
+        $split = '';
+        $suffix = '';
         $allow_operator = ['>', '<', '<>', '!=', '>=', '<=', '+=', '-=', 'LIKE', 'like'];
         if (in_array(strtolower($glue), ['and', 'or'])) {
             $suffix = '__';
@@ -55,16 +183,16 @@ class SqlPaser
                     $insql = [];
                     $value = array_values($value);
                     foreach ($value as $v) {
-                        $placeholder                    = self::parsePlaceholder($fields, $suffix);
-                        $insql[]                        = $placeholder;
+                        $placeholder = self::parsePlaceholder($fields, $suffix);
+                        $insql[] = $placeholder;
                         $result['params'][$placeholder] = is_null($v) ? '' : $v;
                     }
                     $result['fields'] .= $split . "$select_fields {$operator} (" . implode(",", $insql) . ")";
-                    $split            = ' ' . $glue . ' ';
+                    $split = ' ' . $glue . ' ';
                 } else {
-                    $placeholder      = self::parsePlaceholder($fields, $suffix);
+                    $placeholder = self::parsePlaceholder($fields, $suffix);
                     $result['fields'] .= $split . "$select_fields {$operator} " . ($value === 'NULL' ? 'NULL' : $placeholder);
-                    $split            = ' ' . $glue . ' ';
+                    $split = ' ' . $glue . ' ';
                     if ($value !== 'NULL') {
                         $result['params'][$placeholder] = is_array($value) ? '' : $value;
                     }
@@ -110,7 +238,7 @@ class SqlPaser
             $field = [$field];
         }
         $select = [];
-        $index  = 0;
+        $index = 0;
         foreach ($field as $field_row) {
             if (strexists($field_row, '*')) {
                 if ( ! strexists(strtolower($field_row), 'as')) {
@@ -183,7 +311,7 @@ class SqlPaser
                 unset($orderby[$i]);
             }
             $field = self::parseFieldAlias($field, $alias);
-            $row   = "{$field} {$orderbyrule}";
+            $row = "{$field} {$orderbyrule}";
         }
         $orderbysql = implode(',', $orderby);
 

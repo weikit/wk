@@ -9,15 +9,8 @@ class Module extends \yii\base\Module
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function init()
     {
-        return [
-            'we8' => [
-                'class' => Behavior::class,
-                'events' => [
-                    self::EVENT_BEFORE_ACTION => ['\weikit\core\We8', 'initApp']
-                ]
-            ]
-        ];
+        We8::initApp();
     }
 }
