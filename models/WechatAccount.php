@@ -74,7 +74,8 @@ class WechatAccount extends ActiveRecord
     {
         return [
             [['acid', 'uniacid', 'name', 'account', 'original', 'level', 'key', 'secret'], 'required'],
-            [['acid', 'uniacid', 'level', 'styleid'], 'integer'],
+            [['acid', 'uniacid', 'styleid'], 'integer'],
+            [['level'], 'in', 'range' => array_keys(WechatAccount::$levels)],
             [['token'], 'string', 'max' => 32],
             [['signature'], 'string', 'max' => 100],
             [['original', 'key', 'secret'], 'string', 'max' => 50],

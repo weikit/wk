@@ -285,7 +285,7 @@ namespace weikit\core {
             load()->func('global');
             define('CLIENT_IP', getip());
 
-            load()->class('sqlparser');
+            load()->classs('sqlparser');
             load()->func('pdo');
             load()->func('communication'); // TODO 替换
 

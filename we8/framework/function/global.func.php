@@ -154,7 +154,7 @@ function checkcaptcha($code) {
 }
 
 function tablename($table) {
-	return '`' . WEIKIT_TABLE_PREFIX . $table . '`';
+    return '`' . Yii::$app->db->tablePrefix . $table . '`';
 }
 
 

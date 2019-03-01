@@ -90,9 +90,6 @@ class WechatAccountService extends BaseService
                 'name' => $form->name,
                 'description' => $form->description,
                 'title_initial' => $uniAccount->defaultTitleInitial($form->name),
-
-//                'groupid' => 0, // TODO remove
-//                'default_acid' => 0, // TODO remove
             ], false);
             $uniAccount->save(false);
 
@@ -102,12 +99,7 @@ class WechatAccountService extends BaseService
             $account->setAttributes([
                 'uniacid' => $uniAccount->uniacid,
                 'hash' => Account::generateHash(),
-
-//                'isconnect' => 0, // TODO fix
-//                'isdeleted' => 0, // TODO fix
-//                'endtime' => 0, // TODO fix
-
-                'type' => 1, // TODO remove or fix
+                'type' => Account::TYPE_WECHAT,
 
             ], false);
             $account->save(false);
@@ -126,17 +118,6 @@ class WechatAccountService extends BaseService
                 'secret' => $form->secret,
                 'token' => WechatAccount::generateToken(),
                 'encodingaeskey' => WechatAccount::generateEncodingAesKey(),
-
-//                'signature' => '', // TODO remove or fix
-//                'country' => '', // TODO remove or fix
-//                'province' => '', // TODO remove or fix
-//                'city' => '', // TODO remove or fix
-//                'username' => '', // TODO remove or fix
-//                'password' => '', // TODO remove or fix
-//                'lastupdate' => 0, // TODO fix
-//                'styleid' => 0, // TODO remove or fix
-//                'subscribeurl' => '', // TODO remove or fix
-//                'auth_refresh_token' => '', // TODO remove or fix
             ], false);
             $wechatAccount->save(false);
 

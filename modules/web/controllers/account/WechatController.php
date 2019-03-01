@@ -3,6 +3,7 @@
 namespace weikit\modules\web\controllers\account;
 
 use weikit\models\WechatAccount;
+use weikit\services\AccountService;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -41,6 +42,11 @@ class WechatController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionManger()
+    {
+        return Yii::$app->session->get(AccountService::SESSION_MANAGE_ACCOUNT);
     }
 
     /**

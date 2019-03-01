@@ -50,7 +50,17 @@
             //'subscribeurl',
             //'auth_refresh_token',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{manage}',
+                'buttons' => [
+                    'manage' => function ($url, $model) {
+                        return \yii\helpers\Html::a('管理此公众号', ['account/default/switch', 'uniacid' => $model->uniacid], [
+                            'class' => 'text-danger'
+                        ]);
+                    }
+                ],
+            ]
         ],
     ]); }
 {template 'common/footer'}

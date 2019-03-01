@@ -19,6 +19,19 @@ use Yii;
 class Account extends ActiveRecord
 {
     /**
+     * 微信公众号
+     */
+    const TYPE_WECHAT = ACCOUNT_TYPE_OFFCIAL_NORMAL;
+    /**
+     * 支持的类型
+     *
+     * @var array
+     */
+    public static $types = [
+        self::TYPE_WECHAT => '微信公众号',
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -33,6 +46,7 @@ class Account extends ActiveRecord
     {
         return [
             [['uniacid', 'hash', 'type', 'isconnect', 'isdeleted', 'endtime'], 'required'],
+            [['type'], 'in', 'range' => static::$types],
             [['uniacid', 'type', 'isconnect', 'isdeleted', 'endtime'], 'integer'],
             [['hash'], 'string', 'max' => 8],
         ];

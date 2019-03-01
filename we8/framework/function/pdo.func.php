@@ -97,13 +97,13 @@ function pdo_fetchall($sql, $params = [], string $keyField = null)
  * @return array|false
  * @throws \yii\db\Exception
  */
-function pdo_get($tablename, $params = [], $fields = [], $orderby = [])
+function pdo_get($tablename, $params = [], $fields = [], $orderBy = [])
 {
     $select = SqlPaser::parseSelect($fields);
     $condition = SqlPaser::parseParameter($params, 'AND');
-    $orderbysql = SqlPaser::parseOrderby($orderby);
+    $orderBySql = SqlPaser::parseOrderby($orderBy);
 
-    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . " $orderbysql LIMIT 1";
+    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . " $orderBySql LIMIT 1";
 
     return pdo_fetch($sql, $condition['params']);
 }
@@ -174,7 +174,7 @@ function pdo_getslice(
             $orderBySql = $orderBy;
         }
     }
-    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . (! empty($orderbysql) ? " ORDER BY $orderBySql " : '') . $limitSql;
+    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . (! empty($orderBySql) ? " ORDER BY $orderBySql " : '') . $limitSql;
     $total = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : ''),
         $condition['params']);
 
@@ -236,7 +236,6 @@ function pdo_exists($tablename, $params = [])
  */
 function pdo_count($tablename, $params = [], $cachetime = 15)
 {
-
     // TODO cache
     return (int)pdo_getcolumn($tablename, $params, 'count(*)');
 }
@@ -307,7 +306,7 @@ function pdo_delete($table, $params = [], $glue = 'AND')
  */
 function pdo_insertid()
 {
-    return Yii::$app->db->lastInsertID;
+    return Yii::$app->db->getLastInsertID();
 }
 
 /**
@@ -352,13 +351,14 @@ function pdo_run($sql)
 {
     $db = Yii::$app->db;
     // @see https://stackoverflow.com/questions/7690380/regular-expression-to-match-all-comments-in-a-t-sql-script/13821950#13821950 移除注释
-    $sql = preg_replace( '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms', '$1', $sql );
+    $sql = preg_replace('@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms',
+        '$1', $sql);
     // 替换前缀
     $sql = str_replace(' ims_', ' ' . $db->tablePrefix, $sql);
     $sql = str_replace(' `ims_', ' `' . $db->tablePrefix, $sql);
 
-    foreach(explode(';', $sql) as $sql) {
-        if (!empty($sql)) {
+    foreach (explode(';', $sql) as $sql) {
+        if ( ! empty($sql)) {
             pdo_query($sql);
         }
     }
@@ -374,7 +374,7 @@ function pdo_run($sql)
  */
 function pdo_fieldexists($tablename, $fieldName = '')
 {
-    return Yii::$app->db->schema->getTableSchema($tablename)->getColumn($fieldName) !== null;
+    return Yii::$app->db->getSchema()->getTableSchema(pdo_tablename($tablename))->getColumn($fieldName) !== null;
 }
 
 /**
@@ -389,17 +389,16 @@ function pdo_fieldexists($tablename, $fieldName = '')
  */
 function pdo_fieldmatch($tablename, $fieldName, $dataType = '', $length = '')
 {
-    $cloumn =  Yii::$app->db->getTableSchema($tablename)->getColumn($fieldName);
+    $column = Yii::$app->db->getTableSchema(pdo_tablename($tablename))->getColumn($fieldName);
 
-    if ($cloumn !== null) {
-        
-        if (!empty($datatype)) {
-            $dataType .=  !empty($length) ? '(' . $length . ')' : '';
-            return stripos($cloumn->dbType, $dataType) === 0;
+    if ($column !== null) {
+        if ( ! empty($datatype)) {
+            $dataType .= ! empty($length) ? '(' . $length . ')' : '';
+            return stripos($column->dbType, $dataType) === 0;
         }
-
         return true;
     }
+
     return false;
 }
 
@@ -411,7 +410,7 @@ function pdo_fieldmatch($tablename, $fieldName, $dataType = '', $length = '')
  */
 function pdo_indexexists($tablename, $indexName = '')
 {
-    $indexes = ArrayHelper::getColumn(Yii::$app->db->schema->getTableIndexes($tablename), 'name');
+    $indexes = ArrayHelper::getColumn(Yii::$app->db->getSchema()->getTableIndexes(pdo_tablename($tablename)), 'name');
 
     return in_array($indexName, $indexes);
 }
@@ -420,20 +419,36 @@ function pdo_indexexists($tablename, $indexName = '')
  * 获取表字段名
  *
  * @param string $tablename
+ *
  * @return array
  */
 function pdo_fetchallfields($tablename)
 {
-    return Yii::$app->db->getTableSchema($tablename)->columnNames;
+    return Yii::$app->db->getTableSchema(pdo_tablename($tablename))->columnNames;
 }
 
 /**
  * 查询表是否存在
  *
  * @param $tablename
+ *
  * @return bool
  */
 function pdo_tableexists($tablename)
 {
-    return Yii::$app->db->getTableSchema($tablename) !== null;
+    return Yii::$app->db->getTableSchema(pdo_tablename($tablename)) !== null;
+}
+
+/**
+ * 返回带前缀的表名
+ *
+ * @param $tablename
+ *
+ * @return string
+ */
+function pdo_tablename($tablename)
+{
+    $prefix = Yii::$app->db->tablePrefix;
+
+    return strpos($tablename, $prefix) === 0 ? $tablename : $prefix . $tablename;
 }

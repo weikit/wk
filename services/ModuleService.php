@@ -136,7 +136,9 @@ class ModuleService extends BaseService
             }
 
             // 3. 扩展模块生成数据
-            $scripts = [$addon['install'], $addon['upgrade']];
+            $scripts = [$addon['install']];
+            // alert table 出错的话事务会影式提交, 确保结构操作操作不会出问题
+            // @see https://github.com/yiisoft/yii2/issues/17173#issuecomment-467946276
             array_walk($scripts, function($script, $key, $db) use ($addon) {
                 /* @var $db \yii\db\Connection */
                 if (!empty($script)) {
