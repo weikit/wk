@@ -1,67 +1,106 @@
 <?php
 
+use yii\helpers\ArrayHelper;
+use weikit\core\exceptions\UnsupportedException;
+
 function pdo()
 {
-    unsupported();
+    throw new UnsupportedException();
 }
 
 function pdos($table = '')
 {
-    unsupported();
+    throw new UnsupportedException();
 }
 
+/**
+ * 执行sql语句
+ *
+ * @param $sql
+ * @param array $params
+ *
+ * @return int
+ * @throws \yii\db\Exception
+ */
 function pdo_query($sql, $params = [])
 {
-    global $wpdb;
-    $sql = _prepare_sql($sql, $params);
+    SqlParser::checkQuery($sql);
 
-    return $wpdb->query($sql);
+    return Yii::$app->db->createCommand($sql, $params)->execute();
 }
 
-function pdo_fetchcolumn($sql, $params = [], $column = 0)
+/**
+ * 获取指定列数据
+ *
+ * @param string $sql
+ * @param array $params
+ * @param int $column
+ *
+ * @return array
+ * @throws \yii\db\Exception
+ */
+function pdo_fetchcolumn($sql, $params = [], int $column = 0)
 {
-    global $wpdb;
-    $sql = _prepare_sql($sql, $params);
-
-    return $wpdb->get_col($sql, $column);
-}
-
-function pdo_fetch($sql, $params = [])
-{
-    global $wpdb;
-    $sql = _prepare_sql($sql, $params);
-
-    return $wpdb->get_row($sql, ARRAY_A);
-}
-
-function pdo_fetchall($sql, $params = [], $keyfield = '')
-{
-    global $wpdb;
-    $sql = _prepare_sql($sql, $params);
-
-    $tmp = $wpdb->get_results($sql, ARRAY_A);
-    if (empty($keyfield)) {
-        return $tmp;
+    SqlParser::checkQuery($sql);
+    $command = Yii::$app->db->createCommand($sql, $params);
+    if ($column === 0) {
+        return $command->queryColumn();
     } else {
-        $return = [];
-        if ( ! empty($tmp)) {
-            foreach ($tmp as $key => $row) {
-                if (isset($row[$keyfield])) {
-                    $return[$row[$keyfield]] = $row;
-                } else {
-                    $return[] = $row;
-                }
-            }
-        }
+        $result = $command->queryAll(\PDO::FETCH_NUM);
 
-        return $return;
+        return ArrayHelper::getColumn($result, $column);
     }
 }
 
+/**
+ * 获取一行数据
+ *
+ * @param string $sql
+ * @param array $params
+ *
+ * @return array|false
+ * @throws \yii\db\Exception
+ */
+function pdo_fetch($sql, $params = [])
+{
+    SqlParser::checkQuery($sql);
+
+    return Yii::$app->db->createCommand($sql, $params)->queryOne();
+}
+
+/**
+ * 获取多行数据
+ *
+ * @param string $sql
+ * @param array $params
+ * @param string|null $keyField
+ *
+ * @return array
+ * @throws \yii\db\Exception
+ */
+function pdo_fetchall($sql, $params = [], string $keyField = null)
+{
+    SqlParser::checkQuery($sql);
+    $result = Yii::$app->db->createCommand($sql, $params)->queryAll();
+
+    return ArrayHelper::getColumn($result, $keyField);
+}
+
+/**
+ * 获取一行数据(自动拼装Sql)
+ *
+ * @param string $tablename
+ * @param array $params
+ * @param array $fields
+ * @param array $orderby
+ *
+ * @return array|false
+ * @throws \yii\db\Exception
+ */
 function pdo_get($tablename, $params = [], $fields = [], $orderby = [])
 {
-    $select     = SqlPaser::parseSelect($fields);
-    $condition  = SqlPaser::parseParameter($params, 'AND');
+    $select = SqlPaser::parseSelect($fields);
+    $condition = SqlPaser::parseParameter($params, 'AND');
     $orderbysql = SqlPaser::parseOrderby($orderby);
 
     $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . " $orderbysql LIMIT 1";
@@ -69,52 +108,89 @@ function pdo_get($tablename, $params = [], $fields = [], $orderby = [])
     return pdo_fetch($sql, $condition['params']);
 }
 
+/**
+ * 获取多行数据(自动拼装Sql)
+ *
+ * @param string $tablename
+ * @param array $params
+ * @param array $fields
+ * @param string $keyField
+ * @param array $orderBy
+ * @param array $limit
+ *
+ * @return array
+ * @throws \yii\db\Exception
+ */
 function pdo_getall(
     $tablename,
     $params = [],
     $fields = [],
-    $keyfield = '',
-    $orderby = [],
+    $keyField = '',
+    $orderBy = [],
     $limit = []
 ) {
-    $select    = SqlPaser::parseSelect($fields);
+    $select = SqlPaser::parseSelect($fields);
     $condition = SqlPaser::parseParameter($params, 'AND');
 
-    $limitsql   = SqlPaser::parseLimit($limit);
-    $orderbysql = SqlPaser::parseOrderby($orderby);
+    $limitSql = SqlPaser::parseLimit($limit);
+    $orderBySql = SqlPaser::parseOrderby($orderBy);
 
-    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . $orderbysql . $limitsql;
+    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . $orderBySql . $limitSql;
 
-    return pdo_fetchall($sql, $condition['params'], $keyfield);
+    return pdo_fetchall($sql, $condition['params'], $keyField);
 }
 
+/**
+ * 获取指定列的数据(自动拼装Sql)
+ *
+ * @param string $tablename
+ * @param array $params
+ * @param array $limit
+ * @param null $total
+ * @param array $fields
+ * @param string $keyField
+ * @param array $orderBy
+ *
+ * @return array
+ * @throws \yii\db\Exception
+ */
 function pdo_getslice(
     $tablename,
     $params = [],
     $limit = [],
     &$total = null,
     $fields = [],
-    $keyfield = '',
-    $orderby = []
+    $keyField = '',
+    $orderBy = []
 ) {
-    $select    = SqlPaser::parseSelect($fields);
+    $select = SqlPaser::parseSelect($fields);
     $condition = SqlPaser::parseParameter($params, 'AND');
-    $limitsql  = SqlPaser::parseLimit($limit);
+    $limitSql = SqlPaser::parseLimit($limit);
 
     if ( ! empty($orderby)) {
         if (is_array($orderby)) {
-            $orderbysql = implode(',', $orderby);
+            $orderBySql = implode(',', $orderBy);
         } else {
-            $orderbysql = $orderby;
+            $orderBySql = $orderBy;
         }
     }
-    $sql   = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . (! empty($orderbysql) ? " ORDER BY $orderbysql " : '') . $limitsql;
+    $sql = "{$select} FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : '') . (! empty($orderbysql) ? " ORDER BY $orderBySql " : '') . $limitSql;
     $total = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($tablename) . (! empty($condition['fields']) ? " WHERE {$condition['fields']}" : ''),
         $condition['params']);
 
-    return pdo_fetchall($sql, $condition['params'], $keyfield);
+    return pdo_fetchall($sql, $condition['params'], $keyField);
 }
 
+/**
+ * 获取指定列的数据(自动拼装Sql)
+ *
+ * @param $tablename
+ * @param array $params
+ * @param $field
+ *
+ * @return bool|mixed
+ * @throws \yii\db\Exception
+ */
 function pdo_getcolumn($tablename, $params = [], $field)
 {
     $result = pdo_get($tablename, $params, $field);
@@ -129,6 +205,15 @@ function pdo_getcolumn($tablename, $params = [], $field)
     return false;
 }
 
+/**
+ * 查询指定条件的数据是否存在(自动拼装Sql)
+ *
+ * @param string $tablename
+ * @param array $params
+ *
+ * @return bool
+ * @throws \yii\db\Exception
+ */
 function pdo_exists($tablename, $params = [])
 {
     $row = pdo_get($tablename, $params);
@@ -139,241 +224,216 @@ function pdo_exists($tablename, $params = [])
     return true;
 }
 
+/**
+ * 查询指定条件的数据统计数(自动拼装Sql)
+ *
+ * @param string $tablename
+ * @param array $params
+ * @param int $cachetime
+ *
+ * @return int
+ * @throws \yii\db\Exception
+ */
 function pdo_count($tablename, $params = [], $cachetime = 15)
 {
+
+    // TODO cache
     return (int)pdo_getcolumn($tablename, $params, 'count(*)');
 }
 
+/**
+ * 更新数据(自动拼装Sql)
+ *
+ * @param string $table
+ * @param array $data
+ * @param array $params
+ * @param string $glue
+ *
+ * @return int
+ * @throws \yii\db\Exception
+ */
 function pdo_update($table, $data = [], $params = [], $glue = 'AND')
 {
-    $fields    = SqlPaser::parseParameter($data, ',');
+    $fields = SqlPaser::parseParameter($data, ',');
     $condition = SqlPaser::parseParameter($params, $glue);
-    $params    = array_merge($fields['params'], $condition['params']);
-    $sql       = "UPDATE " . tablename($table) . " SET {$fields['fields']}";
-    $sql       .= $condition['fields'] ? ' WHERE ' . $condition['fields'] : '';
+    $params = array_merge($fields['params'], $condition['params']);
+    $sql = "UPDATE " . tablename($table) . " SET {$fields['fields']}";
+    $sql .= $condition['fields'] ? ' WHERE ' . $condition['fields'] : '';
 
     return pdo_query($sql, $params);
 }
 
+/**
+ * 插入数据(自动拼装Sql)
+ *
+ * @param $table
+ * @param array $data
+ * @param bool $replace
+ *
+ * @return int
+ * @throws \yii\db\Exception
+ */
 function pdo_insert($table, $data = [], $replace = false)
 {
-    $cmd       = $replace ? 'REPLACE INTO' : 'INSERT INTO';
+    $cmd = $replace ? 'REPLACE INTO' : 'INSERT INTO';
     $condition = SqlPaser::parseParameter($data, ',');
 
     return pdo_query("$cmd " . tablename($table) . " SET {$condition['fields']}", $condition['params']);
 }
 
+/**
+ * 删除数据(自动拼装Sql)
+ *
+ * @param string $table
+ * @param array $params
+ * @param string $glue
+ *
+ * @return int
+ * @throws \yii\db\Exception
+ */
 function pdo_delete($table, $params = [], $glue = 'AND')
 {
     $condition = SqlPaser::parseParameter($params, $glue);
-    $sql       = "DELETE FROM " . tablename($table);
-    $sql       .= $condition['fields'] ? ' WHERE ' . $condition['fields'] : '';
+    $sql = "DELETE FROM " . tablename($table);
+    $sql .= $condition['fields'] ? ' WHERE ' . $condition['fields'] : '';
 
     return pdo_query($sql, $condition['params']);
 }
 
+/**
+ * 获取最后插入的数据ID
+ *
+ * @return string
+ */
 function pdo_insertid()
 {
-    global $wpdb;
-
-    return $wpdb->insert_id;
+    return Yii::$app->db->lastInsertID;
 }
 
+/**
+ * 开始事务
+ *
+ * @return \yii\db\Transaction
+ */
 function pdo_begin()
 {
-    global $wpdb;
-    $wpdb->query('START TRANSACTION');
+    Yii::$app->db->beginTransaction();
 }
 
+/**
+ * 事务提交
+ *
+ * @throws \yii\db\Exception
+ */
 function pdo_commit()
 {
-    global $wpdb;
-    $wpdb->query('COMMIT');
+    Yii::$app->db->getTransaction()->commit();
 }
 
+/**
+ * 事务回滚
+ */
 function pdo_rollback()
 {
-    global $wpdb;
-    $wpdb->query('ROLLBACK');
+    Yii::$app->db->getTransaction()->rollBack();
 }
 
 function pdo_debug($output = true, $append = [])
 {
-    unsupported();
-}
-
-function pdo_run($sql)
-{
-    $sql = str_replace("\r", "\n", str_replace(' ims_ ' . WEIKIT_TABLE_PREFIX, $sql));
-    $sql = str_replace("\r", "\n", str_replace(' `ims_`' . WEIKIT_TABLE_PREFIX, $sql));
-    $ret = [];
-    $num = 0;
-    $sql = preg_replace("/\;[ \f\t\v]+/", ';', $sql);
-    foreach (explode(";\n", trim($sql)) as $query) {
-        $ret[$num] = '';
-        $queries   = explode("\n", trim($query));
-        foreach ($queries as $query) {
-            $ret[$num] .= (isset($query[0]) && $query[0] == '#') || (isset($query[1]) && isset($query[1]) && $query[0] . $query[1] == '--') ? '' : $query;
-        }
-        $num++;
-    }
-    unset($sql);
-    foreach ($ret as $query) {
-        $query = trim($query);
-        if ($query) {
-            pdo_query($query, []);
-        }
-    }
-}
-
-function pdo_fieldexists($tablename, $fieldname = '')
-{
-    $field = pdo_fetch('DESCRIBE ' . tablename($tablename) . ' `' . $fieldname . '`', []);
-
-    return ! empty($field);
-}
-
-function pdo_fieldmatch($tablename, $fieldname, $datatype = '', $length = '')
-{
-    $datatype   = strtolower($datatype);
-    $field_info = pdo_fetch("DESCRIBE " . tablename($tablename) . ' `' . $fieldname . '`', []);
-    if (empty($field_info)) {
-        return false;
-    }
-    if ( ! empty($datatype)) {
-        $find = strexists($field_info['Type'], '(');
-        if (empty($find)) {
-            $length = '';
-        }
-        if ( ! empty($length)) {
-            $datatype .= ("({$length})");
-        }
-
-        return strpos($field_info['Type'], $datatype) === 0 ? true : -1;
-    }
-
-    return true;
-}
-
-function pdo_indexexists($tablename, $indexname = '')
-{
-    if ( ! empty($indexname)) {
-        $indexs = pdo_fetchall("SHOW INDEX FROM " . tablename($tablename), [], '');
-        if ( ! empty($indexs) && is_array($indexs)) {
-            foreach ($indexs as $row) {
-                if ($row['Key_name'] == $indexname) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-function pdo_fetchallfields($tablename)
-{
-    $fields = pdo_fetchall("DESCRIBE {$tablename}", [], 'Field');
-
-    return array_keys($fields);
-}
-
-function pdo_tableexists($tablename)
-{
-    $table = trim(tablename($tablename), '`');
-    $data = pdo_fetch("SHOW TABLES LIKE '{$table}'", []);
-    if ( ! empty($data)) {
-        return in_array($table, array_values($data));
-    }
-
-    return false;
-}
-
-function _prepare_sql($sql, $params = [])
-{
-    global $wpdb;
-    if (count($params) > 0) {
-        $args = _convert_pdo_placeholders($sql, $params);
-        $sql  = call_user_func_array([$wpdb, 'prepare'], $args);
-    }
-
-    return $sql;
+    throw new UnsupportedException();
 }
 
 /**
- * Convert pdo named or unnamed placeholders to wpdb style placeholders
+ * 批量运行sql语句
  *
- * @param $sql
- * @param $params
+ * @param string $sql
+ */
+function pdo_run($sql)
+{
+    $db = Yii::$app->db;
+    // @see https://stackoverflow.com/questions/7690380/regular-expression-to-match-all-comments-in-a-t-sql-script/13821950#13821950 移除注释
+    $sql = preg_replace( '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms', '$1', $sql );
+    // 替换前缀
+    $sql = str_replace(' ims_', ' ' . $db->tablePrefix, $sql);
+    $sql = str_replace(' `ims_', ' `' . $db->tablePrefix, $sql);
+
+    foreach(explode(';', $sql) as $sql) {
+        if (!empty($sql)) {
+            pdo_query($sql);
+        }
+    }
+}
+
+/**
+ * 查询自乱是否存在
  *
- * Example:
- * ```php
- *  convert_pdo_placeholders('select * from wp_users where user_login = :user_login', array(':user_login' => 'admin'))
- *  // output ['select * from wp_users where user_login = %s', array('admin')]
+ * @param string $tablename
+ * @param string $fieldName
  *
- *  convert_pdo_placeholders('select * from wp_users where user_login = ?', array('admin'))
- *  // output ['select * from wp_users where user_login = %s', array('admin')]
- * ```
+ * @return bool
+ */
+function pdo_fieldexists($tablename, $fieldName = '')
+{
+    return Yii::$app->db->schema->getTableSchema($tablename)->getColumn($fieldName) !== null;
+}
+
+/**
+ * 匹配表的字段类型和长度
  *
+ * @param string $tablename
+ * @param string $fieldName
+ * @param string $dataType
+ * @param string|int $length
+ *
+ * @return bool
+ */
+function pdo_fieldmatch($tablename, $fieldName, $dataType = '', $length = '')
+{
+    $cloumn =  Yii::$app->db->getTableSchema($tablename)->getColumn($fieldName);
+
+    if ($cloumn !== null) {
+        
+        if (!empty($datatype)) {
+            $dataType .=  !empty($length) ? '(' . $length . ')' : '';
+            return stripos($cloumn->dbType, $dataType) === 0;
+        }
+
+        return true;
+    }
+    return false;
+}
+
+/**
+ * 查询表索引名是否存在
+ *
+ * @param string $tablename
+ * @param string $indexName
+ */
+function pdo_indexexists($tablename, $indexName = '')
+{
+    $indexes = ArrayHelper::getColumn(Yii::$app->db->schema->getTableIndexes($tablename), 'name');
+
+    return in_array($indexName, $indexes);
+}
+
+/**
+ * 获取表字段名
+ *
+ * @param string $tablename
  * @return array
  */
-function _convert_pdo_placeholders($sql, array $params)
+function pdo_fetchallfields($tablename)
 {
-    $params_keys = array_keys($params);
-    $first_key   = array_shift($params_keys);
+    return Yii::$app->db->getTableSchema($tablename)->columnNames;
+}
 
-    if ((is_int($first_key) && strpos($sql, '?') === false) && substr($first_key, 0, 1) !== ':') { // wpdb style
-        return [$sql, $params];
-    }
-
-    $contents = []; // collect content inside quotes
-    $i        = 0;
-    $sql      = preg_replace_callback('/(("[^"\\\\]*(?:\\\\.[^"\\\\]*)*")|(`[^`\\\\]*(?:\\\\.[^`\\\\]*)*`)|(\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'))/s',
-        function ($matches) use (&$i, &$contents) {
-            $replace            = '{{' . $i . '}}';
-            $contents[$replace] = $matches[0];
-            $i++;
-
-            return $replace;
-        }, $sql); // replace quotes contents
-
-    if (is_int($first_key)) { // unnamed placeholders
-        $i   = 0;
-        $sql = preg_replace_callback('/(\?)/', function ($matches) use ($params, &$i) {
-            if (array_key_exists($i, $params)) {
-                $value = $params[$i];
-                if (is_int($value)) {
-                    return '%d';
-                } elseif (is_float($value)) {
-                    return '%f';
-                } else {
-                    return '%s';
-                }
-            }
-
-            return $matches[0];
-        }, $sql);
-    } elseif (substr($first_key, 0, 1) === ':') { // named placeholders
-        $sql    = preg_replace_callback('/([:][a-zA-Z_]+[a-zA-Z0-9_]+)/', function ($matches) use ($params) {
-            if (array_key_exists($matches[0], $params)) {
-                $value = $params[$matches[0]];
-                if (is_int($value)) {
-                    return '%d';
-                } elseif (is_float($value)) {
-                    return '%f';
-                } else {
-                    return '%s';
-                }
-            }
-
-            return $matches[0];
-        }, $sql);
-        $params = array_values($params);
-    }
-    if (count($contents) > 0) {
-        $sql = strtr($sql, $contents); // replace contents back
-    }
-
-
-    return [$sql, $params];
+/**
+ * 查询表是否存在
+ *
+ * @param $tablename
+ * @return bool
+ */
+function pdo_tableexists($tablename)
+{
+    return Yii::$app->db->getTableSchema($tablename) !== null;
 }

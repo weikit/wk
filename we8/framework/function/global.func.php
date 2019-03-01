@@ -255,8 +255,8 @@ function is_base64($str){
 
 
 function wurl($segment, $params = array()) {
-    return new \Weikit\Foundation\Http\WebUrl($segment, $params);
-	list($controller, $action, $do) = explode('/', $segment);
+    $params[0] = $segment;
+    return yii\helpers\Url::to($params);
 }
 
 if (!function_exists('murl')) {

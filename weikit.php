@@ -14,12 +14,13 @@ add_action('wk_init', function() { // 初始化Weikit
         define('YII_BEGIN_TIME', $timestart);
 
         require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
-        require_once ( __DIR__ . '/core/helper.php');
 
         new weikit\core\Application(
             apply_filters( 'wk_config', require ( __DIR__ . '/config/web.php' ) )
         );
     }
+    Yii::$app->getModule('web');
+    pdo_indexexists('wp_users');
 });
 
 if (SHORTINIT) { // Wordpress精简运行模式(SHORTINIT)加载基本wordpress功能保证WeiKit最优性能运行
