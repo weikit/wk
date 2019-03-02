@@ -1,33 +1,23 @@
 {template 'common/header-base'}
 {php $__menu = get_option('wk_web_menu', [
-    'account' => [
-        'label' => '平台',
+    'wechat' => [
+        'label' => '微信公众号',
         'url' => ['/web/account/wechat/index'],
-        'items' => [
-            'wechat' => [
-                'label' => '微信公众号',
-                'url' => ['/web/account/wechat/index'],
-            ],
-            'wxapp' => [
-                'label' => '微信小程序',
-                'url' => ['/web/account/wxapp'],
-            ],
-            'aliapp' => [
-                'label' => '支付宝小程序',
-                'url' => ['/web/account/aliapp'],
-                'items' => [
-                    'aliapp' => [
-                        'label' => '支付宝小程序',
-                        'url' => ['/web/account/aliapp'],
-                    ],
-                ]
-            ],
-        ],
     ],
-    'module' => [
-        'label' => '模块',
-        'url' => ['/web/module/index'],
-    ]
+    'wxapp' => [
+        'label' => '微信小程序',
+        'url' => ['/web/account/wxapp'],
+    ],
+    'aliapp' => [
+        'label' => '支付宝小程序',
+        'url' => ['/web/account/aliapp'],
+        'items' => [
+            'aliapp' => [
+                'label' => '支付宝小程序1',
+                'url' => ['/web/account/aliapp'],
+            ],
+        ]
+    ],
 ]);}
 <div data-skin="default" class="skin-default">
     <div class="main">
@@ -70,4 +60,16 @@
                             'items' => $__menu[$__currentMenuId]['items']
                         ])}
                     </div>
+                {/if}
+
+                <div class="row">
+                {if !empty($menu) || (isset($menuKey) && $menu = \Yii::createObject('weikit\services\MenuService')->getMenuByKey($menuKey)) }
+                    <div class="col-md-2">
+                        {php echo weikit\widgets\NavMenu::widget([
+                            'items' => $menu
+                        ])}
+                    </div>
+                    <div class="col-md-10">
+                {else}
+                    <div class="col-md-12">
                 {/if}

@@ -65,4 +65,9 @@ class ModuleBinding extends ActiveRecord
             'displayorder' => '排序',
         ];
     }
+
+    public function getModule()
+    {
+        return $this->hasOne(Module::class, ['module' => 'name']);
+    }
 }

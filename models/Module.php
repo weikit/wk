@@ -110,4 +110,9 @@ class Module extends ActiveRecord
             'xzapp_support' => 'Xzapp Support',
         ];
     }
+
+    public function getEntries()
+    {
+        return $this->hasMany(ModuleBinding::class, ['module' => 'name']);
+    }
 }

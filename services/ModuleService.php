@@ -27,6 +27,17 @@ class ModuleService extends BaseService
     }
 
     /**
+     * @param $eid
+     *
+     * @return ModuleBinding|null
+     * @throw \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findEntryByEid($eid)
+    {
+        return ModuleBinding::tryFindOne(['eid' => $eid]);
+    }
+
+    /**
      * @param $name
      *
      * @return array|null

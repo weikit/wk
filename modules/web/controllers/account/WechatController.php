@@ -2,6 +2,7 @@
 
 namespace weikit\modules\web\controllers\account;
 
+use weikit\models\Module;
 use weikit\models\WechatAccount;
 use weikit\services\AccountService;
 use Yii;
@@ -44,9 +45,11 @@ class WechatController extends Controller
         ];
     }
 
-    public function actionManger()
+    public function actionManage()
     {
-        return Yii::$app->session->get(AccountService::SESSION_MANAGE_ACCOUNT);
+        return $this->render('manage', [
+            'modules' => Module::find()->all()
+        ]);
     }
 
     /**

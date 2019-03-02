@@ -15,6 +15,9 @@ body {
 .mb20 {
     margin-bottom: 20px;
 }
+.cursor-pointer {
+    cursor: pointer;
+}
 
 /* BOOTSTRAP RESET */
 a.asc:after{
@@ -33,7 +36,9 @@ a.desc:after {
     position: absolute;
     margin-left: 2px;
     top: 8px;
-
+}
+.list-group-item.active a {
+    color: #fff;
 }
 .nav-underline {
     border-bottom: 1px solid #d1d5da;
