@@ -2,8 +2,8 @@
 
 namespace weikit\models;
 
-use weikit\core\db\ActiveRecord;
 use Yii;
+use weikit\core\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%modules}}".
@@ -33,6 +33,8 @@ use Yii;
  * @property int $phoneapp_support
  * @property int $account_support
  * @property int $xzapp_support
+ *
+ * @property ModuleBinding[] $entries
  */
 class Module extends ActiveRecord
 {

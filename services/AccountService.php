@@ -8,7 +8,14 @@ use weikit\core\service\BaseService;
 
 class AccountService extends BaseService
 {
+    /**
+     * 当前管理账号seesion键值
+     */
     const SESSION_MANAGE_ACCOUNT = 'session_manage_account';
+    /**
+     * @var string
+     */
+    public $modelClass = Account::class;
 
     /**
      * @param int $uniacid
@@ -18,7 +25,7 @@ class AccountService extends BaseService
      */
     public function findByUniacid($uniacid)
     {
-        return Account::tryFindOne(['uniacid' => $uniacid]);
+        return $this->powerFind(['uniacid' => $uniacid], [ 'class']);
     }
 
     /**

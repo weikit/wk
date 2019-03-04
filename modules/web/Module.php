@@ -2,8 +2,6 @@
 
 namespace weikit\modules\web;
 
-use weikit\core\We8;
-
 class Module extends \yii\base\Module
 {
     public $controllerNamespace = 'weikit\modules\web\controllers';
@@ -13,6 +11,6 @@ class Module extends \yii\base\Module
      */
     public function init()
     {
-        We8::initWeb();
+        \We8::initWeb();
     }
 }

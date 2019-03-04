@@ -16,6 +16,20 @@ use weikit\models\ModuleBinding;
 class ModuleService extends BaseService
 {
     /**
+     * @var string
+     */
+    public $modelClass = Module::class;
+    /**
+     * @param $mid
+     * @return Module|null
+     *  @throw \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findByMid($mid)
+    {
+        return $this->powerFind(['mid' => $mid]);
+    }
+
+    /**
      * @param $name
      *
      * @return Module|null
@@ -23,18 +37,48 @@ class ModuleService extends BaseService
      */
     public function findByName($name)
     {
-        return Module::tryFindOne(['name' => $name]);
+        return $this->powerFind(['name' => $name]);
     }
 
     /**
-     * @param $eid
+     * @param string|int $eid
      *
      * @return ModuleBinding|null
      * @throw \weikit\core\exceptions\ModelNotFoundException
      */
     public function findEntryByEid($eid)
     {
-        return ModuleBinding::tryFindOne(['eid' => $eid]);
+        return $this->findEntryBy(['eid' => $eid]);
+    }
+
+    /**
+     * @param array $condition
+     * @param array $options
+     *
+     * @return ModuleBinding
+     * @throw \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findEntryBy($condition, array $options = [])
+    {
+        return $this->powerFind($condition, array_merge($options, [
+            'all' => false,
+            'modelClass' => ModuleBinding::class
+        ]));
+    }
+
+
+    /**
+     * @param array $condition
+     * @param array $options
+     *
+     * @return ModuleBinding[]
+     */
+    public function findAllEntryBy($condition, array $options = [])
+    {
+        return $this->powerFind($condition, array_merge($options, [
+            'all' => true,
+            'modelClass' => ModuleBinding::class
+        ]));
     }
 
     /**
@@ -177,5 +221,26 @@ class ModuleService extends BaseService
         });
 
         return $module;
+    }
+
+    /**
+     * @param Module $module
+     *
+     * @return mixed
+     */
+    public function instanceSite(Module $module)
+    {
+        $class = $module->name . 'ModuleSite';
+        if (!class_exists($class)) {
+            require_once Yii::$app->addon->getPath($module->name, 'site.php');
+        }
+        if (!class_exists($class)) {
+            list($namespace) = explode('_', $module->name);
+            if (class_exists('\\' . $namespace . '\\' . $class)) {
+                $class = '\\' . $namespace . '\\' . $class;
+            }
+        }
+        $site = new $class();
+        return $site;
     }
 }

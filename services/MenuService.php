@@ -2,8 +2,10 @@
 
 namespace weikit\services;
 
-use weikit\core\service\BaseService;
+use weikit\models\ModuleBinding;
+use Yii;
 use yii\helpers\ArrayHelper;
+use weikit\core\service\BaseService;
 
 class MenuService extends BaseService
 {
@@ -11,6 +13,7 @@ class MenuService extends BaseService
      * 通过关键字获取菜单数据
      *
      * @param $key
+     *
      * @return array
      */
     public function getMenuByKey($key)
@@ -26,31 +29,42 @@ class MenuService extends BaseService
      * 获取菜单数据
      *
      * @param $mid
+     *
      * @return array
      */
     public function getModuleMenu($mid)
     {
-        return [
-            'wxapp' => [
-                'label' => '微信小程序',
-                'url' => ['/web/account/wxapp'],
-                'items' => [
-                    'aliapp' => [
-                        'label' => '支付宝小程序1',
-                        'url' => ['/web/account/aliapp'],
+        return Yii::$app->cache->getOrSet('menu_module:' . $mid, function() use ($mid) {
+            /* @var $service ModuleService */
+            $service = Yii::createObject(ModuleService::class);
+            $module = $service->findByMid($mid);
+            $entries = $module->entries;
+
+            $customMenu = [];
+            foreach ($entries as $entry) {
+                if ($entry->entry === ModuleBinding::ENTRY_MENU) {
+                    $customMenu[] = [
+                        'label' => $entry->title,
+                        'url' => ['site/entry', 'eid' => $entry->eid]
+                    ];
+                }
+            }
+
+            $menu = [
+                'entry'  => [
+                    'label' => $module->title,
+                    'items' => [
                     ],
-                ]
-            ],
-            'aliapp' => [
-                'label' => '支付宝小程序',
-                'url' => ['/web/account/aliapp'],
-                'items' => [
-                    'aliapp' => [
-                        'label' => '支付宝小程序1',
-                        'url' => ['/web/account/aliapp'],
-                    ],
-                ]
-            ],
-        ];
+                ],
+                'custom' => [
+                    'label' => '自定义',
+                    'items' => $customMenu,
+                ],
+            ];
+
+
+            return $menu;
+
+        }, 604800);
     }
 }

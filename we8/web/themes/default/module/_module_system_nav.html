@@ -1,5 +1,0 @@
-<p>
-    {loop $this->navs $key $name}
-    <a class="{php echo $do === $key ? 'text-muted' : ''}" href="{php echo wurl('module/manage-system/' . $key)}">{$name}</a> |
-    {/loop}
-</p>

@@ -15,6 +15,10 @@ use weikit\models\search\WechatAccountSearch;
 class WechatAccountService extends BaseService
 {
     /**
+     * @var string
+     */
+    public $modelClass = WechatAccount::class;
+    /**
      * @param $acid
      *
      * @return WechatAccount|null
@@ -22,7 +26,7 @@ class WechatAccountService extends BaseService
      */
     public function findByAcid($id)
     {
-        return WechatAccount::tryFindOne($id);
+        return $this->powerFind(['acid' => $id]);
     }
 
     /**

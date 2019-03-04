@@ -23,6 +23,22 @@ use weikit\core\db\ActiveRecord;
 class ModuleBinding extends ActiveRecord
 {
     /**
+     * 自定义菜单入口
+     */
+    const ENTRY_MENU = 'menu';
+    /**
+     * 功能入口
+     */
+    const ENTRY_COVER = 'cover';
+    /**
+     * @var array
+     */
+    public static $entries = [
+        self::ENTRY_MENU => '自定义菜单入口',
+        self::ENTRY_COVER => '功能入口',
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -40,6 +56,7 @@ class ModuleBinding extends ActiveRecord
             [['call', 'title', 'icon'], 'string', 'max' => 50],
             [['module', 'url'], 'string', 'max' => 100],
             [['entry'], 'string', 'max' => 30],
+            [['entry'], 'in', 'range' => array_keys(static::$entries)],
             [['do', 'state'], 'string', 'max' => 200],
             [['direct'], 'boolean'],
             [['displayorder'], 'integer'],
@@ -66,8 +83,8 @@ class ModuleBinding extends ActiveRecord
         ];
     }
 
-    public function getModule()
+    public function getRelationModule()
     {
-        return $this->hasOne(Module::class, ['module' => 'name']);
+        return $this->hasOne(Module::class, ['name' => 'module']);
     }
 }

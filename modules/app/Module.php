@@ -11,6 +11,6 @@ class Module extends \yii\base\Module
      */
     public function init()
     {
-        We8::initApp();
+        \We8::initApp();
     }
 }

@@ -22,6 +22,12 @@ class PlatformController extends Controller
         parent::__construct($id, $module, $config);
     }
 
+    /**
+     * @param null $m
+     * @param null $eid
+     *
+     * @return string
+     */
     public function actionCover($m = null, $eid = null)
     {
         if ($m) {
