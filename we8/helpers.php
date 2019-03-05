@@ -7,15 +7,15 @@ class Loader
     /**
      * @var array
      */
-    private $cache = [];
+    protected $cache = [];
     /**
      * @var array
      */
-    private $singletonObject = [];
+    protected $singletons = [];
     /**
      * @var array
      */
-    private $libraryMap = [
+    protected $libraries = [
         'agent'     => 'agent/agent.class',
         'captcha'   => 'captcha/captcha.class',
         'pdo'       => 'pdo/PDO.class',
@@ -34,7 +34,7 @@ class Loader
     /**
      * @var array
      */
-    private $loadTypeMap = [
+    protected $types = [
         'func'    => '/framework/function/%s.func.php',
         'model'   => '/framework/model/%s.mod.php',
         'classs'  => '/framework/class/%s.class.php',
@@ -53,38 +53,43 @@ class Loader
     public function __call($type, $params)
     {
         $name = $cacheKey = array_shift($params);
-        if ( ! empty($this->cache[$type]) && isset($this->cache[$type][$cacheKey])) {
+        if (isset($this->cache[$type][$cacheKey]) || empty($this->libraries[$type])) {
             return true;
+        } elseif ($type === 'library' && ! empty($this->libraries[$name])) {
+            $name = $this->libraries[$name];
         }
-        if (empty($this->loadTypeMap[$type])) {
-            return true;
-        }
-        if ($type == 'library' && ! empty($this->libraryMap[$name])) {
-            $name = $this->libraryMap[$name];
-        }
-        $file = sprintf($this->loadTypeMap[$type], $name);
-        if (file_exists(WE8_PATH . $file)) {
-            include WE8_PATH . $file;
-            $this->cache[$type][$cachekey] = true;
 
-            return true;
-        } else {
-            trigger_error('Invalid ' . ucfirst($type) . $file, E_USER_WARNING);
-
-            return false;
+        $file = sprintf($this->types[$type], $name);
+        if ( ! file_exists(WE8_PATH . $file)) {
+            throw new RuntimeException("Invalid file '{$file}' of type ${$type}");
         }
+
+        include WE8_PATH . $file;
+        $this->cache[$type][$cacheKey] = true;
+
+        return $this->cache[$type][$cacheKey] = true;
     }
 
-    function singleton($name)
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function singleton($name)
     {
-        if ( ! isset($this->singletonObject[$name])) {
-            $this->singletonObject[$name] = $this->object($name);
+        if ( ! isset($this->singletons[$name])) {
+            $this->singletons[$name] = $this->object($name);
         }
 
-        return $this->singletonObject[$name];
+        return $this->singletons[$name];
     }
 
-    function object($name)
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function object($name)
     {
         $this->classs(strtolower($name));
 
@@ -93,7 +98,7 @@ class Loader
 }
 
 /**
- * 类加载器
+ * 加载辅助器
  *
  * @return Loader
  */
@@ -102,58 +107,61 @@ function load()
     static $loader;
 
     if ($loader === null) {
-        $loader = new Loader();
+        $loader = Yii::createObject(Loader::class);
     }
 
     return $loader;
 }
 
-function ver_compare($version1, $version2)
+/**
+ * 严格比对版本号
+ *
+ * @param string|int $a
+ * @param string|int $b
+ *
+ * @return mixed
+ */
+function ver_compare($a, $b)
 {
-    $version1 = str_replace('.', '', $version1);
-    $version2 = str_replace('.', '', $version2);
-    $oldLength = istrlen($version1);
-    $newLength = istrlen($version2);
-    if (is_numeric($version1) && is_numeric($version2)) {
-        if ($oldLength > $newLength) {
-            $version2 .= str_repeat('0', $oldLength - $newLength);
-        }
-        if ($newLength > $oldLength) {
-            $version1 .= str_repeat('0', $newLength - $oldLength);
-        }
-        $version1 = intval($version1);
-        $version2 = intval($version2);
-    }
+    $a = str_replace('.', '', $a);
+    $b = str_replace('.', '', $b);
 
-    return version_compare($version1, $version2);
+    $len = max([strlen($a), strlen($b)]);
+
+
+    $a = (int)str_pad($a, $len, '0', STR_PAD_RIGHT);
+    $b = (int)str_pad($b, $len, '0', STR_PAD_RIGHT);
+
+    return version_compare($a, $b);
 }
 
-function istripslashes($var)
+/**
+ * 转义字符串(数组递归转义)
+ *
+ * @param array|string $value
+ *
+ * @return array|string
+ */
+function istripslashes($value)
 {
-    if (is_array($var)) {
-        foreach ($var as $key => $value) {
-            $var[stripslashes($key)] = istripslashes($value);
-        }
-    } else {
-        $var = stripslashes($var);
-    }
-
-    return $var;
+    return is_array($value) ? array_map('istripslashes', $value) : stripslashes($value);
 }
 
-function ihtmlspecialchars($var)
+/**
+ * 转换特殊html字符(数组递归转换)
+ *
+ * @param array|string $value
+ *
+ * @return array|string
+ */
+function ihtmlspecialchars($value)
 {
-    if (is_array($var)) {
-        foreach ($var as $key => $value) {
-            $var[htmlspecialchars($key)] = ihtmlspecialchars($value);
-        }
-    } else {
-        $var = str_replace('&amp;', '&', htmlspecialchars($var, ENT_QUOTES));
-    }
-
-    return $var;
+    return is_array($value) ?
+        array_map('ihtmlspecialchars', $value) :
+        str_replace('&amp;', '&', htmlspecialchars($value, ENT_QUOTES));
 }
 
+// TODO
 function isetcookie($key, $value, $expire = 0, $httponly = false)
 {
     global $_W;
@@ -164,30 +172,38 @@ function isetcookie($key, $value, $expire = 0, $httponly = false)
         $_W['config']['cookie']['domain'], $secure, $httponly);
 }
 
+/**
+ * 获取真实IP地址
+ *
+ * @return string
+ */
 function getip()
 {
-    static $ip = '';
-    $ip = $_SERVER['REMOTE_ADDR'];
-    if (isset($_SERVER['HTTP_CDN_SRC_IP'])) {
-        $ip = $_SERVER['HTTP_CDN_SRC_IP'];
-    } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s',
-            $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
-        foreach ($matches[0] AS $xip) {
-            if ( ! preg_match('#^(10|172\.16|192\.168)\.#', $xip)) {
-                $ip = $xip;
-                break;
+    static $ip;
+    if ($ip === null) {
+        $ip = $_SERVER['REMOTE_ADDR'];
+        if (isset($_SERVER['HTTP_CDN_SRC_IP'])) {
+            $ip = $_SERVER['HTTP_CDN_SRC_IP'];
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && preg_match_all('#\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}#s',
+                $_SERVER['HTTP_X_FORWARDED_FOR'], $matches)) {
+            foreach ($matches[0] AS $_ip) {
+                if ( ! preg_match('#^(10|172\.16|192\.168)\.#', $_ip)) {
+                    $ip = $_ip;
+                    break;
+                }
             }
         }
+        if ( ! preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $ip)) {
+            $ip = '127.0.0.1';
+        }
     }
-    if (preg_match('/^([0-9]{1,3}\.){3}[0-9]{1,3}$/', $ip)) {
-        return $ip;
-    } else {
-        return '127.0.0.1';
-    }
+
+    return $ip;
 }
 
+// TODO
 function token($specialadd = '')
 {
     global $_W;
@@ -211,24 +227,30 @@ function token($specialadd = '')
     }
 }
 
+/**
+ * 生成随机字符串或随机随机数
+ *
+ * @param int $length
+ * @param bool $numeric
+ *
+ * @return string
+ * @throws \yii\base\Exception
+ */
 function random($length, $numeric = false)
 {
-    $seed = base_convert(md5(microtime() . $_SERVER['DOCUMENT_ROOT']), 16, $numeric ? 10 : 35);
-    $seed = $numeric ? (str_replace('0', '', $seed) . '012340567890') : ($seed . 'zZ' . strtoupper($seed));
-    if ($numeric) {
-        $hash = '';
+    if ($numeric === false) {
+        return Yii::$app->security->generateRandomString($length);
     } else {
-        $hash = chr(rand(1, 26) + rand(0, 1) * 32 + 64);
-        $length--;
-    }
-    $max = strlen($seed) - 1;
-    for ($i = 0; $i < $length; $i++) {
-        $hash .= $seed{mt_rand(0, $max)};
-    }
+        $result = '';
+        for ($i = 0; $i < $length; $i++) {
+            $result .= mt_rand(0, 9);
+        }
 
-    return $hash;
+        return $result;
+    }
 }
 
+// TODO
 function checksubmit($var = 'submit', $allowget = false)
 {
     global $_W, $_GPC;
@@ -254,6 +276,7 @@ function checksubmit($var = 'submit', $allowget = false)
     return false;
 }
 
+// TODO
 function checkcaptcha($code)
 {
     global $_W, $_GPC;
@@ -270,6 +293,13 @@ function checkcaptcha($code)
     return $return;
 }
 
+/**
+ * 获取带前缀的数据库名
+ *
+ * @param $table
+ *
+ * @return string
+ */
 function tablename($table)
 {
     return '`' . Yii::$app->db->tablePrefix . $table . '`';
@@ -292,90 +322,109 @@ function array_elements($keys, $src, $default = false)
     return $return;
 }
 
-function iarray_sort($array, $keys, $type = 'asc')
+/**
+ * 对多维数组排序
+ *
+ * @param array $array
+ * @param $key
+ * @param string $type
+ *
+ * @return mixed
+ */
+function iarray_sort($array, $key, $type = 'asc')
 {
-    $keysvalue = $new_array = [];
-    foreach ($array as $k => $v) {
-        $keysvalue[$k] = $v[$keys];
-    }
-    if ($type == 'asc') {
-        asort($keysvalue);
-    } else {
-        arsort($keysvalue);
-    }
-    reset($keysvalue);
-    foreach ($keysvalue as $k => $v) {
-        $new_array[$k] = $array[$k];
-    }
+    \yii\helpers\ArrayHelper::multisort($array, $key, $type == 'asc' ? SORT_ASC : SORT_DESC);
 
-    return $new_array;
+    return $array;
 }
 
-function range_limit($num, $downline, $upline, $returnNear = true)
+/**
+ * 查询数字是否在最小和最大边界值内. 超出则返回边界值
+ *
+ * @param int $num
+ * @param int $min
+ * @param int $max
+ * @param bool $limit
+ *
+ * @return bool|int
+ */
+function range_limit($num, $min, $max, $limit = true)
 {
     $num = intval($num);
-    $downline = intval($downline);
-    $upline = intval($upline);
-    if ($num < $downline) {
-        return empty($returnNear) ? false : $downline;
-    } elseif ($num > $upline) {
-        return empty($returnNear) ? false : $upline;
+    $min = intval($min);
+    $max = intval($max);
+    $limit = $limit === true;
+    if ($num < $min) {
+        return ! $limit ? false : $min;
+    } elseif ($num > $max) {
+        return ! $limit ? false : $max;
     } else {
-        return empty($returnNear) ? true : $num;
+        return ! $limit ? true : $num;
     }
 }
 
+/**
+ * json转码
+ *
+ * @param mixed $value
+ * @param int $options
+ *
+ * @return bool|string
+ */
 function ijson_encode($value, $options = 0)
 {
-    if (empty($value)) {
-        return false;
-    }
-    if (version_compare(PHP_VERSION, '5.4.0', '<') && $options == JSON_UNESCAPED_UNICODE) {
-        $str = json_encode($value);
-        $json_str = preg_replace_callback("#\\\u([0-9a-f]{4})#i", function ($matchs) {
-            return iconv('UCS-2BE', 'UTF-8', pack('H4', $matchs[1]));
-        }, $str);
-    } else {
-        $json_str = json_encode($value, $options);
-    }
-
-    return addslashes($json_str);
+    return empty($value) ? false : addslashes(json_encode($value, $options));
 }
 
+/**
+ * 序列化数据
+ *
+ * @param $value
+ *
+ * @return string
+ */
 function iserializer($value)
 {
     return serialize($value);
 }
 
+/**
+ * 解码序列化数据(优化中文序列化问题)
+ *
+ * @param $value
+ *
+ * @return array|mixed
+ */
 function iunserializer($value)
 {
     if (empty($value)) {
         return [];
-    }
-    if ( ! is_serialized($value)) {
+    } elseif ( ! is_serialized($value)) {
         return $value;
     }
-    $result = unserialize($value);
-    if ($result === false) {
-        $temp = preg_replace_callback('!s:(\d+):"(.*?)";!s', function ($matchs) {
-            return 's:' . strlen($matchs[2]) . ':"' . $matchs[2] . '";';
+    if (($result = unserialize($value)) === false) {
+        $temp = preg_replace_callback('#s:(\d+):"(.*?)";#s', function ($match) {
+            return 's:' . strlen($match[2]) . ':"' . $match[2] . '";';
         }, $value);
-
         return unserialize($temp);
     } else {
         return $result;
     }
 }
 
+/**
+ * 判断字符串是base6编码
+ *
+ * @param string $str
+ *
+ * @return bool
+ */
 function is_base64($str)
 {
-    if ( ! is_string($str)) {
-        return false;
-    }
-
-    return $str == base64_encode(base64_decode($str));
+    return is_string($str) && $str == base64_encode(base64_decode($str));
 }
 
+// TODO
 function wurl($segment, $params = [])
 {
     $params[0] = $segment;
@@ -383,6 +432,7 @@ function wurl($segment, $params = [])
     return yii\helpers\Url::to($params);
 }
 
+// TODO
 if ( ! function_exists('murl')) {
 
     function murl($segment, $params = [], $noredirect = true, $addhost = false)
@@ -426,6 +476,7 @@ if ( ! function_exists('murl')) {
     }
 }
 
+// TODO
 function pagination(
     $total,
     $pageIndex,
@@ -546,6 +597,7 @@ function pagination(
     return $html;
 }
 
+// TODO
 function tomedia($src, $local_path = false)
 {
     global $_W;
@@ -580,6 +632,14 @@ function tomedia($src, $local_path = false)
     return $src;
 }
 
+/**
+ * 错误格式
+ *
+ * @param $errno
+ * @param string $message
+ *
+ * @return array
+ */
 function error($errno, $message = '')
 {
     return [
@@ -588,6 +648,13 @@ function error($errno, $message = '')
     ];
 }
 
+/**
+ * 是否错误数据体
+ *
+ * @param $data
+ *
+ * @return bool
+ */
 function is_error($data)
 {
     if (empty($data) || ! is_array($data) || ! array_key_exists('errno', $data) || (array_key_exists('errno',
@@ -598,6 +665,7 @@ function is_error($data)
     }
 }
 
+// TODO
 function detect_sensitive_word($string)
 {
     $setting = setting_load('sensitive_words');
@@ -613,6 +681,7 @@ function detect_sensitive_word($string)
     return false;
 }
 
+// TODO
 function referer($default = '')
 {
     global $_GPC, $_W;
@@ -637,11 +706,29 @@ function referer($default = '')
     return strip_tags($_W['referer']);
 }
 
+/**
+ * 查询关键字是否存在字符串中
+ *
+ * @param $string
+ * @param $find
+ *
+ * @return bool
+ */
 function strexists($string, $find)
 {
-    return ! (strpos($string, $find) === false);
+    return strpos($string, $find) !== false;
 }
 
+/**
+ *
+ * TODO
+ * @param $string
+ * @param $length
+ * @param bool $havedot
+ * @param string $charset
+ *
+ * @return mixed|string
+ */
 function cutstr($string, $length, $havedot = false, $charset = '')
 {
     global $_W;
@@ -738,69 +825,20 @@ function cutstr($string, $length, $havedot = false, $charset = '')
     return $string;
 }
 
-function istrlen($string, $charset = '')
+/**
+ * 获取字符串长度
+ *
+ * @param $str
+ * @param null $encoding
+ *
+ * @return int
+ */
+function istrlen($str, $encoding = null)
 {
-    global $_W;
-    if (empty($charset)) {
-        $charset = $_W['charset'];
-    }
-    if (strtolower($charset) == 'gbk') {
-        $charset = 'gbk';
-    } else {
-        $charset = 'utf8';
-    }
-    if (function_exists('mb_strlen') && extension_loaded('mbstring')) {
-        return mb_strlen($string, $charset);
-    } else {
-        $n = $noc = 0;
-        $strlen = strlen($string);
-
-        if ($charset == 'utf8') {
-
-            while ($n < $strlen) {
-                $t = ord($string[$n]);
-                if ($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
-                    $n++;
-                    $noc++;
-                } elseif (194 <= $t && $t <= 223) {
-                    $n += 2;
-                    $noc++;
-                } elseif (224 <= $t && $t <= 239) {
-                    $n += 3;
-                    $noc++;
-                } elseif (240 <= $t && $t <= 247) {
-                    $n += 4;
-                    $noc++;
-                } elseif (248 <= $t && $t <= 251) {
-                    $n += 5;
-                    $noc++;
-                } elseif ($t == 252 || $t == 253) {
-                    $n += 6;
-                    $noc++;
-                } else {
-                    $n++;
-                }
-            }
-
-        } else {
-
-            while ($n < $strlen) {
-                $t = ord($string[$n]);
-                if ($t > 127) {
-                    $n += 2;
-                    $noc++;
-                } else {
-                    $n++;
-                    $noc++;
-                }
-            }
-
-        }
-
-        return $noc;
-    }
+    return mb_strlen($str, $encoding ?? Yii::$app->charset);
 }
 
+// TODO 下载表情图片
 function emotion($message = '', $size = '24px')
 {
     $emotions = [
@@ -919,6 +957,7 @@ function emotion($message = '', $size = '24px')
     return $message;
 }
 
+// TODO
 function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 {
     $ckey_length = 4;
@@ -974,31 +1013,31 @@ function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 
 function sizecount($size)
 {
-    if ($size >= 1073741824) {
-        $size = round($size / 1073741824 * 100) / 100 . ' GB';
-    } elseif ($size >= 1048576) {
-        $size = round($size / 1048576 * 100) / 100 . ' MB';
-    } elseif ($size >= 1024) {
-        $size = round($size / 1024 * 100) / 100 . ' KB';
-    } else {
-        $size = $size . ' Bytes';
-    }
+    $units = array('Bytes', 'KB', 'MB', 'GB', 'TB');
 
-    return $size;
+    $bytes = max($size, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+
+    // Uncomment one of the following alternatives
+    // $bytes /= pow(1024, $pow);
+    // $bytes /= (1 << (10 * $pow));
+
+    return round($bytes, 2) . ' ' . $units[$pow];
 }
 
 function bytecount($str)
 {
-    if (strtolower($str[strlen($str) - 1]) == 'b') {
+    $unit = strtoupper($str[strlen($str) - 1]);
+    if ($unit == 'B') {
         $str = substr($str, 0, -1);
-    }
-    if (strtolower($str[strlen($str) - 1]) == 'k') {
+    } elseif ($unit == 'K') {
         return floatval($str) * 1024;
-    }
-    if (strtolower($str[strlen($str) - 1]) == 'm') {
+    } elseif ($unit == 'M') {
         return floatval($str) * 1048576;
-    }
-    if (strtolower($str[strlen($str) - 1]) == 'g') {
+    } elseif ($unit == 'G') {
+        return floatval($str) * 1073741824;
+    } elseif ($unit == 'T') {
         return floatval($str) * 1073741824;
     }
 }
@@ -1901,8 +1940,10 @@ function pdo_fieldmatch($tablename, $fieldName, $dataType = '', $length = '')
     if ($column !== null) {
         if ( ! empty($datatype)) {
             $dataType .= ! empty($length) ? '(' . $length . ')' : '';
+
             return stripos($column->dbType, $dataType) === 0;
         }
+
         return true;
     }
 
