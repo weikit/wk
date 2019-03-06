@@ -1305,33 +1305,49 @@ function iarray_change_key_case($array, $case = CASE_LOWER)
     return $array;
 }
 
+/**
+ * 安全检测并过滤$_GET, $_POST, $_COOKIE关键字
+ *
+ * @param $values
+ * @param string $type
+ *
+ * @return array|string
+ */
 function strip_gpc($values, $type = 'g')
 {
-    $filter = [
-        'g' => "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-        'p' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-        'c' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-    ];
-    if ( ! isset($values)) {
-        return '';
-    }
-    if (is_array($values)) {
-        foreach ($values as $key => $val) {
-            $values[addslashes($key)] = strip_gpc($val, $type);
+    if(!empty($values)) {
+        $filter = [
+            'g' => "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+            'p' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+            'c' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+        ];
+        if (is_array($values)) {
+            foreach ($values as $key => $val) {
+                $values[addslashes($key)] = strip_gpc($val, $type);
+            }
+        } else {
+            if (preg_match("/" . $filter[$type] . "/is", $values, $match) == 1) {
+                $values = '';
+            }
         }
     } else {
-        if (preg_match("/" . $filter[$type] . "/is", $values, $match) == 1) {
-            $values = '';
-        }
+        $values = '';
     }
 
     return $values;
 }
 
+/**
+ * 安全检测路径字符串
+ *
+ * @param $path
+ *
+ * @return bool
+ */
 function parse_path($path)
 {
-    $danger_char = ['../', '{php', '<?php', '<%', '<?', '..\\', '\\\\', '\\', '..\\\\', '%00', '\0', '\r'];
-    foreach ($danger_char as $char) {
+    $characters = ['../', '..\\', '..\\\\', '\\\\', '\\', '{php', '<?php', '<%', '<?', '%00', '\0', '\r'];
+    foreach ($characters as $char) {
         if (strexists($path, $char)) {
             return false;
         }
@@ -1342,17 +1358,23 @@ function parse_path($path)
 
 function dir_size($dir)
 {
+    // 更简洁更精确但是性能差
+//    $ite = new RecursiveDirectoryIterator($dir);
+//    $bytesTotal=0;
+//    foreach (new RecursiveIteratorIterator($ite) as $filename => $cur) {
+//        $bytesTotal += $cur->getSize();
+//    }
+//    return $bytesTotal;
+
     $size = 0;
     if (is_dir($dir)) {
         $handle = opendir($dir);
-        while (false !== ($entry = readdir($handle))) {
-            if ($entry != '.' && $entry != '..') {
-                if (is_dir("{$dir}/{$entry}")) {
-                    $size += dir_size("{$dir}/{$entry}");
-                } else {
-                    $size += filesize("{$dir}/{$entry}");
-                }
+        while (($entry = readdir($handle)) !== false) {
+            if (!in_array($entry, ['.', '..'])) {
+                $subDir = $dir . DIRECTORY_SEPARATOR . $entry;
+                $size += is_dir($subDir) ? dir_size($subDir) : filesize($subDir);
             }
+
         }
         closedir($handle);
     }
@@ -1360,23 +1382,19 @@ function dir_size($dir)
     return $size;
 }
 
-function get_first_pinyin($str)
+/**
+ * 获取字符串的第一个拼音字符
+ *
+ * @param $string
+ *
+ * @return string
+ */
+function get_first_pinyin($string)
 {
-    static $pinyin;
-    $first_char = '';
-    $str = trim($str);
-    if (empty($str)) {
-        return $first_char;
-    }
-    if (empty($pinyin)) {
-        load()->library('pinyin');
-        $pinyin = new Pinyin_Pinyin();
-    }
-    $first_char = $pinyin->get_first_char($str);
-
-    return $first_char;
+    return Yii::$app->pinyin->firstChar($string);
 }
 
+// TODO
 function strip_emoji($nickname)
 {
     $clean_text = "";
@@ -1401,6 +1419,7 @@ function strip_emoji($nickname)
     return str_replace($search, $replace, $clean_text);
 }
 
+// TODO
 function emoji_unicode_decode($string)
 {
     preg_match_all('/\[U\+(\\w{4,})\]/i', $string, $match);
@@ -1413,6 +1432,7 @@ function emoji_unicode_decode($string)
     return $string;
 }
 
+// TODO
 function emoji_unicode_encode($string)
 {
     $ranges = [
@@ -1425,27 +1445,33 @@ function emoji_unicode_encode($string)
     exit;
 }
 
+/**
+ * 递归查找$_W值
+ *
+ * @param $key
+ *
+ * @return mixed
+ */
 function getglobal($key)
 {
     global $_W;
-    $key = explode('/', $key);
-
-    $v = &$_W;
-    foreach ($key as $k) {
-        if ( ! isset($v[$k])) {
-            return null;
-        }
-        $v = &$v[$k];
-    }
-
-    return $v;
+    return \yii\helpers\ArrayHelper::getValue($_W, str_replace('/', '.', $key));
 }
 
+
 if ( ! function_exists('starts_with')) {
+    /**
+     * 判断字符串是否指定字符开头
+     *
+     * @param string $haystack
+     * @param array|string $needles
+     *
+     * @return bool
+     */
     function starts_with($haystack, $needles)
     {
         foreach ((array)$needles as $needle) {
-            if ($needle != '' && substr($haystack, 0, strlen($needle)) === (string)$needle) {
+            if ($needle != '' && mb_substr($haystack, 0, mb_strlen($needle)) === strval($needle)) {
                 return true;
             }
         }
@@ -1454,6 +1480,7 @@ if ( ! function_exists('starts_with')) {
     }
 }
 
+// TODO
 function check_url_not_outside_link($redirect)
 {
     global $_W;
