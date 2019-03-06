@@ -406,6 +406,7 @@ function iunserializer($value)
         $temp = preg_replace_callback('#s:(\d+):"(.*?)";#s', function ($match) {
             return 's:' . strlen($match[2]) . ':"' . $match[2] . '";';
         }, $value);
+
         return unserialize($temp);
     } else {
         return $result;
@@ -435,43 +436,49 @@ function wurl($segment, $params = [])
 // TODO
 if ( ! function_exists('murl')) {
 
-    function murl($segment, $params = [], $noredirect = true, $addhost = false)
+    function murl($segment, $params = [], $noRedirect = true, $addhost = false)
     {
-        global $_W;
-        list($controller, $action, $do) = explode('/', $segment);
-        if ( ! empty($addhost)) {
-            $url = $_W['siteroot'] . 'app/';
-        } else {
-            $url = './';
-        }
-        $str = '';
-        if (uni_is_multi_acid()) {
-            $str .= "&j={$_W['acid']}";
-        }
-        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_WEBAPP_NORMAL) {
-            $str .= '&a=webapp';
-        }
-        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_PHONEAPP_NORMAL) {
-            $str .= '&a=phoneapp';
-        }
-        $url .= "index.php?i={$_W['uniacid']}{$str}&";
-        if ( ! empty($controller)) {
-            $url .= "c={$controller}&";
-        }
-        if ( ! empty($action)) {
-            $url .= "a={$action}&";
-        }
-        if ( ! empty($do)) {
-            $url .= "do={$do}&";
-        }
-        if ( ! empty($params)) {
-            $queryString = http_build_query($params, '', '&');
-            $url .= $queryString;
-            if ($noredirect === false) {
-                $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
-            }
-        }
+//        global $_W;
+//        list($controller, $action, $do) = explode('/', $segment);
+//        if ( ! empty($addhost)) {
+//            $url = $_W['siteroot'] . 'app/';
+//        } else {
+//            $url = './';
+//        }
+//        $str = '';
+//        if (uni_is_multi_acid()) {
+//            $str .= "&j={$_W['acid']}";
+//        }
+//        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_WEBAPP_NORMAL) {
+//            $str .= '&a=webapp';
+//        }
+//        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_PHONEAPP_NORMAL) {
+//            $str .= '&a=phoneapp';
+//        }
+//        $url .= "index.php?i={$_W['uniacid']}{$str}&";
+//        if ( ! empty($controller)) {
+//            $url .= "c={$controller}&";
+//        }
+//        if ( ! empty($action)) {
+//            $url .= "a={$action}&";
+//        }
+//        if ( ! empty($do)) {
+//            $url .= "do={$do}&";
+//        }
+//        if ( ! empty($params)) {
+//            $queryString = http_build_query($params, '', '&');
+//            $url .= $queryString;
+//            if ($noredirect === false) {
+//                $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
+//            }
+//        }
+//
+//        return $url;
 
+        $url = url('app/' . $segment, $params);
+        if ($noRedirect === false) {
+            $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
+        }
         return $url;
     }
 }
@@ -721,105 +728,24 @@ function strexists($string, $find)
 
 /**
  *
- * TODO
+ * 删除多余字符
+ *
  * @param $string
  * @param $length
- * @param bool $havedot
+ * @param bool $dot 为true则在字符末尾补充...字符串
  * @param string $charset
  *
  * @return mixed|string
  */
-function cutstr($string, $length, $havedot = false, $charset = '')
+function cutstr($string, $length, $dot = false, $charset = null)
 {
-    global $_W;
-    if (empty($charset)) {
-        $charset = $_W['charset'];
-    }
-    if (strtolower($charset) == 'gbk') {
-        $charset = 'gbk';
-    } else {
-        $charset = 'utf8';
-    }
-    if (istrlen($string, $charset) <= $length) {
-        return $string;
-    }
-    if (function_exists('mb_strcut')) {
+    $charset = strtolower($charset) == 'gbk' ? 'gbk' : 'utf8';
+
+    if (istrlen($string, $charset) > $length) {
         $string = mb_substr($string, 0, $length, $charset);
-    } else {
-        $pre = '{%';
-        $end = '%}';
-        $string = str_replace(['&amp;', '&quot;', '&lt;', '&gt;'],
-            [$pre . '&' . $end, $pre . '"' . $end, $pre . '<' . $end, $pre . '>' . $end], $string);
-
-        $strcut = '';
-        $strlen = strlen($string);
-
-        if ($charset == 'utf8') {
-            $n = $tn = $noc = 0;
-            while ($n < $strlen) {
-                $t = ord($string[$n]);
-                if ($t == 9 || $t == 10 || (32 <= $t && $t <= 126)) {
-                    $tn = 1;
-                    $n++;
-                    $noc++;
-                } elseif (194 <= $t && $t <= 223) {
-                    $tn = 2;
-                    $n += 2;
-                    $noc++;
-                } elseif (224 <= $t && $t <= 239) {
-                    $tn = 3;
-                    $n += 3;
-                    $noc++;
-                } elseif (240 <= $t && $t <= 247) {
-                    $tn = 4;
-                    $n += 4;
-                    $noc++;
-                } elseif (248 <= $t && $t <= 251) {
-                    $tn = 5;
-                    $n += 5;
-                    $noc++;
-                } elseif ($t == 252 || $t == 253) {
-                    $tn = 6;
-                    $n += 6;
-                    $noc++;
-                } else {
-                    $n++;
-                }
-                if ($noc >= $length) {
-                    break;
-                }
-            }
-            if ($noc > $length) {
-                $n -= $tn;
-            }
-            $strcut = substr($string, 0, $n);
-        } else {
-            while ($n < $strlen) {
-                $t = ord($string[$n]);
-                if ($t > 127) {
-                    $tn = 2;
-                    $n += 2;
-                    $noc++;
-                } else {
-                    $tn = 1;
-                    $n++;
-                    $noc++;
-                }
-                if ($noc >= $length) {
-                    break;
-                }
-            }
-            if ($noc > $length) {
-                $n -= $tn;
-            }
-            $strcut = substr($string, 0, $n);
+        if ($dot) {
+            $string = $string . "...";
         }
-        $string = str_replace([$pre . '&' . $end, $pre . '"' . $end, $pre . '<' . $end, $pre . '>' . $end],
-            ['&amp;', '&quot;', '&lt;', '&gt;'], $strcut);
-    }
-
-    if ($havedot) {
-        $string = $string . "...";
     }
 
     return $string;
@@ -1020,7 +946,7 @@ function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
  */
 function sizecount($size)
 {
-    $units = array('Bytes', 'KB', 'MB', 'GB', 'TB');
+    $units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
 
     $bytes = max($size, 0);
     $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
@@ -1065,6 +991,7 @@ function bytecount($string)
  *
  * @param array $arr
  * @param int $level
+ *
  * @return string|string[]|null
  */
 function array2xml($arr, $level = 1)
@@ -1096,15 +1023,16 @@ function array2xml($arr, $level = 1)
 function xml2array($xml)
 {
     $result = [];
-    if (!empty($xml)) {
+    if ( ! empty($xml)) {
         $xmlObj = isimplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         if ($xmlObj instanceof SimpleXMLElement) {
             $result = json_decode(json_encode($xmlObj), true);
-            if (!is_array($result)) {
+            if ( ! is_array($result)) {
                 return '';
             }
         }
     }
+
     return $result;
 }
 
@@ -1122,8 +1050,9 @@ function xml2array($xml)
 function isimplexml_load_string($string, $className = 'SimpleXMLElement', $options = 0, $ns = '', $isPrefix = false)
 {
     libxml_disable_entity_loader(true);
-    if (!preg_match('/(\<\!DOCTYPE|\<\!ENTITY)/i', $string)) {
+    if ( ! preg_match('/(\<\!DOCTYPE|\<\!ENTITY)/i', $string)) {
         $string = preg_replace("/[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f\\x7f]/", '', $string);
+
         return simplexml_load_string($string, $className, $options, $ns, $isPrefix);
     }
 
@@ -1144,6 +1073,7 @@ function scriptname()
  * 转换成utf8格式字符
  *
  * @param $cp
+ *
  * @return string
  */
 function utf8_bytes($cp)
@@ -1182,100 +1112,36 @@ function media2local($media_id, $all = false)
         return '';
     }
 }
-// TODO
-function aes_decode($message, $encodingaeskey = '', $appid = '')
-{
-
-    $key = base64_decode($encodingaeskey . '=');
-
-    $ciphertext_dec = base64_decode($message);
-    $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
-    $iv = substr($key, 0, 16);
-
-    mcrypt_generic_init($module, $key, $iv);
-    $decrypted = mdecrypt_generic($module, $ciphertext_dec);
-    mcrypt_generic_deinit($module);
-    mcrypt_module_close($module);
-    $block_size = 32;
-
-    $pad = ord(substr($decrypted, -1));
-    if ($pad < 1 || $pad > 32) {
-        $pad = 0;
-    }
-    $result = substr($decrypted, 0, (strlen($decrypted) - $pad));
-    if (strlen($result) < 16) {
-        return '';
-    }
-    $content = substr($result, 16, strlen($result));
-    $len_list = unpack("N", substr($content, 0, 4));
-    $contentlen = $len_list[1];
-    $content = substr($content, 4, $contentlen);
-    $from_appid = substr($content, $xml_len + 4);
-    if ( ! empty($appid) && $appid != $from_appid) {
-        return '';
-    }
-
-    return $content;
-}
 
 // TODO
-function aes_encode($message, $encodingaeskey = '', $appid = '')
-{
-    $key = base64_decode($encodingaeskey . '=');
-    $text = random(16) . pack("N", strlen($message)) . $message . $appid;
-
-    $size = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
-    $module = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
-    $iv = substr($key, 0, 16);
-
-    $block_size = 32;
-    $text_length = strlen($text);
-    $amount_to_pad = $block_size - ($text_length % $block_size);
-    if ($amount_to_pad == 0) {
-        $amount_to_pad = $block_size;
-    }
-    $pad_chr = chr($amount_to_pad);
-    $tmp = '';
-    for ($index = 0; $index < $amount_to_pad; $index++) {
-        $tmp .= $pad_chr;
-    }
-    $text = $text . $tmp;
-    mcrypt_generic_init($module, $key, $iv);
-    $encrypted = mcrypt_generic($module, $text);
-    mcrypt_generic_deinit($module);
-    mcrypt_module_close($module);
-    $encrypt_msg = base64_encode($encrypted);
-
-    return $encrypt_msg;
-}
+//function aes_decode($message, $encodingaeskey = '', $appid = '')
+//{
+//}
 
 // TODO
-function aes_pkcs7_decode($encrypt_data, $key, $iv = false)
-{
-    load()->library('pkcs7');
-    $encrypt_data = base64_decode($encrypt_data);
-    if ( ! empty($iv)) {
-        $iv = base64_decode($iv);
-    }
-    $pc = new Prpcrypt($key);
-    $result = $pc->decrypt($encrypt_data, $iv);
-    if ($result[0] != 0) {
-        return error($result[0], '解密失败');
-    }
+//function aes_encode($message, $encodingaeskey = '', $appid = '')
+//{
+//
+//}
 
-    return $result[1];
-}
+// TODO
+//function aes_pkcs7_decode($encrypt_data, $key, $iv = false)
+//{
+//
+//}
 
 /**
  * 转换特殊字符(保留&nbsp;空格字符)
  *
  * @param $str
+ *
  * @return mixed
  */
 function ihtml_entity_decode($str)
 {
     $str = str_replace('&nbsp;', '!nbsp;', $str);
     $str = html_entity_decode(urldecode($str));
+
     return str_replace('!nbsp;', '&nbsp;', $str);
 }
 
@@ -1284,11 +1150,12 @@ function ihtml_entity_decode($str)
  *
  * @param $array
  * @param int $case
+ *
  * @return array
  */
 function iarray_change_key_case($array, $case = CASE_LOWER)
 {
-    if (is_array($array) && !empty($array)) {
+    if (is_array($array) && ! empty($array)) {
         $array = array_change_key_case($array, $case);
         foreach ($array as $key => $value) {
             if (empty($value) && is_array($value)) {
@@ -1315,18 +1182,18 @@ function iarray_change_key_case($array, $case = CASE_LOWER)
  */
 function strip_gpc($values, $type = 'g')
 {
-    if(!empty($values)) {
-        $filter = [
-            'g' => "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-            'p' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-            'c' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
-        ];
+    if ( ! empty($values)) {
         if (is_array($values)) {
             foreach ($values as $key => $val) {
                 $values[addslashes($key)] = strip_gpc($val, $type);
             }
         } else {
-            if (preg_match("/" . $filter[$type] . "/is", $values, $match) == 1) {
+            $filters = [
+                'g' => "'|(and|or)\\b.+?(>|<|=|in|like)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+                'p' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+                'c' => "\\b(and|or)\\b.{1,6}?(=|>|<|\\bin\\b|\\blike\\b)|\\/\\*.+?\\*\\/|<\\s*script\\b|\\bEXEC\\b|UNION.+?SELECT|UPDATE.+?SET|INSERT\\s+INTO.+?VALUES|(SELECT|DELETE).+?FROM|(CREATE|ALTER|DROP|TRUNCATE)\\s+(TABLE|DATABASE)",
+            ];
+            if (preg_match('/' . $filters[$type] . '/is', $values, $match) == 1) {
                 $values = '';
             }
         }
@@ -1356,6 +1223,13 @@ function parse_path($path)
     return $path;
 }
 
+/**
+ * 获取目录的size
+ *
+ * @param $dir
+ *
+ * @return int
+ */
 function dir_size($dir)
 {
     // 更简洁更精确但是性能差
@@ -1370,7 +1244,7 @@ function dir_size($dir)
     if (is_dir($dir)) {
         $handle = opendir($dir);
         while (($entry = readdir($handle)) !== false) {
-            if (!in_array($entry, ['.', '..'])) {
+            if ( ! in_array($entry, ['.', '..'])) {
                 $subDir = $dir . DIRECTORY_SEPARATOR . $entry;
                 $size += is_dir($subDir) ? dir_size($subDir) : filesize($subDir);
             }
@@ -1394,55 +1268,59 @@ function get_first_pinyin($string)
     return Yii::$app->pinyin->firstChar($string);
 }
 
-// TODO
-function strip_emoji($nickname)
+/**
+ * 移除字符串中的emoji字符
+ *
+ * @param $string
+ *
+ * @return mixed
+ */
+function strip_emoji($string)
 {
-    $clean_text = "";
     $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
-    $clean_text = preg_replace($regexEmoticons, '', $nickname);
+    $cleanText = preg_replace($regexEmoticons, '', $string);
+
     $regexSymbols = '/[\x{1F300}-\x{1F5FF}]/u';
-    $clean_text = preg_replace($regexSymbols, '', $clean_text);
+    $cleanText = preg_replace($regexSymbols, '', $cleanText);
+
     $regexTransport = '/[\x{1F680}-\x{1F6FF}]/u';
-    $clean_text = preg_replace($regexTransport, '', $clean_text);
+    $cleanText = preg_replace($regexTransport, '', $cleanText);
+
     $regexMisc = '/[\x{2600}-\x{26FF}]/u';
-    $clean_text = preg_replace($regexMisc, '', $clean_text);
+    $cleanText = preg_replace($regexMisc, '', $cleanText);
+
     $regexDingbats = '/[\x{2700}-\x{27BF}]/u';
-    $clean_text = preg_replace($regexDingbats, '', $clean_text);
+    $cleanText = preg_replace($regexDingbats, '', $cleanText);
 
-    $clean_text = str_replace("'", '', $clean_text);
-    $clean_text = str_replace('"', '', $clean_text);
-    $clean_text = str_replace('“', '', $clean_text);
-    $clean_text = str_replace('゛', '', $clean_text);
-    $search = [" ", "　", "\n", "\r", "\t"];
-    $replace = ["", "", "", "", ""];
+    // todo 需要清除多余字符???
+    $search = ["'", '"', '“', '゛', " ", "　", "\n", "\r", "\t"];
+    $replace = ['', '', '', '', '', '', '', '', ''];
 
-    return str_replace($search, $replace, $clean_text);
+    return str_replace($search, $replace, $cleanText);
 }
 
-// TODO
+/**
+ * 替换emoji代码为emoji字符
+ *
+ * @param string $string
+ *
+ * @return string
+ */
 function emoji_unicode_decode($string)
 {
-    preg_match_all('/\[U\+(\\w{4,})\]/i', $string, $match);
-    if ( ! empty($match[1])) {
-        foreach ($match[1] as $emojiUSB) {
-            $string = str_ireplace("[U+{$emojiUSB}]", utf8_bytes(hexdec($emojiUSB)), $string);
+    if (preg_match_all('/\[U\+(\\w{4,})\]/i', $string, $matches)) {
+        foreach ($matches[1] as $eomjiCode) {
+            $string = str_ireplace("[U+{$eomjiCode}]", utf8_bytes(hexdec($eomjiCode)), $string);
         }
     }
 
     return $string;
 }
 
-// TODO
 function emoji_unicode_encode($string)
 {
-    $ranges = [
-        '\\\\ud83c[\\\\udf00-\\\\udfff]',
-        '\\\\ud83d[\\\\udc00-\\\\ude4f]',
-        '\\\\ud83d[\\\\ude80-\\\\udeff]',
-    ];
-    preg_match_all('/' . implode('|', $ranges) . '/i', $string, $match);
-    print_r($match);
-    exit;
+    // TODO 转换emoji为emoji字符串
+    throw new \weikit\core\exceptions\UnsupportedException('Emoji encode not is support yet');
 }
 
 /**
@@ -1455,6 +1333,7 @@ function emoji_unicode_encode($string)
 function getglobal($key)
 {
     global $_W;
+
     return \yii\helpers\ArrayHelper::getValue($_W, str_replace('/', '.', $key));
 }
 
@@ -1491,142 +1370,16 @@ function check_url_not_outside_link($redirect)
     return $redirect;
 }
 
+/**
+ * XSS过滤字符串
+ *
+ * @param $val
+ *
+ * @return string
+ */
 function remove_xss($val)
 {
-    $val = preg_replace('/([\x00-\x08,\x0b-\x0c,\x0e-\x19])/', '', $val);
-    $search = 'abcdefghijklmnopqrstuvwxyz';
-    $search .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $search .= '1234567890!@#$%^&*()';
-    $search .= '~`";:?+/={}[]-_|\'\\';
-    for ($i = 0; $i < strlen($search); $i++) {
-        $val = preg_replace('/(&#[xX]0{0,8}' . dechex(ord($search[$i])) . ';?)/i', $search[$i], $val);
-        $val = preg_replace('/(�{0,8}' . ord($search[$i]) . ';?)/', $search[$i], $val);
-    }
-    $ra1 = [
-        'javascript',
-        'vbscript',
-        'expression',
-        'applet',
-        'meta',
-        'xml',
-        'blink',
-        'link',
-        'script',
-        'embed',
-        'object',
-        'frameset',
-        'ilayer',
-        'bgsound',
-        'title',
-        'base',
-    ];
-    $ra2 = [
-        'onabort',
-        'onactivate',
-        'onafterprint',
-        'onafterupdate',
-        'onbeforeactivate',
-        'onbeforecopy',
-        'onbeforecut',
-        'onbeforedeactivate',
-        'onbeforeeditfocus',
-        'onbeforepaste',
-        'onbeforeprint',
-        'onbeforeunload',
-        'onbeforeupdate',
-        'onblur',
-        'onbounce',
-        'oncellchange',
-        'onchange',
-        'onclick',
-        'oncontextmenu',
-        'oncontrolselect',
-        'oncopy',
-        'oncut',
-        'ondataavailable',
-        'ondatasetchanged',
-        'ondatasetcomplete',
-        'ondblclick',
-        'ondeactivate',
-        'ondrag',
-        'ondragend',
-        'ondragenter',
-        'ondragleave',
-        'ondragover',
-        'ondragstart',
-        'ondrop',
-        'onerror',
-        'onerrorupdate',
-        'onfilterchange',
-        'onfinish',
-        'onfocus',
-        'onfocusin',
-        'onfocusout',
-        'onhelp',
-        'onkeydown',
-        'onkeypress',
-        'onkeyup',
-        'onlayoutcomplete',
-        'onload',
-        'onlosecapture',
-        'onmousedown',
-        'onmouseenter',
-        'onmouseleave',
-        'onmousemove',
-        'onmouseout',
-        'onmouseover',
-        'onmouseup',
-        'onmousewheel',
-        'onmove',
-        'onmoveend',
-        'onmovestart',
-        'onpaste',
-        'onpropertychange',
-        'onreadystatechange',
-        'onreset',
-        'onresize',
-        'onresizeend',
-        'onresizestart',
-        'onrowenter',
-        'onrowexit',
-        'onrowsdelete',
-        'onrowsinserted',
-        'onscroll',
-        'onselect',
-        'onselectionchange',
-        'onselectstart',
-        'onstart',
-        'onstop',
-        'onsubmit',
-        'onunload',
-        'import',
-    ];
-    $ra = array_merge($ra1, $ra2);
-    $found = true;
-    while ($found == true) {
-        $val_before = $val;
-        for ($i = 0; $i < sizeof($ra); $i++) {
-            $pattern = '/';
-            for ($j = 0; $j < strlen($ra[$i]); $j++) {
-                if ($j > 0) {
-                    $pattern .= '(';
-                    $pattern .= '(&#[xX]0{0,8}([9ab]);)';
-                    $pattern .= '|';
-                    $pattern .= '|(�{0,8}([9|10|13]);)';
-                    $pattern .= ')*';
-                }
-                $pattern .= $ra[$i][$j];
-            }
-            $pattern .= '/i';
-            $replacement = substr($ra[$i], 0, 2) . '<x>' . substr($ra[$i], 2);
-            $val = preg_replace($pattern, $replacement, $val);
-            if ($val_before == $val) {
-                $found = false;
-            }
-        }
-    }
-
-    return $val;
+    return \yii\helpers\HtmlPurifier::process($val);
 }
 
 /**
