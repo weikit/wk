@@ -1011,6 +1011,13 @@ function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 
 }
 
+/**
+ * 返回可读存储位
+ *
+ * @param $size
+ *
+ * @return string
+ */
 function sizecount($size)
 {
     $units = array('Bytes', 'KB', 'MB', 'GB', 'TB');
@@ -1026,22 +1033,40 @@ function sizecount($size)
     return round($bytes, 2) . ' ' . $units[$pow];
 }
 
-function bytecount($str)
+/**
+ * 可读存储位转Bytes
+ *
+ * @param $string
+ *
+ * @return float|int
+ */
+function bytecount($string)
 {
+    if (strtoupper($string[strlen($string) - 1]) == 'B') {
+        $str = substr($string, 0, -1);
+    }
+
     $unit = strtoupper($str[strlen($str) - 1]);
-    if ($unit == 'B') {
-        $str = substr($str, 0, -1);
-    } elseif ($unit == 'K') {
+    if ($unit == 'K') {
         return floatval($str) * 1024;
     } elseif ($unit == 'M') {
         return floatval($str) * 1048576;
     } elseif ($unit == 'G') {
         return floatval($str) * 1073741824;
     } elseif ($unit == 'T') {
-        return floatval($str) * 1073741824;
+        return floatval($str) * 1099511627776;
     }
+
+    return $string;
 }
 
+/**
+ * 数组转xml
+ *
+ * @param array $arr
+ * @param int $level
+ * @return string|string[]|null
+ */
 function array2xml($arr, $level = 1)
 {
     $s = $level == 1 ? "<xml>" : '';
@@ -1061,56 +1086,66 @@ function array2xml($arr, $level = 1)
     return $level == 1 ? $s . "</xml>" : $s;
 }
 
+/**
+ * xml转数组
+ *
+ * @param $xml
+ *
+ * @return mixed
+ */
 function xml2array($xml)
 {
-    if (empty($xml)) {
-        return [];
-    }
     $result = [];
-    $xmlobj = isimplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-    if ($xmlobj instanceof SimpleXMLElement) {
-        $result = json_decode(json_encode($xmlobj), true);
-        if (is_array($result)) {
-            return $result;
-        } else {
-            return '';
-        }
-    } else {
-        return $result;
-    }
-}
-
-function scriptname()
-{
-    global $_W;
-    $_W['script_name'] = basename($_SERVER['SCRIPT_FILENAME']);
-    if (basename($_SERVER['SCRIPT_NAME']) === $_W['script_name']) {
-        $_W['script_name'] = $_SERVER['SCRIPT_NAME'];
-    } else {
-        if (basename($_SERVER['PHP_SELF']) === $_W['script_name']) {
-            $_W['script_name'] = $_SERVER['PHP_SELF'];
-        } else {
-            if (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $_W['script_name']) {
-                $_W['script_name'] = $_SERVER['ORIG_SCRIPT_NAME'];
-            } else {
-                if (($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
-                    $_W['script_name'] = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $_W['script_name'];
-                } else {
-                    if (isset($_SERVER['DOCUMENT_ROOT']) && strpos($_SERVER['SCRIPT_FILENAME'],
-                            $_SERVER['DOCUMENT_ROOT']) === 0) {
-                        $_W['script_name'] = str_replace('\\', '/',
-                            str_replace($_SERVER['DOCUMENT_ROOT'], '', $_SERVER['SCRIPT_FILENAME']));
-                    } else {
-                        $_W['script_name'] = 'unknown';
-                    }
-                }
+    if (!empty($xml)) {
+        $xmlObj = isimplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if ($xmlObj instanceof SimpleXMLElement) {
+            $result = json_decode(json_encode($xmlObj), true);
+            if (!is_array($result)) {
+                return '';
             }
         }
     }
-
-    return $_W['script_name'];
+    return $result;
 }
 
+/**
+ * 是否简单xml类型(如果是则自定返回SimpleXMLElement实例)
+ *
+ * @param $string
+ * @param string $className
+ * @param int $options
+ * @param string $ns
+ * @param bool $isPrefix
+ *
+ * @return bool|SimpleXMLElement
+ */
+function isimplexml_load_string($string, $className = 'SimpleXMLElement', $options = 0, $ns = '', $isPrefix = false)
+{
+    libxml_disable_entity_loader(true);
+    if (!preg_match('/(\<\!DOCTYPE|\<\!ENTITY)/i', $string)) {
+        $string = preg_replace("/[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f\\x7f]/", '', $string);
+        return simplexml_load_string($string, $className, $options, $ns, $isPrefix);
+    }
+
+    return false;
+}
+
+/**
+ * 获取当前执行PHP文件名
+ *
+ * @return string
+ */
+function scriptname()
+{
+    return basename(Yii::$app->request->scriptFile);
+}
+
+/**
+ * 转换成utf8格式字符
+ *
+ * @param $cp
+ * @return string
+ */
 function utf8_bytes($cp)
 {
     if ($cp > 0x10000) {
@@ -1130,6 +1165,7 @@ function utf8_bytes($cp)
     }
 }
 
+// TODO
 function media2local($media_id, $all = false)
 {
     global $_W;
@@ -1146,9 +1182,10 @@ function media2local($media_id, $all = false)
         return '';
     }
 }
-
+// TODO
 function aes_decode($message, $encodingaeskey = '', $appid = '')
 {
+
     $key = base64_decode($encodingaeskey . '=');
 
     $ciphertext_dec = base64_decode($message);
@@ -1181,6 +1218,7 @@ function aes_decode($message, $encodingaeskey = '', $appid = '')
     return $content;
 }
 
+// TODO
 function aes_encode($message, $encodingaeskey = '', $appid = '')
 {
     $key = base64_decode($encodingaeskey . '=');
@@ -1211,6 +1249,7 @@ function aes_encode($message, $encodingaeskey = '', $appid = '')
     return $encrypt_msg;
 }
 
+// TODO
 function aes_pkcs7_decode($encrypt_data, $key, $iv = false)
 {
     load()->library('pkcs7');
@@ -1227,36 +1266,40 @@ function aes_pkcs7_decode($encrypt_data, $key, $iv = false)
     return $result[1];
 }
 
-function isimplexml_load_string($string, $class_name = 'SimpleXMLElement', $options = 0, $ns = '', $is_prefix = false)
-{
-    libxml_disable_entity_loader(true);
-    if (preg_match('/(\<\!DOCTYPE|\<\!ENTITY)/i', $string)) {
-        return false;
-    }
-
-    return simplexml_load_string($string, $class_name, $options, $ns, $is_prefix);
-}
-
+/**
+ * 转换特殊字符(保留&nbsp;空格字符)
+ *
+ * @param $str
+ * @return mixed
+ */
 function ihtml_entity_decode($str)
 {
-    $str = str_replace('&nbsp;', '#nbsp;', $str);
-
-    return str_replace('#nbsp;', '&nbsp;', html_entity_decode(urldecode($str)));
+    $str = str_replace('&nbsp;', '!nbsp;', $str);
+    $str = html_entity_decode(urldecode($str));
+    return str_replace('!nbsp;', '&nbsp;', $str);
 }
 
+/**
+ * 转换数组关键字大小写
+ *
+ * @param $array
+ * @param int $case
+ * @return array
+ */
 function iarray_change_key_case($array, $case = CASE_LOWER)
 {
-    if ( ! is_array($array) || empty($array)) {
-        return [];
-    }
-    $array = array_change_key_case($array, $case);
-    foreach ($array as $key => $value) {
-        if (empty($value) && is_array($value)) {
-            $array[$key] = '';
+    if (is_array($array) && !empty($array)) {
+        $array = array_change_key_case($array, $case);
+        foreach ($array as $key => $value) {
+            if (empty($value) && is_array($value)) {
+                $array[$key] = '';
+            }
+            if ( ! empty($value) && is_array($value)) {
+                $array[$key] = iarray_change_key_case($value, $case);
+            }
         }
-        if ( ! empty($value) && is_array($value)) {
-            $array[$key] = iarray_change_key_case($value, $case);
-        }
+    } else {
+        $array = [];
     }
 
     return $array;
