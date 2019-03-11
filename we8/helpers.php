@@ -162,15 +162,9 @@ function ihtmlspecialchars($value)
 }
 
 // TODO
-function isetcookie($key, $value, $expire = 0, $httponly = false)
-{
-    global $_W;
-    $expire = $expire != 0 ? (TIMESTAMP + $expire) : 0;
-    $secure = $_SERVER['SERVER_PORT'] == 443 ? 1 : 0;
-
-    return setcookie($_W['config']['cookie']['pre'] . $key, $value, $expire, $_W['config']['cookie']['path'],
-        $_W['config']['cookie']['domain'], $secure, $httponly);
-}
+//function isetcookie($key, $value, $expire = 0, $httponly = false)
+//{
+//}
 
 /**
  * 获取真实IP地址
@@ -305,18 +299,25 @@ function tablename($table)
     return '`' . Yii::$app->db->tablePrefix . $table . '`';
 }
 
+/**
+ * 获取指定关键字的键值数组
+ *
+ * @param $keys
+ * @param $src
+ * @param bool $default
+ *
+ * @return array
+ */
 function array_elements($keys, $src, $default = false)
 {
-    $return = [];
     if ( ! is_array($keys)) {
         $keys = [$keys];
     }
+
+    $return = [];
+
     foreach ($keys as $key) {
-        if (isset($src[$key])) {
-            $return[$key] = $src[$key];
-        } else {
-            $return[$key] = $default;
-        }
+        $return[$key] = isset($src[$key]) ? $src[$key] : $default;
     }
 
     return $return;
@@ -354,13 +355,14 @@ function range_limit($num, $min, $max, $limit = true)
     $min = intval($min);
     $max = intval($max);
     $limit = $limit === true;
+
     if ($num < $min) {
         return ! $limit ? false : $min;
     } elseif ($num > $max) {
         return ! $limit ? false : $max;
-    } else {
-        return ! $limit ? true : $num;
     }
+
+    return ! $limit ? true : $num;
 }
 
 /**
@@ -425,62 +427,62 @@ function is_base64($str)
     return is_string($str) && $str == base64_encode(base64_decode($str));
 }
 
-// TODO
+/**
+ * 拼装web url
+ *
+ * @param string $segment
+ * @param array $params
+ *
+ * @return string
+ */
 function wurl($segment, $params = [])
 {
-    $params[0] = $segment;
+    $params[0] = '/web/' . $segment;
 
     return yii\helpers\Url::to($params);
 }
 
-// TODO
-if ( ! function_exists('murl')) {
-
-    function murl($segment, $params = [], $noRedirect = true, $addhost = false)
-    {
-//        global $_W;
-//        list($controller, $action, $do) = explode('/', $segment);
-//        if ( ! empty($addhost)) {
-//            $url = $_W['siteroot'] . 'app/';
-//        } else {
-//            $url = './';
-//        }
-//        $str = '';
-//        if (uni_is_multi_acid()) {
-//            $str .= "&j={$_W['acid']}";
-//        }
-//        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_WEBAPP_NORMAL) {
-//            $str .= '&a=webapp';
-//        }
-//        if ( ! empty($_W['account']) && $_W['account']['type'] == ACCOUNT_TYPE_PHONEAPP_NORMAL) {
-//            $str .= '&a=phoneapp';
-//        }
-//        $url .= "index.php?i={$_W['uniacid']}{$str}&";
-//        if ( ! empty($controller)) {
-//            $url .= "c={$controller}&";
-//        }
-//        if ( ! empty($action)) {
-//            $url .= "a={$action}&";
-//        }
-//        if ( ! empty($do)) {
-//            $url .= "do={$do}&";
-//        }
-//        if ( ! empty($params)) {
-//            $queryString = http_build_query($params, '', '&');
-//            $url .= $queryString;
-//            if ($noredirect === false) {
-//                $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
-//            }
-//        }
-//
-//        return $url;
-
-        $url = url('app/' . $segment, $params);
-        if ($noRedirect === false) {
-            $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
-        }
-        return $url;
+/**
+ * 拼装app url
+ *
+ * @param string $segment
+ * @param array $params
+ * @param bool $noRedirect
+ * @param bool $addHost
+ *
+ * @return string
+ */
+function murl($segment, $params = [], $noRedirect = true, $schema = false)
+{
+    $params[0] = '/app/' . $segment;
+    $url = yii\helpers\Url::to($params, $schema);
+    if ($noRedirect) {
+        $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
     }
+
+    return $url;
+}
+
+/**
+ * 组合凭借parse_url后的url
+ *
+ * @param array $parsed_url
+ *
+ * @return string
+ */
+function build_parsed_url($parsed_url)
+{
+    $scheme = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
+    $host = isset($parsed_url['host']) ? $parsed_url['host'] : '';
+    $port = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
+    $user = isset($parsed_url['user']) ? $parsed_url['user'] : '';
+    $pass = isset($parsed_url['pass']) ? ':' . $parsed_url['pass'] : '';
+    $pass = ($user || $pass) ? "$pass@" : '';
+    $path = isset($parsed_url['path']) ? $parsed_url['path'] : '';
+    $query = isset($parsed_url['query']) ? '?' . (is_array($parsed_url['query']) ? http_build_query($parsed_url['query']) : $parsed_url['query']) : '';
+    $fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
+
+    return $scheme . $user . $pass . $host . $port . $path . $query . $fragment;
 }
 
 // TODO
@@ -489,10 +491,9 @@ function pagination(
     $pageIndex,
     $pageSize = 15,
     $url = '',
-    $context = ['before' => 5, 'after' => 4, 'ajaxcallback' => '', 'callbackfuncname' => '']
+    array $context = []
 ) {
-    global $_W;
-    $pdata = [
+    $pdata = array_merge([
         'tcount'  => 0,
         'tpage'   => 0,
         'cindex'  => 0,
@@ -501,65 +502,74 @@ function pagination(
         'nindex'  => 0,
         'lindex'  => 0,
         'options' => '',
-    ];
-    if (empty($context['before'])) {
-        $context['before'] = 5;
-    }
-    if (empty($context['after'])) {
-        $context['after'] = 4;
-    }
+    ], [
+        'tcount' => $total,
+        'tpage'  => (empty($pageSize) || $pageSize < 0) ? 1 : ceil($total / $pageSize),
+    ]);
 
-    if ($context['ajaxcallback']) {
-        $context['isajax'] = true;
-    }
-
-    if ($context['callbackfuncname']) {
-        $callbackfunc = $context['callbackfuncname'];
-    }
-
-    $pdata['tcount'] = $total;
-    $pdata['tpage'] = (empty($pageSize) || $pageSize < 0) ? 1 : ceil($total / $pageSize);
     if ($pdata['tpage'] <= 1) {
         return '';
     }
+
     $cindex = $pageIndex;
-    $cindex = min($cindex, $pdata['tpage']);
-    $cindex = max($cindex, 1);
     $pdata['cindex'] = $cindex;
     $pdata['findex'] = 1;
     $pdata['pindex'] = $cindex > 1 ? $cindex - 1 : 1;
     $pdata['nindex'] = $cindex < $pdata['tpage'] ? $cindex + 1 : $pdata['tpage'];
     $pdata['lindex'] = $pdata['tpage'];
 
+    $context = array_merge([
+        'before'           => 5,
+        'after'            => 4,
+        'ajaxcallback'     => null,
+        'callbackfuncname' => null,
+        'isajax'           => false,
+    ], $context);
+
+    if ($context['ajaxcallback']) {
+        $context['isajax'] = true;
+    }
+    $callbackfunc = $context['callbackfuncname'];
+
+    $schemas = parse_url(Yii::$app->request->getUrl());
+    $schemas['query'] = empty($schemas['query']) ? [] : parse_str($schemas['query']);
+
+    // todo deprecate ng-click
+    $tpl = 'href="javascript:;" page="{index}" ' . ($callbackfunc ? 'ng-click="{callback}(\'{url}\', \'{index}\', this);"' : '');
+
     if ($context['isajax']) {
         if (empty($url)) {
-            $url = $_W['script_name'] . '?' . http_build_query($_GET);
+            $url = Yii::$app->request->getUrl();
         }
-        $pdata['faa'] = 'href="javascript:;" page="' . $pdata['findex'] . '" ' . ($callbackfunc ? 'ng-click="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['findex'] . '\', this);"' : '');
-        $pdata['paa'] = 'href="javascript:;" page="' . $pdata['pindex'] . '" ' . ($callbackfunc ? 'ng-click="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['pindex'] . '\', this);"' : '');
-        $pdata['naa'] = 'href="javascript:;" page="' . $pdata['nindex'] . '" ' . ($callbackfunc ? 'ng-click="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['nindex'] . '\', this);"' : '');
-        $pdata['laa'] = 'href="javascript:;" page="' . $pdata['lindex'] . '" ' . ($callbackfunc ? 'ng-click="' . $callbackfunc . '(\'' . $url . '\', \'' . $pdata['lindex'] . '\', this);"' : '');
+
+        $pdata['faa'] = strtr($tpl, ['{index}' => $pdata['findex'], '{callback}' => $callbackfunc, '{url}' => $url]);
+        $pdata['paa'] = strtr($tpl, ['{index}' => $pdata['pindex'], '{callback}' => $callbackfunc, '{url}' => $url]);
+        $pdata['naa'] = strtr($tpl, ['{index}' => $pdata['nindex'], '{callback}' => $callbackfunc, '{url}' => $url]);
+        $pdata['laa'] = strtr($tpl, ['{index}' => $pdata['lindex'], '{callback}' => $callbackfunc, '{url}' => $url]);
     } else {
-        if ($url) {
+        if ( ! empty($url)) {
             $pdata['faa'] = 'href="?' . str_replace('*', $pdata['findex'], $url) . '"';
             $pdata['paa'] = 'href="?' . str_replace('*', $pdata['pindex'], $url) . '"';
             $pdata['naa'] = 'href="?' . str_replace('*', $pdata['nindex'], $url) . '"';
             $pdata['laa'] = 'href="?' . str_replace('*', $pdata['lindex'], $url) . '"';
         } else {
-            $_GET['page'] = $pdata['findex'];
-            $pdata['faa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
-            $_GET['page'] = $pdata['pindex'];
-            $pdata['paa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
-            $_GET['page'] = $pdata['nindex'];
-            $pdata['naa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
-            $_GET['page'] = $pdata['lindex'];
-            $pdata['laa'] = 'href="' . $_W['script_name'] . '?' . http_build_query($_GET) . '"';
+            $schemas['query']['page'] = $pdata['findex'];
+            $pdata['faa'] = 'href="' . build_parsed_url($schemas) . '"';
+            $schemas['query']['page'] = $pdata['pindex'];
+            $pdata['paa'] = 'href="' . build_parsed_url($schemas) . '"';
+            $schemas['query']['page'] = $pdata['nindex'];
+            $pdata['naa'] = 'href="' . build_parsed_url($schemas) . '"';
+            $schemas['query']['page'] = $pdata['lindex'];
+            $pdata['laa'] = 'href="' . build_parsed_url($schemas) . '"';
         }
     }
 
     $html = '<div><ul class="pagination pagination-centered">';
     $html .= "<li><a {$pdata['faa']} class=\"pager-nav\">首页</a></li>";
-    empty($callbackfunc) && $html .= "<li><a {$pdata['paa']} class=\"pager-nav\">&laquo;上一页</a></li>";
+
+    if (empty($callbackfunc)) {
+        $html .= "<li><a {$pdata['paa']} class=\"pager-nav\">&laquo;上一页</a></li>";
+    }
 
     if ( ! $context['before'] && $context['before'] != 0) {
         $context['before'] = 5;
@@ -568,7 +578,7 @@ function pagination(
         $context['after'] = 4;
     }
 
-    if ($context['after'] != 0 && $context['before'] != 0) {
+    if ($context['after'] && $context['before']) {
         $range = [];
         $range['start'] = max(1, $pdata['cindex'] - $context['before']);
         $range['end'] = min($pdata['tpage'], $pdata['cindex'] + $context['after']);
@@ -578,13 +588,13 @@ function pagination(
         }
         for ($i = $range['start']; $i <= $range['end']; $i++) {
             if ($context['isajax']) {
-                $aa = 'href="javascript:;" page="' . $i . '" ' . ($callbackfunc ? 'ng-click="' . $callbackfunc . '(\'' . $url . '\', \'' . $i . '\', this);"' : '');
+                $aa = strtr($tpl, ['{index}' => $i, '{callback}' => $callbackfunc, '{url}' => $url]);
             } else {
                 if ($url) {
                     $aa = 'href="?' . str_replace('*', $i, $url) . '"';
                 } else {
-                    $_GET['page'] = $i;
-                    $aa = 'href="?' . http_build_query($_GET) . '"';
+                    $schemas['query']['page'] = $i;
+                    $aa = 'href="' . build_parsed_url($schemas) . '"';
                 }
             }
             if ( ! empty($context['isajax'])) {
@@ -688,29 +698,21 @@ function detect_sensitive_word($string)
     return false;
 }
 
-// TODO
+/**
+ * 获取上一个请求连接
+ *
+ * @param string $default
+ *
+ * @return string
+ */
 function referer($default = '')
 {
-    global $_GPC, $_W;
-    $_W['referer'] = ! empty($_GPC['referer']) ? $_GPC['referer'] : $_SERVER['HTTP_REFERER'];;
-    $_W['referer'] = substr($_W['referer'], -1) == '?' ? substr($_W['referer'], 0, -1) : $_W['referer'];
+    $request = Yii::$app->request;
 
-    if (strpos($_W['referer'], 'member.php?act=login')) {
-        $_W['referer'] = $default;
-    }
-    $_W['referer'] = $_W['referer'];
-    $_W['referer'] = str_replace('&amp;', '&', $_W['referer']);
-    $reurl = parse_url($_W['referer']);
+    $referer = $request->get('referer') ?? $request->getReferrer();
+    $referer = str_replace('&amp;', '&', $referer);
 
-    if ( ! empty($reurl['host']) && ! in_array($reurl['host'],
-            [$_SERVER['HTTP_HOST'], 'www.' . $_SERVER['HTTP_HOST']]) && ! in_array($_SERVER['HTTP_HOST'],
-            [$reurl['host'], 'www.' . $reurl['host']])) {
-        $_W['referer'] = $_W['siteroot'];
-    } elseif (empty($reurl['host'])) {
-        $_W['referer'] = $_W['siteroot'] . './' . $_W['referer'];
-    }
-
-    return strip_tags($_W['referer']);
+    return strip_tags($referer);
 }
 
 /**
@@ -764,178 +766,10 @@ function istrlen($str, $encoding = null)
     return mb_strlen($str, $encoding ?? Yii::$app->charset);
 }
 
-// TODO 下载表情图片
-function emotion($message = '', $size = '24px')
-{
-    $emotions = [
-        "/::)",
-        "/::~",
-        "/::B",
-        "/::|",
-        "/:8-)",
-        "/::<",
-        "/::$",
-        "/::X",
-        "/::Z",
-        "/::'(",
-        "/::-|",
-        "/::@",
-        "/::P",
-        "/::D",
-        "/::O",
-        "/::(",
-        "/::+",
-        "/:--b",
-        "/::Q",
-        "/::T",
-        "/:,@P",
-        "/:,@-D",
-        "/::d",
-        "/:,@o",
-        "/::g",
-        "/:|-)",
-        "/::!",
-        "/::L",
-        "/::>",
-        "/::,@",
-        "/:,@f",
-        "/::-S",
-        "/:?",
-        "/:,@x",
-        "/:,@@",
-        "/::8",
-        "/:,@!",
-        "/:!!!",
-        "/:xx",
-        "/:bye",
-        "/:wipe",
-        "/:dig",
-        "/:handclap",
-        "/:&-(",
-        "/:B-)",
-        "/:<@",
-        "/:@>",
-        "/::-O",
-        "/:>-|",
-        "/:P-(",
-        "/::'|",
-        "/:X-)",
-        "/::*",
-        "/:@x",
-        "/:8*",
-        "/:pd",
-        "/:<W>",
-        "/:beer",
-        "/:basketb",
-        "/:oo",
-        "/:coffee",
-        "/:eat",
-        "/:pig",
-        "/:rose",
-        "/:fade",
-        "/:showlove",
-        "/:heart",
-        "/:break",
-        "/:cake",
-        "/:li",
-        "/:bome",
-        "/:kn",
-        "/:footb",
-        "/:ladybug",
-        "/:shit",
-        "/:moon",
-        "/:sun",
-        "/:gift",
-        "/:hug",
-        "/:strong",
-        "/:weak",
-        "/:share",
-        "/:v",
-        "/:@)",
-        "/:jj",
-        "/:@@",
-        "/:bad",
-        "/:lvu",
-        "/:no",
-        "/:ok",
-        "/:love",
-        "/:<L>",
-        "/:jump",
-        "/:shake",
-        "/:<O>",
-        "/:circle",
-        "/:kotow",
-        "/:turn",
-        "/:skip",
-        "/:oY",
-        "/:#-0",
-        "/:hiphot",
-        "/:kiss",
-        "/:<&",
-        "/:&>",
-    ];
-    foreach ($emotions as $index => $emotion) {
-        $message = str_replace($emotion,
-            '<img style="width:' . $size . ';vertical-align:middle;" src="http://res.mail.qq.com/zh_CN/images/mo/DEFAULT2/' . $index . '.gif" />',
-            $message);
-    }
-
-    return $message;
-}
-
 // TODO
-function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
-{
-    $ckey_length = 4;
-    $key = md5($key != '' ? $key : $GLOBALS['_W']['config']['setting']['authkey']);
-    $keya = md5(substr($key, 0, 16));
-    $keyb = md5(substr($key, 16, 16));
-    $keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length) : substr(md5(microtime()),
-        -$ckey_length)) : '';
-
-    $cryptkey = $keya . md5($keya . $keyc);
-    $key_length = strlen($cryptkey);
-
-    $string = $operation == 'DECODE' ? base64_decode(substr($string, $ckey_length)) : sprintf('%010d',
-            $expiry ? $expiry + time() : 0) . substr(md5($string . $keyb), 0, 16) . $string;
-    $string_length = strlen($string);
-
-    $result = '';
-    $box = range(0, 255);
-
-    $rndkey = [];
-    for ($i = 0; $i <= 255; $i++) {
-        $rndkey[$i] = ord($cryptkey[$i % $key_length]);
-    }
-
-    for ($j = $i = 0; $i < 256; $i++) {
-        $j = ($j + $box[$i] + $rndkey[$i]) % 256;
-        $tmp = $box[$i];
-        $box[$i] = $box[$j];
-        $box[$j] = $tmp;
-    }
-
-    for ($a = $j = $i = 0; $i < $string_length; $i++) {
-        $a = ($a + 1) % 256;
-        $j = ($j + $box[$a]) % 256;
-        $tmp = $box[$a];
-        $box[$a] = $box[$j];
-        $box[$j] = $tmp;
-        $result .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
-    }
-
-    if ($operation == 'DECODE') {
-        if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10,
-                16) == substr(md5(substr($result, 26) . $keyb), 0, 16)) {
-            return substr($result, 26);
-        } else {
-            return '';
-        }
-    } else {
-        return $keyc . str_replace('=', '', base64_encode($result));
-    }
-
-}
+//function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
+//{
+//}
 
 /**
  * 返回可读存储位
@@ -1095,23 +929,10 @@ function utf8_bytes($cp)
     }
 }
 
-// TODO
-function media2local($media_id, $all = false)
-{
-    global $_W;
-    load()->model('material');
-    $data = material_get($media_id);
-    if ( ! is_error($data)) {
-        $data['attachment'] = tomedia($data['attachment'], true);
-        if ( ! $all) {
-            return $data['attachment'];
-        }
-
-        return $data;
-    } else {
-        return '';
-    }
-}
+//// TODO
+//function media2local($media_id, $all = false)
+//{
+//}
 
 // TODO
 //function aes_decode($message, $encodingaeskey = '', $appid = '')
@@ -1359,15 +1180,18 @@ if ( ! function_exists('starts_with')) {
     }
 }
 
-// TODO
+/**
+ * 是否外部链接,如果是则返回站点链接
+ *
+ * @param $redirect
+ *
+ * @return mixed|string
+ */
 function check_url_not_outside_link($redirect)
 {
-    global $_W;
-    if (starts_with($redirect, 'http') && ! starts_with($redirect, $_W['siteroot'])) {
-        $redirect = $_W['siteroot'];
-    }
+    $baseUrl = Yii::$app->request->baseUrl;
 
-    return $redirect;
+    return starts_with($redirect, 'http') && !starts_with($redirect, $baseUrl) ? $baseUrl : $redirect;
 }
 
 /**
