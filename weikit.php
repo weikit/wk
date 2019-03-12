@@ -14,7 +14,6 @@ add_action('wk_init', function() { // 初始化Weikit
         define('YII_BEGIN_TIME', $timestart);
 
         require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
-        require_once ( __DIR__ . '/we8/We8.php' );
 
         new weikit\core\Application(
             apply_filters( 'wk_config', require ( __DIR__ . '/config/web.php' ) )
