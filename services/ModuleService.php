@@ -21,47 +21,50 @@ class ModuleService extends BaseService
     public $modelClass = Module::class;
     /**
      * @param $mid
+     * @param array $options
+     *
      * @return Module|null
-     *  @throw \weikit\core\exceptions\ModelNotFoundException
+     * @throw \weikit\core\exceptions\ModelNotFoundException
      */
-    public function findByMid($mid)
+    public function findByMid($mid, array $options = [])
     {
-        return $this->powerFind(['mid' => $mid]);
+        return $this->findBy(['mid' => $mid], $options);
     }
 
     /**
      * @param $name
+     * @param array $options
      *
      * @return Module|null
      * @throw \weikit\core\exceptions\ModelNotFoundException
      */
-    public function findByName($name)
+    public function findByName($name, array $options = [])
     {
-        return $this->powerFind(['name' => $name]);
+        return $this->findBy(['name' => $name], $options);
     }
 
     /**
      * @param string|int $eid
+     * @param array $options
      *
      * @return ModuleBinding|null
      * @throw \weikit\core\exceptions\ModelNotFoundException
      */
-    public function findEntryByEid($eid)
+    public function findEntryByEid($eid, array $options = [])
     {
-        return $this->findEntryBy(['eid' => $eid]);
+        return $this->findEntryBy(['eid' => $eid], $options);
     }
 
     /**
-     * @param array $condition
+     * @param $condition
      * @param array $options
      *
-     * @return ModuleBinding
+     * @return ModuleBinding|null
      * @throw \weikit\core\exceptions\ModelNotFoundException
      */
     public function findEntryBy($condition, array $options = [])
     {
-        return $this->powerFind($condition, array_merge($options, [
-            'all' => false,
+        return $this->findBy($condition, array_merge($options, [
             'modelClass' => ModuleBinding::class
         ]));
     }
@@ -75,8 +78,7 @@ class ModuleService extends BaseService
      */
     public function findAllEntryBy($condition, array $options = [])
     {
-        return $this->powerFind($condition, array_merge($options, [
-            'all' => true,
+        return $this->findAllBy($condition, array_merge($options, [
             'modelClass' => ModuleBinding::class
         ]));
     }
@@ -240,7 +242,7 @@ class ModuleService extends BaseService
                 $class = '\\' . $namespace . '\\' . $class;
             }
         }
-        $site = new $class();
+        $site = Yii::createObject($class);
         return $site;
     }
 }

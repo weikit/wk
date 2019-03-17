@@ -18,15 +18,17 @@ class WechatAccountService extends BaseService
      * @var string
      */
     public $modelClass = WechatAccount::class;
+
     /**
      * @param $acid
+     * @param array $options
      *
      * @return WechatAccount|null
      * @throws \weikit\core\exceptions\ModelNotFoundException
      */
-    public function findByAcid($id)
+    public function findByAcid($id, array $options = [])
     {
-        return $this->powerFind(['acid' => $id]);
+        return $this->findBy(['acid' => $id], $options);
     }
 
     /**

@@ -23,9 +23,9 @@ class AccountService extends BaseService
      * @return Account|null
      * @throws \weikit\core\exceptions\ModelNotFoundException
      */
-    public function findByUniacid($uniacid)
+    public function findByUniacid($uniacid, array $options = [])
     {
-        return $this->powerFind(['uniacid' => $uniacid], [ 'class']);
+        return $this->findBy(['uniacid' => $uniacid], $options);
     }
 
     /**
@@ -44,11 +44,13 @@ class AccountService extends BaseService
     /**
      * 获取正在管理的账号
      *
-     * @return Account|false
+     * @return Account|null
      */
     public function managing()
-    {
+    {   // TODO cache, last manage
         $uniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT);
-        return $this->findByUniacid($uniacid);
+        return $uniacid ? $this->findByUniacid($uniacid, [
+            'exception' => false
+        ]) : null;
     }
 }

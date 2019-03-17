@@ -45,6 +45,6 @@ class SiteController extends Controller
         }
         return $this->service
             ->instanceSite($module)
-            ->{'doWeb' . ucfirst($do)};
+            ->{'doWeb' . ucfirst($do)}();
     }
 }
