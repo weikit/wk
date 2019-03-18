@@ -9,6 +9,10 @@ use weikit\core\service\BaseService;
 class AccountService extends BaseService
 {
     /**
+     * @var Account
+     */
+    private $_managing = false;
+    /**
      * 当前管理账号seesion键值
      */
     const SESSION_MANAGE_ACCOUNT = 'session_manage_account';
@@ -38,7 +42,7 @@ class AccountService extends BaseService
     {
         $model = $modelOrUniacid instanceof Account ? $modelOrUniacid : $this->findByUniacid($modelOrUniacid);
         Yii::$app->session->set(self::SESSION_MANAGE_ACCOUNT, $model->uniacid);
-        return $model;
+        return $this->_managing = $model;
     }
 
     /**
@@ -48,9 +52,12 @@ class AccountService extends BaseService
      */
     public function managing()
     {   // TODO cache, last manage
-        $uniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT);
-        return $uniacid ? $this->findByUniacid($uniacid, [
-            'exception' => false
-        ]) : null;
+        if ($this->_managing === false) {
+            $uniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT);
+            $this->_managing = $uniacid ? $this->findByUniacid($uniacid, [
+                'exception' => false
+            ]) : null;
+        }
+        return $this->_managing;
     }
 }

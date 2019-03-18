@@ -2,8 +2,8 @@
 
 namespace weikit\models;
 
+use weikit\core\helpers\Pinyin;
 use weikit\core\db\ActiveRecord;
-use Yii;
 
 /**
  * This is the model class for table "{{%uni_account}}".
@@ -47,7 +47,7 @@ class UniAccount extends ActiveRecord
      */
     public function defaultTitleInitial($name = null)
     {
-        return strtoupper(Yii::$app->pinyin->firstChar($name ?? $this->name));
+        return strtoupper(Pinyin::firstChar($name ?? $this->name));
     }
 
     /**

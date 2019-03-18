@@ -71,12 +71,6 @@ $config = [
 //                // ...
 //            ],
         ],
-        'pinyin' => [
-            'class' => 'weikit\core\Pinyin'
-        ],
-        'addon' => [
-            'class' => 'weikit\core\addon\Addon',
-        ]
     ],
     'params' => $params,
     'modules' => [

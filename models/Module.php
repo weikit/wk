@@ -2,7 +2,7 @@
 
 namespace weikit\models;
 
-use Yii;
+use weikit\core\helpers\Pinyin;
 use weikit\core\db\ActiveRecord;
 
 /**
@@ -76,7 +76,7 @@ class Module extends ActiveRecord
      */
     public function defaultTitleInitial($name = null)
     {
-        return strtoupper(Yii::$app->pinyin->firstChar($name ?? $this->name));
+        return strtoupper(Pinyin::firstChar($name ?? $this->name));
     }
 
     /**
