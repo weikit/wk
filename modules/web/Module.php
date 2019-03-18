@@ -12,5 +12,6 @@ class Module extends \yii\base\Module
     public function init()
     {
         \We8::initWeb();
+        require_once WEIKIT_PATH . '/core/addon/compat.php';
     }
 }

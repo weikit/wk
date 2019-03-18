@@ -2,16 +2,16 @@
 
 namespace weikit\services;
 
-
 use Yii;
+use RuntimeException;
 use weikit\models\Module;
 use yii\data\ArrayDataProvider;
 use yii\data\ActiveDataProvider;
+use weikit\models\ModuleBinding;
+use weikit\core\addon\ModuleSite;
 use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;
-use weikit\models\form\InactiveModuleForm;
 use weikit\exceptions\AddonModuleNotFoundException;
-use weikit\models\ModuleBinding;
 
 class ModuleService extends BaseService
 {
@@ -243,6 +243,10 @@ class ModuleService extends BaseService
             }
         }
         $site = Yii::createObject($class);
+
+        if (!$site instanceof ModuleSite) {
+            throw new RuntimeException('The module class "'. $class  .'" must extend "' . ModuleSite::class . '"');
+        }
         return $site;
     }
 }
