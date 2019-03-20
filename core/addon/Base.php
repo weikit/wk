@@ -13,6 +13,7 @@ use weikit\models\Module;
  * @package weikit\core\addon
  * @property string $moduleName
  * @property boolean $inMobile
+ * @property View $view
  */
 abstract class Base extends BaseObject implements ViewContextInterface
 {
@@ -61,11 +62,9 @@ abstract class Base extends BaseObject implements ViewContextInterface
 
     protected function template($filename)
     {
-        if (!$this->getInMobile()) {
-//            $source = $this->
-        } else {
-
-        }
+        $service = Yii::createObject(ModuleService::class);
+        $view = $service->getVirtualPath($this->moduleName, 'template/' . ($this->inMobile ? 'mobile' : '') . '/' . $filename . '.html');
+        return $this->view->template($view, TEMPLATE_INCLUDEPATH);
     }
 
     /**

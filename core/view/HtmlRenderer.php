@@ -36,9 +36,7 @@ class HtmlRenderer extends ViewRenderer
 
     public function render($view, $file, $params)
     {
-        return $view->renderPhpFile($this->getCacheFile($file), array_merge($params, [
-            '__renderer' => $this,
-        ]));
+        return $view->renderPhpFile($this->getCacheFile($file), $params);
     }
 
     /**
@@ -76,7 +74,7 @@ class HtmlRenderer extends ViewRenderer
 
     public function parse($str) {
         $str = preg_replace('/<!--{(.+?)}-->/s', '{$1}', $str);
-        $str = preg_replace_callback('/{template\s+(.+?)}/', [ $this, 'templateInclude' ], $str);
+        $str = preg_replace('/{template\s+(.+?)}/', '<?php include $this->template($1, TEMPLATE_INCLUDEPATH) ?>', $str);
 
         $str = preg_replace('/{encode\s+(.+?)}/', '<?php echo \yii\helpers\Html::encode($1) ?>', $str);
         $str = preg_replace('/{to\s+(.+?)}/', '<?php echo \yii\helpers\Url::to($1) ?>', $str);
@@ -111,15 +109,9 @@ class HtmlRenderer extends ViewRenderer
         return $str;
     }
 
-    public function templateInclude($matches)
-    {
-        $file = '\'/' . trim($matches[1], '\'"') . '\'';
-        return '<?php include $__renderer->getCacheFile($this->findViewFile(' . $file . '), true) ?>';
-    }
-
     public function templateAddQuote($matches)
     {
-        $str = "<?php {$matches[1]}?>";
+        $str = '<?php ' . trim($matches[1]) . ' ?>';
         $str = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $str);
 
         return str_replace('\\\"', '\"', $str);

@@ -97,20 +97,21 @@ class ModuleService extends BaseService
         ],
     ];
 
+    public function getVirtualPath($name, $file = null)
+    {
+        return $this->basePath . '/' . $name . '/' . $file;
+    }
+
     /**
-     * 获取扩展模块路径
+     * 获取扩展模块真实路径
      *
      * @param $name
      *
      * @return string
      */
-    public function getPath($name, $file = null)
+    public function getRealPath($name, $file = null)
     {
-        $path = $this->basePath . '/' . $name;
-        if ($file !== null) {
-            $path .= '/' . $file;
-        }
-        return Yii::getAlias($path);
+        return Yii::getAlias($this->getVirtualPath($name, $file));
     }
 
     /**
@@ -294,7 +295,7 @@ class ModuleService extends BaseService
                 /* @var $db \yii\db\Connection */
                 if (!empty($script)) {
                     if (strtolower(substr($script, -4)) === '.php') {
-                        $path = $this->getPath($addon['name'], $script);
+                        $path = $this->getRealPath($addon['name'], $script);
 
                         if (file_exists($path)) {
                             require $path;
@@ -570,7 +571,7 @@ class ModuleService extends BaseService
     {
         $class = $module->name . 'ModuleSite';
         if (!class_exists($class)) {
-            require_once $this->getPath($module->name, 'site.php');
+            require_once $this->getRealPath($module->name, 'site.php');
         }
         if (!class_exists($class)) {
             list($namespace) = explode('_', $module->name);

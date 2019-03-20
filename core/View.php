@@ -2,53 +2,44 @@
 
 namespace weikit\core;
 
-use weikit\core\view\HtmlViewTrait;
+use Yii;
+use weikit\core\view\HtmlRenderer;
+use yii\base\InvalidCallException;
 
 class View extends \yii\web\View
 {
-//    use HtmlViewTrait;
-//
-//    /**
-//     * @var string
-//     */
-//    public $defaultExtension = 'html';
-//
-//    /**
-//     * @inheritdoc
-//     */
-//    public function findViewFile($view, $context = null)
-//    {
-//        // TODO 需增加theme支持
-//        $file = parent::findViewFile($view, $context);
-//        if (pathinfo($file, PATHINFO_EXTENSION) === 'html') { // html 解析
-//            $cacheFile = $this->getCachePhpFile($file);
-//            $this->checkCacheFile($file, $cacheFile);
-//            return $cacheFile;
-//        }
-//
-//        return $file;
-//    }
-
     public function template($view, $flag = TEMPLATE_DISPLAY)
     {
         // template默认基础路径从$this->context->module->viewPath开始
-        if (!in_array(substr($view, 0, 1), ['/', '@'])) {
+        if ( ! in_array(substr($view, 0, 1), ['/', '@'])) {
             $view = '/' . $view;
         }
-        $file = $this->findViewFile($view, $this->context);
+
+        $viewFile = $this->findViewFile($view, $this->context);
 
         switch ($flag) {
             case TEMPLATE_DISPLAY:
             default:
-                extract($GLOBALS, EXTR_SKIP);
-                include $file;
+                echo $this->renderFile($viewFile, $GLOBALS);
                 break;
             case TEMPLATE_FETCH:
-                return $this->renderPhpFile($file);
+                return $this->renderFile($viewFile, $GLOBALS);
                 break;
             case TEMPLATE_INCLUDEPATH:
+                $ext = pathinfo($viewFile, PATHINFO_EXTENSION);
+                if (isset($this->renderers[$ext])) {
+                    if (is_array($this->renderers[$ext]) || is_string($this->renderers[$ext])) {
+                        $this->renderers[$ext] = Yii::createObject($this->renderers[$ext]);
+                    }
+                    /* @var $renderer HtmlRenderer */
+                    $renderer = $this->renderers[$ext];
+                    if (!$renderer instanceof HtmlRenderer) {
+                        throw new InvalidCallException('Only ' . HtmlRenderer::class . ' support return compiled view file path');
+                    }
+                    $viewFile = $renderer->getCacheFile($viewFile);
+                }
 
-                return $file;
+                return $viewFile;
                 break;
         }
     }
