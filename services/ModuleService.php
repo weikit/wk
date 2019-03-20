@@ -25,11 +25,11 @@ class ModuleService extends BaseService
      */
     public $modelClass = Module::class;
     /**
-     * 插件路径
+     * 插件基本路径
      *
      * @var string
      */
-    public $path = '@wp/addons';
+    public $basePath = '@wp/addons';
     /**
      * 插件设置文件名
      *
@@ -106,7 +106,7 @@ class ModuleService extends BaseService
      */
     public function getPath($name, $file = null)
     {
-        $path = $this->path . '/' . $name;
+        $path = $this->basePath . '/' . $name;
         if ($file !== null) {
             $path .= '/' . $file;
         }
@@ -194,7 +194,7 @@ class ModuleService extends BaseService
     }
 
     /**
-     * @param Request|array $requestOrData
+     * @param yii\web\Request|array $requestOrData
      *
      * @return array
      */

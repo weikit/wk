@@ -3,10 +3,12 @@
 namespace weikit\core\view;
 
 use Yii;
+use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
 use yii\base\ViewNotFoundException;
+use weikit\core\View;
 
-trait HtmlViewTrait
+class HtmlRenderer extends ViewRenderer
 {
     /**
      * @var string
@@ -32,58 +34,53 @@ trait HtmlViewTrait
         $this->_cachePath = $cachePath;
     }
 
-    public function template($view, $flag = TEMPLATE_DISPLAY)
+    public function render($view, $file, $params)
     {
-        // template默认基础路径从$this->context->module->viewPath开始
-        if (!in_array(substr($view, 0, 1), ['/', '@'])) {
-            $view = '/' . $view;
-        }
-        $file = $this->findViewFile($view, $this->context);
-
-        switch ($flag) {
-            case TEMPLATE_DISPLAY:
-            default:
-                extract($GLOBALS, EXTR_SKIP);
-                include $file;
-                break;
-            case TEMPLATE_FETCH:
-                return $this->renderPhpFile($file);
-                break;
-            case TEMPLATE_INCLUDEPATH:
-                return $file;
-                break;
-        }
+        return $view->renderPhpFile($this->getCacheFile($file), array_merge($params, [
+            '__renderer' => $this,
+        ]));
     }
 
-    public function getCachePhpFile($file)
+    /**
+     * @param string $file
+     * @param bool $check
+     *
+     * @return string
+     */
+    public function getCacheFile(string $file, bool $check = true): string
     {
         $filename = md5($file);
-        return $this->getCachePath() . '/' . substr($filename , 0, 2) . '/' . md5($file) . '.php';
+
+        $cacheFile = $this->getCachePath() . '/' . substr($filename , 0, 2) . '/' . md5($file) . '.php';
+        if ($check === true && $this->isExpired($file, $cacheFile)) {
+            $this->compile($file, $cacheFile);
+        }
+        return $cacheFile;
     }
 
-    protected function checkCacheFile($file, $cacheFile)
+    protected function isExpired(string $file, string $cacheFile): bool
     {
         if (!is_file($file)) {
             throw new ViewNotFoundException("The view file does not exist: $file");
         }
 
-        if (!is_file($cacheFile) || filemtime($file) > filemtime($cacheFile)) {
-            $this->compile($file, $cacheFile);
-        }
+        return !is_file($cacheFile) || @filemtime($file) > @filemtime($cacheFile);
     }
 
-    public function compile($source, $target, $inModule = false)
+    public function compile(string $source, string $target)
     {
         FileHelper::createDirectory(dirname($target));
-        $content = $this->parse(file_get_contents($source), $inModule);
+        $content = $this->parse(file_get_contents($source));
         file_put_contents($target, $content);
     }
 
-    public function parse($str, $inModule = false) {
+    public function parse($str) {
         $str = preg_replace('/<!--{(.+?)}-->/s', '{$1}', $str);
-        $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
-            '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",
-            $str);
+//        $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
+/*            '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",*/
+//            $str);
+
+        $str = preg_replace_callback('/{template\s+(.+?)}/', [ $this, 'templateInclude' ], $str);
 
         $str = preg_replace('/{encode\s+(.+?)}/', '<?php echo \yii\helpers\Html::encode($1) ?>', $str);
         $str = preg_replace('/{to\s+(.+?)}/', '<?php echo \yii\helpers\Url::to($1) ?>', $str);
@@ -109,18 +106,26 @@ trait HtmlViewTrait
         $str = preg_replace('/{media\s+(\S+)}/', '<?php echo tomedia($1);?>', $str);
         $str = preg_replace_callback('/<\?php([^\?]+)\?>/s', [ $this, 'templateAddQuote' ], $str);
         $str = preg_replace('/{([A-Z_\x7f-\xff][A-Z0-9_\x7f-\xff]*)}/s', '<?php echo $1;?>', $str);
+
         $str = str_replace('{##', '{', $str);
         $str = str_replace('##}', '}', $str);
+
         $str = "<?php defined('ABSPATH') || exit;?>\n" . $str;
 
         return $str;
     }
 
+    public function templateInclude($matches)
+    {
+        $file = '\'/' . trim($matches[1], '\'"') . '\'';
+        return '<?php include $__renderer->getCacheFile($this->findViewFile(' . $file . '), true) ?>';
+    }
+
     public function templateAddQuote($matches)
     {
-        $code = "<?php {$matches[1]}?>";
-        $code = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $code);
+        $str = "<?php {$matches[1]}?>";
+        $str = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $str);
 
-        return str_replace('\\\"', '\"', $code);
+        return str_replace('\\\"', '\"', $str);
     }
 }
