@@ -76,10 +76,6 @@ class HtmlRenderer extends ViewRenderer
 
     public function parse($str) {
         $str = preg_replace('/<!--{(.+?)}-->/s', '{$1}', $str);
-//        $str = preg_replace('/{template\s+(.+?)}/', // todo template 和 this->tempalte
-/*            '<?php (!empty($this) && $this instanceof WeModuleSite || ' . intval($inModule) . ') ? (include $this->template($1, TEMPLATE_INCLUDEPATH)) : (include $this->template($1, TEMPLATE_INCLUDEPATH));?>' . "\n",*/
-//            $str);
-
         $str = preg_replace_callback('/{template\s+(.+?)}/', [ $this, 'templateInclude' ], $str);
 
         $str = preg_replace('/{encode\s+(.+?)}/', '<?php echo \yii\helpers\Html::encode($1) ?>', $str);
