@@ -43,8 +43,15 @@ class SiteController extends Controller
         if (empty($do)) {
             throw new NotFoundHttpException('The method "do" of module is missing');
         }
-        return $this->service
+
+        ob_start(); // TODO
+        ob_implicit_flush(false);
+
+        $method = 'doWeb' . ucfirst($do);
+        echo $this->service
             ->instanceSite($module)
-            ->{'doWeb' . ucfirst($do)}();
+            ->$method();
+
+        return ob_get_clean();
     }
 }

@@ -21,7 +21,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
                 'a' => $segments[2] ?? null,
                 'do' => $segments[3] ?? null,
             ]);
-            return home_url('/' . $segments[0] . '/?' . http_build_query($params));
+            return '?' . http_build_query($params);
         }
         return false;
     }

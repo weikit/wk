@@ -48,7 +48,7 @@ if (is_admin()) {
                 $url = home_url('/web/');
                 wp_enqueue_script('iframe-resizer', site_url('web/resource/components/iframe-resizer/iframeResizer.min.js'))
 ?>
-<style type="text/css">#wpcontent { margin-left: 140px; }</style>
+<style type="text/css">#wk_iframe { margin-left: -10px; }</style>
 <iframe src="<?= $url ?>" id="wk_iframe" name="wk_iframe" frameborder="0" width="100%" scrolling="no"></iframe>
 <script type="text/javascript">
   jQuery(function() { iFrameResize({ log: true, heightCalculationMethod: 'bodyScroll' }); })

@@ -17,9 +17,18 @@ use weikit\models\Module;
  */
 abstract class Base extends BaseObject implements ViewContextInterface
 {
+    /**
+     * @var View
+     */
     private $_view;
+    /**
+     * @var string
+     */
     private $_viewPath;
-
+    /**
+     * @var ModuleService
+     */
+    protected $service;
     /**
      * @var int
      */
@@ -42,6 +51,14 @@ abstract class Base extends BaseObject implements ViewContextInterface
         if ($this->weid === null) {
             $this->weid = $_W['uniacid'];
         }
+
+        $this->service = Yii::createObject(ModuleService::class);
+        if ( ! defined('MODULE_ROOT')) {
+            define('MODULE_ROOT', $this->service->getRealPath($this->moduleName));
+        }
+        if ( ! defined('MODULE_URL')) {
+            define('MODULE_URL', $this->service->getUrl($this->moduleName) . '/');
+        }
     }
 
     /**
@@ -62,8 +79,7 @@ abstract class Base extends BaseObject implements ViewContextInterface
 
     protected function template($filename)
     {
-        $service = Yii::createObject(ModuleService::class);
-        $view = $service->getVirtualPath($this->moduleName, 'template/' . ($this->inMobile ? 'mobile' : '') . '/' . $filename . '.html');
+        $view = $this->service->getVirtualPath($this->moduleName, 'template/' . ($this->inMobile ? 'mobile' : '') . '/' . $filename . '.html');
         return $this->view->template($view, TEMPLATE_INCLUDEPATH);
     }
 

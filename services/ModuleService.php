@@ -25,6 +25,12 @@ class ModuleService extends BaseService
      */
     public $modelClass = Module::class;
     /**
+     * 插件基本路由
+     *
+     * @var string
+     */
+    public $baseUrl = '@wp_url/addons';
+    /**
      * 插件基本路径
      *
      * @var string
@@ -97,6 +103,26 @@ class ModuleService extends BaseService
         ],
     ];
 
+    /**
+     * 获取插件Url
+     *
+     * @param $name
+     *
+     * @return bool|string
+     */
+    public function getUrl($name)
+    {
+        return Yii::getAlias($this->baseUrl . '/' . $name);
+    }
+
+    /**
+     * 获取扩展模块虚拟路径
+     *
+     * @param $name
+     * @param null $file
+     *
+     * @return string
+     */
     public function getVirtualPath($name, $file = null)
     {
         return $this->basePath . '/' . $name . '/' . $file;
@@ -106,8 +132,9 @@ class ModuleService extends BaseService
      * 获取扩展模块真实路径
      *
      * @param $name
+     * @param null $file
      *
-     * @return string
+     * @return bool|string
      */
     public function getRealPath($name, $file = null)
     {

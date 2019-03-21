@@ -1,8 +1,5 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
-
 $config = [
     'id' => 'weikit',
     'name' => 'Weikit',
@@ -11,9 +8,9 @@ $config = [
     'language' => 'zh-CN',
     'aliases' => [
         '@weikit' => WEIKIT_PATH,
-        '@weikit_url' => home_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
+        '@weikit_url' => site_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
         '@wp' => ABSPATH,
-        '@wp_url' => home_url(),
+        '@wp_url' => site_url(),
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
@@ -37,13 +34,13 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
+        'db' => require __DIR__ . '/db.php',
         'user' => [
             'class' => 'weikit\core\User',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-//            'showScriptName' => false,
+            'showScriptName' => false,
             'rules' => [
                 [ 'class' => 'weikit\core\rules\WeikitRule' ]
             ],
@@ -78,7 +75,6 @@ $config = [
             ],
         ],
     ],
-    'params' => $params,
     'modules' => [
         'app' => [
             'class' => 'weikit\modules\app\Module',
@@ -86,10 +82,6 @@ $config = [
         'web' => [
             'class' => 'weikit\modules\web\Module',
         ],
-
-        'gridview' => [
-            'class' => 'kartik\grid\Module'
-        ]
     ]
 ];
 
