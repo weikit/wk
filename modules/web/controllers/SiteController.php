@@ -35,19 +35,23 @@ class SiteController extends Controller
         if ($eid) {
             $entry = $this->service->findEntryByEid($eid);
             $module = $entry->relationModule;
-            $do = $entry->do;
         } else {
             $entry = $this->service->findEntryBy(['module' => $m, 'do' => $do], ['exception' => false]);
             $module = $entry ? $entry->relationModule : $this->service->findByName($m);
         }
-        if (empty($do)) {
-            throw new NotFoundHttpException('The method "do" of module is missing');
+        if (empty($entry)) {
+            throw new NotFoundHttpException('The entry of addon module is not found');
         }
 
-        ob_start(); // TODO
-        ob_implicit_flush(false);
+        // TOOD 兼容语法. 移除并更完美的兼容
+        global $_GPC;
+        $_GPC['state'] = $entry->state;
+        $_GPC['m'] = $entry->module;
+        $_GPC['do'] = $entry->do;
 
-        $method = 'doWeb' . ucfirst($do);
+        ob_start();
+        ob_implicit_flush(false);
+        $method = 'doWeb' . ucfirst($entry->do);
         echo $this->service
             ->instanceSite($module)
             ->$method();
