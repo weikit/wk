@@ -2,11 +2,14 @@
 
 namespace weikit\core\service;
 
+use Closure;
 use yii\base\Model;
 use yii\web\Request;
 use yii\base\BaseObject;
+use yii\helpers\ArrayHelper;
 use yii\base\InvalidConfigException;
 use weikit\core\db\ActiveRecord;
+use weikit\core\exceptions\ModelNotFoundException;
 
 abstract class BaseService extends BaseObject
 {
@@ -48,7 +51,9 @@ abstract class BaseService extends BaseObject
      * @param $condition
      * @param array $options
      *
-     * @return mixed
+     * @return array|\yii\db\ActiveRecord|\yii\db\ActiveRecord[]|null
+     * @throws InvalidConfigException
+     * @throws ModelNotFoundException
      */
     protected function powerFind($condition, array $options = [])
     {
@@ -59,6 +64,8 @@ abstract class BaseService extends BaseObject
             'modelClass' => $this->modelClass,
             // 是否查询多行数据
             'all' => false,
+            // 自定义查询
+            'query' => null,
         ], $options);
 
         if ($options['modelClass'] === null) {
@@ -67,14 +74,45 @@ abstract class BaseService extends BaseObject
             throw new InvalidConfigException('The modelClass must be subclass of "Model" or "ActiveRecord"');
         }
 
+        /* @var $class \yii\db\ActiveRecord */
         $class = $options['modelClass'];
-        if ($options['all']) {
-            $method = 'findAll';
-        } else {
-            $method = $options['exception'] ? 'tryFindOne' : 'findOne';
+
+        $query = $class::find();
+
+        if ( !empty($condition)) {
+            // find by primary key
+            if (!ArrayHelper::isAssociative($condition)) {
+                // query by primary key
+                $primaryKey = $class::primaryKey();
+                if (isset($primaryKey[0])) {
+                    // if condition is scalar, search for a single primary key, if it is array, search for multiple primary key values
+                    $condition = [$primaryKey[0] => is_array($condition) ? array_values($condition) : $condition];
+                } else {
+                    throw new InvalidConfigException('"' . get_called_class() . '" must have a primary key.');
+                }
+            }
+
+            $query->andWhere($condition);
         }
 
-        return call_user_func_array([$class, $method], [$condition]);
+        // query callback
+        if ($options['query'] instanceof Closure) {
+            call_user_func($options['query'], $query);
+        }
+
+        // findAll
+        if ($options['all']) {
+            return $query->all();
+        }
+
+        // findOne
+        $model = $query->one();
+
+        if ($options['exception'] && $model === null) {
+            throw new ModelNotFoundException($class);
+        }
+
+        return $model;
     }
 
     /**

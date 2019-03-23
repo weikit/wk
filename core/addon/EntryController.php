@@ -2,7 +2,7 @@
 
 namespace weikit\core\addon;
 
-class ModuleSite extends Base
+class EntryController extends Controller
 {
 
 }

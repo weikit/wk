@@ -34,6 +34,14 @@ class HtmlRenderer extends ViewRenderer
         $this->_cachePath = $cachePath;
     }
 
+    /**
+     * @param \yii\base\View $view
+     * @param string $file
+     * @param array $params
+     *
+     * @return string
+     * @throws \Throwable
+     */
     public function render($view, $file, $params)
     {
         return $view->renderPhpFile($this->getCacheFile($file), $params);
@@ -47,9 +55,14 @@ class HtmlRenderer extends ViewRenderer
      */
     public function getCacheFile(string $file, bool $check = true): string
     {
-        $filename = md5($file);
+        $md5 = md5($file);
+        $filename = substr($md5,0,8);
+        if (preg_match('#([/\\\\][\w@.-]{3,35}){1,4}\z#', $file, $matches)) {
+            $cacheFile = $this->getCachePath() . $matches[0] . '.' . $filename .'.php';
+        } else {
+            $cacheFile = $this->getCachePath() . '/' . $filename . '/' . $md5 . '.php';
+        }
 
-        $cacheFile = $this->getCachePath() . '/' . substr($filename , 0, 2) . '/' . md5($file) . '.php';
         if ($check === true && $this->isExpired($file, $cacheFile)) {
             $this->compile($file, $cacheFile);
         }
@@ -105,6 +118,9 @@ class HtmlRenderer extends ViewRenderer
         $str = str_replace('##}', '}', $str);
 
         $str = "<?php defined('ABSPATH') || exit;?>\n" . $str;
+
+        // TODO 减少输出内容体积
+//        return trim(preg_replace('/>\s+</', '><', $str));
 
         return $str;
     }

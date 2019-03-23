@@ -10,6 +10,7 @@ use Latte\Macros\MacroSet;
 use yii\base\ViewRenderer;
 
 /**
+ * // TODO 待开发, 机制兼容问题, 待解决
  * Class LatteRenderer
  * @package weikit\core\view
  * @property MacroSet $macroSet

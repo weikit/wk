@@ -2,6 +2,7 @@
 
 namespace weikit\services;
 
+
 use Yii;
 use DOMElement;
 use DOMDocument;
@@ -9,11 +10,12 @@ use RuntimeException;
 use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use yii\data\ActiveDataProvider;
+use yii\base\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use weikit\models\Module;
 use weikit\models\ModuleBinding;
-use weikit\core\addon\ModuleSite;
+use weikit\core\addon\SiteAction;
 use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;
 use weikit\exceptions\AddonModuleNotFoundException;
@@ -198,11 +200,26 @@ class ModuleService extends BaseService
      *
      * @return ModuleBinding[]
      */
-    public function findAllEntryBy($condition, array $options = [])
+    public function findEntriesBy($condition, array $options = [])
     {
         return $this->findAllBy($condition, array_merge($options, [
             'modelClass' => ModuleBinding::class
         ]));
+    }
+
+    /**
+     * @param $name
+     *
+     * @return mixed
+     */
+    public function findEntriesByModuleName($name)
+    { // TODO cache
+        $module = $this->service->findByName($name, [
+            'query' => function($query) {
+                $query->with('entries');
+            }
+        ]);
+        return $module->entries;
     }
 
     /**
@@ -589,6 +606,35 @@ class ModuleService extends BaseService
         return $binding;
     }
 
+    public function instanceActionSite(string $moduleName)
+    {
+        if (preg_match('/^[a-z0-9\\-_]+$/', $moduleName)) {
+            throw new InvalidArgumentException('Illegal addon module name');
+        }
+
+        $class = $moduleName . 'ModuleSite';
+        if (!class_exists($class)) {
+            require_once $this->getRealPath($moduleName, 'site.php');
+        }
+        if (!class_exists($class)) {
+            list($namespace) = explode('_', $moduleName);
+            if (class_exists('\\' . $namespace . '\\' . $class)) {
+                $class = '\\' . $namespace . '\\' . $class;
+            }
+        }
+
+        $site = Yii::createObject([
+            'class' => $class,
+            'moduleName' => $moduleName,
+        ]);
+
+        if (!$site instanceof SiteAction) {
+            throw new RuntimeException('The module class "'. $class  .'" must extend "' . ModuleSite::class . '"');
+        }
+
+        return $site;
+    }
+
     /**
      * @param Module $module
      *
@@ -612,7 +658,7 @@ class ModuleService extends BaseService
             'module' => $module,
         ]);
 
-        if (!$site instanceof ModuleSite) {
+        if (!$site instanceof SiteAction) {
             throw new RuntimeException('The module class "'. $class  .'" must extend "' . ModuleSite::class . '"');
         }
 
