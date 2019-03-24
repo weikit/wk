@@ -11,6 +11,11 @@ use weikit\core\View;
 class HtmlRenderer extends ViewRenderer
 {
     /**
+     * @var bool 是否清除多余空格
+     */
+    public $spaceLess = YII_DEBUG;
+
+    /**
      * @var string
      */
     private $_cachePath;
@@ -119,8 +124,9 @@ class HtmlRenderer extends ViewRenderer
 
         $str = "<?php defined('ABSPATH') || exit;?>\n" . $str;
 
-        // TODO 减少输出内容体积
-//        return trim(preg_replace('/>\s+</', '><', $str));
+        if ($this->spaceLess) {
+            $str = trim(preg_replace('/>\s+</', '><', $str));
+        }
 
         return $str;
     }
