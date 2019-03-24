@@ -45,7 +45,7 @@ class MenuService extends BaseService
                 if ($entry->entry === ModuleBinding::ENTRY_MENU) {
                     $customMenu[] = [
                         'label' => $entry->title,
-                        'url' => ['site/entry', 'eid' => $entry->eid]
+                        'url' => ['/web/site/entry', 'eid' => $entry->eid]
                     ];
                 }
             }
@@ -65,6 +65,6 @@ class MenuService extends BaseService
 
             return $menu;
 
-        }, 604800);
+        });
     }
 }

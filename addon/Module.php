@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\core\addon;
+namespace weikit\addon;
 
 use weikit\services\ModuleService;
 use Yii;
@@ -9,7 +9,7 @@ use weikit\models\Module as ModuleModel;
 
 /**
  * Class Module
- * @package weikit\core\addon
+ * @package weikit\addon
  * @property ModuleModel $model
  */
 class Module extends \yii\base\Module implements ArrayAccess
@@ -18,29 +18,24 @@ class Module extends \yii\base\Module implements ArrayAccess
      * @var ModuleModel
      */
     private $_model;
-
-    /**
-     * @var string
-     */
-    public $controllerNamespace = 'weikit\core\addon\web\controllers';
-
     /**
      * @inheritdoc
      */
     public function  __construct($id, $parent = null, $config = [])
     {
         parent::__construct($id, $parent, array_merge([
-            'controllerMap' => $this->defaultControllerMap($id)
-        ]));
+            'controllerMap' => $this->defaultControllerMap($id, $parent),
+            'controllerNamespace' => 'weikit\addon\\' . $parent->id . '\controllers',
+        ]), $config);
     }
 
     /**
      * @param string $name
+     * @param Module $module
      *
      * @return array
-     * @throws \yii\base\InvalidConfigException
      */
-    protected function defaultControllerMap($name)
+    protected function defaultControllerMap($name, $module)
     {
         // TODO 增加扩展模块的(安装时)扩展功能放入Yii::classes中(可优化性能)
         require_once Yii::getAlias('@wp/addons/' . $name . '/site.php');
@@ -75,7 +70,6 @@ class Module extends \yii\base\Module implements ArrayAccess
     {
         $this->_model = $model;
     }
-
 
     public function offsetExists($offset)
     {
@@ -117,5 +111,15 @@ class Module extends \yii\base\Module implements ArrayAccess
 
         // TODO add behaviors support?
         return $this->model->$name;
+    }
+
+    /**
+     * 默认和web/app模块共享模板路径
+     *
+     * @inheritdoc
+     */
+    public function getViewPath()
+    {
+        return $this->module->getViewPath();
     }
 }

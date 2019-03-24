@@ -32,7 +32,7 @@ class Module extends \yii\base\Module
     public function init()
     {
         \We8::initWeb();
-        require_once WEIKIT_PATH . '/core/addon/compat.php';
+        require_once WEIKIT_PATH . '/addon/compat.php';
     }
 
     /**
@@ -50,7 +50,7 @@ class Module extends \yii\base\Module
             /* @var $model \weikit\models\Module */
             foreach ($service->findAllBy([]) as $model) {
                 $modules[$model->name] = [
-                    'class' => 'weikit\core\addon\Module',
+                    'class' => 'weikit\addon\Module',
                 ];
             }
             // TODO cache dependency
@@ -58,4 +58,6 @@ class Module extends \yii\base\Module
         }
         return $modules;
     }
+
+
 }

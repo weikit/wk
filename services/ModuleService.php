@@ -15,7 +15,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use weikit\models\Module;
 use weikit\models\ModuleBinding;
-use weikit\core\addon\SiteAction;
+use weikit\addon\SiteAction;
 use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;
 use weikit\exceptions\AddonModuleNotFoundException;
@@ -604,64 +604,5 @@ class ModuleService extends BaseService
         }
 
         return $binding;
-    }
-
-    public function instanceActionSite(string $moduleName)
-    {
-        if (preg_match('/^[a-z0-9\\-_]+$/', $moduleName)) {
-            throw new InvalidArgumentException('Illegal addon module name');
-        }
-
-        $class = $moduleName . 'ModuleSite';
-        if (!class_exists($class)) {
-            require_once $this->getRealPath($moduleName, 'site.php');
-        }
-        if (!class_exists($class)) {
-            list($namespace) = explode('_', $moduleName);
-            if (class_exists('\\' . $namespace . '\\' . $class)) {
-                $class = '\\' . $namespace . '\\' . $class;
-            }
-        }
-
-        $site = Yii::createObject([
-            'class' => $class,
-            'moduleName' => $moduleName,
-        ]);
-
-        if (!$site instanceof SiteAction) {
-            throw new RuntimeException('The module class "'. $class  .'" must extend "' . ModuleSite::class . '"');
-        }
-
-        return $site;
-    }
-
-    /**
-     * @param Module $module
-     *
-     * @return mixed
-     */
-    public function instanceSite(Module $module)
-    {
-        $class = $module->name . 'ModuleSite';
-        if (!class_exists($class)) {
-            require_once $this->getRealPath($module->name, 'site.php');
-        }
-        if (!class_exists($class)) {
-            list($namespace) = explode('_', $module->name);
-            if (class_exists('\\' . $namespace . '\\' . $class)) {
-                $class = '\\' . $namespace . '\\' . $class;
-            }
-        }
-
-        $site = Yii::createObject([
-            'class' => $class,
-            'module' => $module,
-        ]);
-
-        if (!$site instanceof SiteAction) {
-            throw new RuntimeException('The module class "'. $class  .'" must extend "' . ModuleSite::class . '"');
-        }
-
-        return $site;
     }
 }

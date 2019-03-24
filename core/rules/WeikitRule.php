@@ -68,7 +68,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
             }
         }
 
-        $route = implode('/', array_filter([$rootModule, $m, $c, $a, $do]));
+        $route = implode('/', array_filter([$rootModule, $m, $c, strtolower($a), strtolower($do)]));
         return [$route, []];
     }
 }

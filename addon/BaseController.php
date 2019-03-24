@@ -1,17 +1,18 @@
 <?php
 
-namespace weikit\core\addon;
+namespace weikit\addon;
 
 use Yii;
+use yii\web\Controller;
 use weikit\services\ModuleService;
 
 /**
- * Class Controller
- * @package weikit\core\addon
+ * Class BaseController
+ * @package weikit\addon
  * @property string $moduleName
  * @property boolean $inMobile
  */
-abstract class Controller extends \yii\web\Controller
+abstract class BaseController extends Controller
 {
     /**
      * @var ModuleService
@@ -102,6 +103,7 @@ abstract class Controller extends \yii\web\Controller
         // TODO 更好的兼容, 放在WeikitRule中兼容?
         global $_GPC;
         $_GPC['do'] = $id;
+        $_GPC['m'] = $this->moduleName;
 
         $actionMap = $this->actions();
         if (isset($actionMap[$id])) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\core\addon;
+namespace weikit\addon;
 
 use Yii;
 use yii\base\InlineAction;
