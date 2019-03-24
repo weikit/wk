@@ -25,7 +25,7 @@ class Module extends \yii\base\Module implements ArrayAccess
     {
         parent::__construct($id, $parent, array_merge([
             'controllerMap' => $this->defaultControllerMap($id, $parent),
-            'controllerNamespace' => 'weikit\addon\\' . $parent->id . '\controllers',
+            'controllerNamespace' => 'weikit\addon\\' . $parent->id . '\controllers', // TODO 切换模块命名空间
         ]), $config);
     }
 

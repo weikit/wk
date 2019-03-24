@@ -8,14 +8,19 @@ use yii\base\InvalidCallException;
 
 class View extends \yii\web\View
 {
-    public function template($view, $flag = TEMPLATE_DISPLAY)
+    public function viewFile($view)
     {
         // template默认基础路径从$this->context->module->viewPath开始
         if ( ! in_array(substr($view, 0, 1), ['/', '@'])) {
             $view = '/' . $view;
         }
 
-        $viewFile = $this->findViewFile($view, $this->context);
+        return $this->findViewFile($view, $this->context);
+    }
+    
+    public function template($view, $flag = TEMPLATE_DISPLAY)
+    {
+        $viewFile = $this->viewFile($view);
 
         switch ($flag) {
             case TEMPLATE_DISPLAY:

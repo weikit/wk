@@ -7,8 +7,6 @@ use yii\web\Controller;
 class PlatformController extends Controller
 {
     /**
-     * @param null $m
-     * @param null $eid
      *
      * @return string
      */

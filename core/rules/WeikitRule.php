@@ -41,14 +41,19 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         $do = $request->get('do');
         if ($eid = (int)$request->get('eid')) {
             $cache = Yii::$app->cache;
-            if (!($m = $cache->get(self::CACHE_ADDON_MODULE_ENTY))) {
+            $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $eid;
+            if (!($data = $cache->get($cacheKey))) {
                 /* @var $service ModuleService */
                 $service = Yii::createObject(ModuleService::class);
                 $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
-                $m = $entry->module;
+                $data = [
+                    'm' => $entry->module,
+                    'do' => $entry->do
+                ];
                 // TODO cache dependency
-                $cache->set(self::CACHE_ADDON_MODULE_ENTY, $m);
+                $cache->set($cacheKey, $data);
             }
+            extract($data);
         } else {
             $m = $request->get('m');
         }

@@ -9,7 +9,6 @@ use weikit\services\ModuleService;
 /**
  * Class BaseController
  * @package weikit\addon
- * @property string $moduleName
  * @property boolean $inMobile
  */
 abstract class BaseController extends Controller
@@ -30,6 +29,10 @@ abstract class BaseController extends Controller
      * @var Module
      */
     public $module;
+    /**
+     * @var
+     */
+    public $modulename;
 
     public function init()
     {
@@ -41,24 +44,16 @@ abstract class BaseController extends Controller
             $this->weid = $_W['uniacid'];
         }
 
-        $name = $this->moduleName;
+        $this->modulename = $this->module->id;
         $this->service = Yii::createObject(ModuleService::class);
-        $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $name);
+        $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $this->modulename);
 
         if ( ! defined('MODULE_ROOT')) {
-            define('MODULE_ROOT', $this->service->getRealPath($name));
+            define('MODULE_ROOT', $this->service->getRealPath($this->modulename));
         }
         if ( ! defined('MODULE_URL')) {
-            define('MODULE_URL', $this->service->getUrl($name) . '/');
+            define('MODULE_URL', $this->service->getUrl($this->modulename) . '/');
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getModuleName()
-    {
-        return $this->module->id;
     }
 
     /**
@@ -76,7 +71,7 @@ abstract class BaseController extends Controller
     protected function createWebUrl($do, array $query = [])
     {
         return wurl('site/entry/' . $do, array_merge($query, [
-            'm' => $this->moduleName
+            'm' => $this->modulename
         ]));
     }
 
@@ -87,8 +82,15 @@ abstract class BaseController extends Controller
      */
     protected function template($filename)
     {
-        $view = $this->service->getVirtualPath($this->moduleName, 'template/' . ($this->inMobile ? 'mobile/' : '') . $filename . '.html');
-        return $this->view->template($view, TEMPLATE_INCLUDEPATH);
+        $view = $this->getView();
+        $viewPath = $this->service->getVirtualPath($this->modulename, 'template/' . ($this->inMobile ? 'mobile/' : '') . $filename . '.html');
+        $file = $view->viewFile($viewPath);
+
+        if (!is_file($file)) {
+            $viewPath = $filename;
+        }
+
+        return $view->template($viewPath, TEMPLATE_INCLUDEPATH); // TODO 优化减少viewFile调用次数
     }
 
     /**
@@ -103,7 +105,7 @@ abstract class BaseController extends Controller
         // TODO 更好的兼容, 放在WeikitRule中兼容?
         global $_GPC;
         $_GPC['do'] = $id;
-        $_GPC['m'] = $this->moduleName;
+        $_GPC['m'] = $this->modulename;
 
         $actionMap = $this->actions();
         if (isset($actionMap[$id])) {
@@ -116,6 +118,10 @@ abstract class BaseController extends Controller
                 if ($method->isPublic() && $method->getName() === $methodName) {
                     return new DoAction($id, $this, $methodName);
                 }
+            } else { // 魔术控制器
+                return new DoAction($id, $this, $methodName, [
+                    'isMagicMethod' => true,
+                ]);
             }
         }
 

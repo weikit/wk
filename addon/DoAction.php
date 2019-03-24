@@ -8,14 +8,15 @@ use yii\base\InlineAction;
 class DoAction extends InlineAction
 {
     /**
-     * Runs this action with the specified parameters.
-     * This method is mainly invoked by the controller.
-     * @param array $params action parameters
-     * @return mixed the result of the action
+     * @var bool
+     */
+    public $isMagicMethod = false;
+    /**
+     * @inheritdoc
      */
     public function runWithParams($params)
     {
-        $args = $this->controller->bindActionParams($this, $params);
+        $args = $this->isMagicMethod ? [] : $this->controller->bindActionParams($this, $params);
         Yii::debug('Running action: ' . get_class($this->controller) . '::' . $this->actionMethod . '()', __METHOD__);
         if (Yii::$app->requestedParams === null) {
             Yii::$app->requestedParams = $args;
