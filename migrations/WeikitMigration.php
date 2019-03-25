@@ -69,12 +69,27 @@ class WeikitMigration extends Migration
                 'title_initial' => $this->string(1)->notNull()->defaultValue('')->comment('首字母'),
             ], $this->tableOptions);
         }
+
+        if (! $this->isTableExists('{{%uni_account_modules}}')) {
+            $this->createTable('{{%uni_account_modules}}', [
+                'id' => $this->primaryKey()->comment('ID'),
+                'uniacid'   => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
+                'module' => $this->string(100)->notNull()->defaultValue('')->comment('关联模块'),
+                'enabled' => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment('是否开启'),
+                'settings' => $this->text()->comment('设置'),
+                'shortcut' => $this->boolean()->unsigned()->notNull()->defaultValue(0)->comment(''),
+                'displayorder' => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('排序'),
+            ]);
+        }
     }
 
     protected function dropUniTable()
     {
         if ($this->isTableExists('{{%uni_account}}')) {
             $this->dropTable('{{%uni_account}}');
+        }
+        if ($this->isTableExists('{{%uni_account_modules}}')) {
+            $this->dropTable('{{%uni_account_modules}}');
         }
     }
 

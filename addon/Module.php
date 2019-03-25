@@ -21,6 +21,7 @@ class Module extends \yii\base\Module implements ArrayAccess
      * @var ModuleModel
      */
     private $_model;
+    private $_config;
     /**
      * @var ModuleService
      */
@@ -93,6 +94,8 @@ class Module extends \yii\base\Module implements ArrayAccess
     {
         $this->_model = $model;
     }
+
+
 
     public function offsetExists($offset)
     {

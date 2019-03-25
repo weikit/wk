@@ -13,6 +13,10 @@ class AccountService extends BaseService
      */
     private $_managing = false;
     /**
+     * @var int
+     */
+    private $_managingUniacid;
+    /**
      * 当前管理账号seesion键值
      */
     const SESSION_MANAGE_ACCOUNT = 'session_manage_account';
@@ -20,6 +24,26 @@ class AccountService extends BaseService
      * @var string
      */
     public $modelClass = Account::class;
+
+    /**
+     * @return int
+     */
+    public function getManagingUniacid()
+    {
+        if ($this->_managingUniacid) {
+            $this->_managingUniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT, 0);
+        }
+        return $this->_managingUniacid;
+    }
+
+    /**
+     * @param Account $managing
+     */
+    public function setManagingUniacid($uniacid)
+    {
+        Yii::$app->session->set(self::SESSION_MANAGE_ACCOUNT, $uniacid);
+        $this->_managingUniacid = $uniacid;
+    }
 
     /**
      * @param int $uniacid
@@ -41,7 +65,7 @@ class AccountService extends BaseService
     public function manage($modelOrUniacid)
     {
         $model = $modelOrUniacid instanceof Account ? $modelOrUniacid : $this->findByUniacid($modelOrUniacid);
-        Yii::$app->session->set(self::SESSION_MANAGE_ACCOUNT, $model->uniacid);
+        $this->setManagingUniacid($model->uniacid);
         return $this->_managing = $model;
     }
 
@@ -53,7 +77,7 @@ class AccountService extends BaseService
     public function managing()
     {   // TODO cache, last manage
         if ($this->_managing === false) {
-            $uniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT);
+            $uniacid = $this->getManagingUniacid();
             $this->_managing = $uniacid ? $this->findByUniacid($uniacid, [
                 'exception' => false
             ]) : null;

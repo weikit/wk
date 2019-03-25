@@ -9,6 +9,7 @@ use weikit\services\ModuleService;
  * Class BaseController
  * @package weikit\addon
  * @property boolean $inMobile
+ * @property Module|\weikit\models\Module $module
  */
 abstract class Controller extends \yii\web\Controller
 {
@@ -25,10 +26,6 @@ abstract class Controller extends \yii\web\Controller
      */
     public $weid;
     /**
-     * @var Module
-     */
-    public $module;
-    /**
      * @var
      */
     public $modulename;
@@ -42,7 +39,6 @@ abstract class Controller extends \yii\web\Controller
         if ($this->weid === null) {
             $this->weid = $_W['uniacid'];
         }
-
         $this->modulename = $this->module->id;
         $this->service = Yii::createObject(ModuleService::class);
         $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $this->modulename);
