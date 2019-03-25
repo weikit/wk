@@ -48,4 +48,9 @@ abstract class ModuleController extends Controller
     {
         return null;
     }
+
+    public function actionSettings()
+    {
+        $this->settingsDisplay([]);
+    }
 }

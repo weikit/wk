@@ -68,7 +68,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
             if ($c === 'site' && $a === 'entry') { // 自定义功能入口
                 $a = null;
                 $c = 'entry';
-            } elseif ($c == 'module' && $a = 'manage-account') { // 模块
+            } elseif ($c == 'module' && $a = 'manage-account') { // 模块参数设置入口
                 $a = null;
             }
         } else {
