@@ -8,7 +8,12 @@ use yii\base\InvalidCallException;
 
 class View extends \yii\web\View
 {
-    public function viewFile($view)
+    /**
+     * @param $view
+     *
+     * @return string
+     */
+    public function getTemplateFile($view)
     {
         // template默认基础路径从$this->context->module->viewPath开始
         if ( ! in_array(substr($view, 0, 1), ['/', '@'])) {
@@ -17,10 +22,17 @@ class View extends \yii\web\View
 
         return $this->findViewFile($view, $this->context);
     }
-    
+
+    /**
+     * @param $view
+     * @param int $flag
+     *
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
     public function template($view, $flag = TEMPLATE_DISPLAY)
     {
-        $viewFile = $this->viewFile($view);
+        $viewFile = $this->getTemplateFile($view);
 
         switch ($flag) {
             case TEMPLATE_DISPLAY:

@@ -58,22 +58,27 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
             $m = $request->get('m');
         }
 
+        $c = strtolower($c);
+        $a = strtolower($a);
+        $do = strtolower($do);
+
+        // 路由兼容
         if (is_admin()) {
             $rootModule = 'web';
-            if ($c === 'site' && $a === 'entry') {
+            if ($c === 'site' && $a === 'entry') { // 自定义功能入口
                 $a = null;
                 $c = 'entry';
+            } elseif ($c == 'module' && $a = 'manage-account') { // 模块
+                $a = null;
             }
         } else {
             $rootModule = 'app';
-
-            if ($c == 'entry') {
+            if ($c == 'entry') { // 自定义功能入口
                 $a = null;
-                $c = 'entry';
             }
         }
 
-        $route = implode('/', array_filter([$rootModule, $m, $c, strtolower($a), strtolower($do)]));
+        $route = implode('/', array_filter([$rootModule, $m, $c, $a, $do]));
         return [$route, []];
     }
 }

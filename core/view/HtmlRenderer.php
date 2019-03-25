@@ -6,19 +6,17 @@ use Yii;
 use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
 use yii\base\ViewNotFoundException;
-use weikit\core\View;
 
 class HtmlRenderer extends ViewRenderer
 {
     /**
-     * @var bool 是否清除多余空格
-     */
-    public $spaceLess = YII_DEBUG;
-
-    /**
      * @var string
      */
     private $_cachePath;
+    /**
+     * @var bool 是否清除多余空格
+     */
+    public $spaceLess = YII_DEBUG;
 
     /**
      * @return string
@@ -122,7 +120,7 @@ class HtmlRenderer extends ViewRenderer
         $str = str_replace('{##', '{', $str);
         $str = str_replace('##}', '}', $str);
 
-        $str = "<?php defined('ABSPATH') || exit;?>\n" . $str;
+        $str = "<?php defined('ABSPATH') || exit;\n{$this->variables()}?>\n" . $str;
 
         if ($this->spaceLess) {
             $str = trim(preg_replace('/>\s+</', '><', $str));
@@ -137,5 +135,16 @@ class HtmlRenderer extends ViewRenderer
         $str = preg_replace('/\[([a-zA-Z0-9_\-\.\x7f-\xff]+)\](?![a-zA-Z0-9_\-\.\x7f-\xff\[\]]*[\'"])/s', "['$1']", $str);
 
         return str_replace('\\\"', '\"', $str);
+    }
+
+    /**
+     * 模板注册默认变量
+     *
+     * @return string
+     */
+    protected function variables()
+    {
+        return 'isset($app) || $app = \Yii::$app;' . "\n" .
+               'isset($view) || $view = $this instanceof \yii\base\View ? $this : (method_exists($this, \'getView\') && ($this->getView() instanceof \yii\base\View) ? $this->getView() : $app->view)' . "\n";
     }
 }

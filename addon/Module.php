@@ -2,10 +2,13 @@
 
 namespace weikit\addon;
 
-use weikit\services\ModuleService;
 use Yii;
 use ArrayAccess;
+use weikit\services\ModuleService;
 use weikit\models\Module as ModuleModel;
+
+// 兼容代码
+require_once __DIR__ . '/compat.php';
 
 /**
  * Class Module
@@ -19,14 +22,29 @@ class Module extends \yii\base\Module implements ArrayAccess
      */
     private $_model;
     /**
+     * @var ModuleService
+     */
+    public $service;
+    /**
      * @inheritdoc
      */
-    public function  __construct($id, $parent = null, $config = [])
+    public function  __construct($id, $parent = null, ModuleService $service, $config = [])
     {
+        $this->service = $service;
         parent::__construct($id, $parent, array_merge([
             'controllerMap' => $this->defaultControllerMap($id, $parent),
-            'controllerNamespace' => 'weikit\addon\\' . $parent->id . '\controllers', // TODO 切换模块命名空间
+            'controllerNamespace' => 'weikit\addon\controllers\\' . $parent->id, // TODO 切换模块命名空间
         ]), $config);
+    }
+
+    public function init()
+    {
+        if ( ! defined('MODULE_ROOT')) {
+            define('MODULE_ROOT', $this->service->getRealPath($this->id));
+        }
+        if ( ! defined('MODULE_URL')) {
+            define('MODULE_URL', $this->service->getUrl($this->id) . '/');
+        }
     }
 
     /**
@@ -35,12 +53,19 @@ class Module extends \yii\base\Module implements ArrayAccess
      *
      * @return array
      */
-    protected function defaultControllerMap($name, $module)
+    protected function defaultControllerMap($name)
     {
-        // TODO 增加扩展模块的(安装时)扩展功能放入Yii::classes中(可优化性能)
-        require_once Yii::getAlias('@wp/addons/' . $name . '/site.php');
+        // TODO 扩展模块的功能(在安装时)放入Yii::$classMap(可优化性能)
+
+        $entryClass = $name . 'ModuleSite';
+        $moduleClass = $name . 'Module';
+
+        Yii::$classMap[$entryClass] = $this->service->getVirtualPath($name, 'site.php');
+        Yii::$classMap[$moduleClass] = $this->service->getVirtualPath($name, 'module.php');
+
         return [
-            'entry' => $name . 'ModuleSite',
+            'entry' => $entryClass,
+            'module' => $moduleClass,
         ];
     }
 
@@ -50,9 +75,7 @@ class Module extends \yii\base\Module implements ArrayAccess
     public function getModel(): ModuleModel
     {
         if ($this->_model === null) {
-            /* @var $service ModuleService */
-            $service = Yii::createObject(ModuleService::class);
-            $model = $service->findByName($this->id, [
+            $model = $this->service->findByName($this->id, [
                 'query' => function($query) {
                     /* @var $query \yii\db\ActiveQuery */
                     $query->cache(); // TODO cache dependency

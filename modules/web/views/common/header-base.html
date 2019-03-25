@@ -1,11 +1,11 @@
-{php \weikit\modules\web\assets\WebAsset::register($this) }
-{php $this->beginPage() }
+{php \weikit\modules\web\assets\WebAsset::register($view) }
+{php $view->beginPage() }
 <!DOCTYPE html>
 <html lang="{php echo Yii::$app->language }">
 <head>
 	<meta charset={php echo \Yii::$app->charset}" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	{php $this->registerCsrfMetaTags() }
+	{php $view->registerCsrfMetaTags() }
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<title>{php echo $this->title}</title>
 	<script type="text/javascript">
@@ -17,10 +17,10 @@
 		}
 
 	</script>
-	{php $this->head() }
+	{php $view->head() }
 </head>
 <body>
-	{php $this->beginBody() }
+	{php $view->beginBody() }
 	<div class="loader" style="display:none">
 		<div class="la-ball-clip-rotate">
 			<div></div>

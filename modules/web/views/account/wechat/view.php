@@ -7,9 +7,9 @@ use yii\widgets\DetailView;
 /* @var $model weikit\models\WechatAccount */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Account Wechats', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
+$this->view->params['breadcrumbs'][] = ['label' => 'Account Wechats', 'url' => ['index']];
+$this->view->params['breadcrumbs'][] = $this->title;
+\yii\web\YiiAsset::register($this->view);
 ?>
 <div class="account-wechat-view">
 

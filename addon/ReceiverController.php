@@ -2,7 +2,7 @@
 
 namespace weikit\addon;
 
-class ReceiverController extends BaseController
+class ReceiverController extends Controller
 {
 
 }

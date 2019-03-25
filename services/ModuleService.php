@@ -396,7 +396,7 @@ class ModuleService extends BaseService
     protected function scanAvailable($name = null)
     {
         $list = [];
-        $path = Yii::getAlias($this->path);
+        $path = Yii::getAlias($this->basePath);
 
         if (is_dir($path)) {
             /* @var $configFile SplFileInfo */

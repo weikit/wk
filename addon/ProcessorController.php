@@ -2,7 +2,7 @@
 
 namespace weikit\addon;
 
-class ProcessorController extends BaseController
+class ProcessorController extends Controller
 {
 
 }

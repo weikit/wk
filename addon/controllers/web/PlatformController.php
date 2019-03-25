@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon\web\controllers;
+namespace weikit\addon\controllers\web;
 
 use yii\web\Controller;
 

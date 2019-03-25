@@ -50,7 +50,7 @@
             </nav>
 
             <div class="page-content">
-                {php $__currentMenuId = explode('/', $this->context->id)[0]}
+                {php $__currentMenuId = explode('/', $view->context->id)[0]}
                 {if !empty($__menu[$__currentMenuId]['items'])}
                     <div class="mb20">
                         {php echo \yii\bootstrap\Nav::widget([

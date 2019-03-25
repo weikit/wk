@@ -32,7 +32,6 @@ class Module extends \yii\base\Module
     public function init()
     {
         \We8::initWeb();
-        require_once WEIKIT_PATH . '/addon/compat.php';
     }
 
     /**
@@ -58,6 +57,4 @@ class Module extends \yii\base\Module
         }
         return $modules;
     }
-
-
 }
