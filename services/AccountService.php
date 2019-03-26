@@ -6,8 +6,17 @@ use Yii;
 use weikit\models\Account;
 use weikit\core\service\BaseService;
 
+/**
+ * Class AccountService
+ * @package weikit\services
+ * @property int $managingUniacid
+ */
 class AccountService extends BaseService
 {
+    /**
+     * 当前管理账号seesion键值
+     */
+    const SESSION_MANAGE_ACCOUNT = 'session_manage_account';
     /**
      * @var Account
      */
@@ -16,10 +25,6 @@ class AccountService extends BaseService
      * @var int
      */
     private $_managingUniacid;
-    /**
-     * 当前管理账号seesion键值
-     */
-    const SESSION_MANAGE_ACCOUNT = 'session_manage_account';
     /**
      * @var string
      */
@@ -30,7 +35,7 @@ class AccountService extends BaseService
      */
     public function getManagingUniacid()
     {
-        if ($this->_managingUniacid) {
+        if ($this->_managingUniacid === null) {
             $this->_managingUniacid = Yii::$app->session->get(self::SESSION_MANAGE_ACCOUNT, 0);
         }
         return $this->_managingUniacid;

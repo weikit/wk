@@ -2,6 +2,7 @@
 
 namespace weikit\addon;
 
+use weikit\services\AccountService;
 use Yii;
 use ArrayAccess;
 use weikit\services\ModuleService;
@@ -13,14 +14,24 @@ require_once __DIR__ . '/compat.php';
 /**
  * Class Module
  * @package weikit\addon
+ *
+ * @property int uniacid
  * @property ModuleModel $model
+ * @property array config
  */
 class Module extends \yii\base\Module implements ArrayAccess
 {
     /**
+     * @var int
+     */
+    private $_uniacid;
+    /**
      * @var ModuleModel
      */
     private $_model;
+    /**
+     * @var array
+     */
     private $_config;
     /**
      * @var ModuleService
@@ -71,6 +82,27 @@ class Module extends \yii\base\Module implements ArrayAccess
     }
 
     /**
+     * @return int
+     */
+    public function getUniacid()
+    {
+        if ($this->_uniacid === null) {
+            /** @var $accountService AccountService */
+            $accountService = Yii::createObject(AccountService::class);
+            $this->setUniacid($accountService->managingUniacid);
+        }
+        return $this->_uniacid;
+    }
+
+    /**
+     * @param int $uniacid
+     */
+    public function setUniacid($uniacid)
+    {
+        $this->_uniacid = $uniacid;
+    }
+
+    /**
      * @return ModuleModel
      */
     public function getModel(): ModuleModel
@@ -95,7 +127,31 @@ class Module extends \yii\base\Module implements ArrayAccess
         $this->_model = $model;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getConfig()
+    {
+        if ($this->_config === null) {
+            $config = [];
+            if ($uniacid = $this->uniacid) {
+                $settings = $this->service->findAccountSettings($this->id, $uniacid);
+                if ($settings) {
+                    $config = $settings->settings;
+                }
+            }
+            $this->setConfig($config);
+        }
+        return $this->_config;
+    }
 
+    /**
+     * @param mixed $config
+     */
+    public function setConfig(array $config)
+    {
+        $this->_config = $config;
+    }
 
     public function offsetExists($offset)
     {

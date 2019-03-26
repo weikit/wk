@@ -3,6 +3,7 @@
 namespace weikit\models;
 
 use Yii;
+use weikit\core\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%uni_account_modules}}".
@@ -15,7 +16,7 @@ use Yii;
  * @property int $shortcut
  * @property int $displayorder 排序
  */
-class UniAccountModule extends \yii\db\ActiveRecord
+class UniAccountModule extends ActiveRecord
 {
     /**
      * {@inheritdoc}

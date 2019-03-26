@@ -6,9 +6,9 @@ use Closure;
 use yii\base\Model;
 use yii\web\Request;
 use yii\base\BaseObject;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\base\InvalidConfigException;
-use weikit\core\db\ActiveRecord;
 use weikit\core\exceptions\ModelNotFoundException;
 
 abstract class BaseService extends BaseObject
@@ -68,9 +68,7 @@ abstract class BaseService extends BaseObject
             'query' => null,
         ], $options);
 
-        if ($options['modelClass'] === null) {
-            throw new InvalidConfigException('The modelClass property must be set');
-        } elseif ( ! is_subclass_of($options['modelClass'], ActiveRecord::class)) {
+        if ( ! is_subclass_of($options['modelClass'], ActiveRecord::class)) {
             throw new InvalidConfigException('The modelClass must be subclass of "Model" or "ActiveRecord"');
         }
 

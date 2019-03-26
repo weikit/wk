@@ -2,24 +2,26 @@
 
 namespace weikit\services;
 
-
 use Yii;
 use DOMElement;
 use DOMDocument;
-use RuntimeException;
 use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use yii\data\ActiveDataProvider;
-use yii\base\InvalidArgumentException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use weikit\models\Module;
 use weikit\models\ModuleBinding;
 use weikit\addon\SiteAction;
+use weikit\models\UniAccountModule;
 use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;
 use weikit\exceptions\AddonModuleNotFoundException;
 
+/**
+ * Class ModuleService
+ * @package weikit\services
+ */
 class ModuleService extends BaseService
 {
     /**
@@ -220,6 +222,25 @@ class ModuleService extends BaseService
             }
         ]);
         return $module->entries;
+    }
+
+    /**
+     * 获取指定账户下的模块设置
+     *
+     * @param string $module
+     * @param init $uniacid
+     *
+     * @return UniAccountModule|null
+     */
+    public function findAccountSettings($module, $uniacid)
+    {   // TODO cache?
+        return $this->findBy([
+            'uniacid' => $uniacid,
+            'module' => $module,
+        ], [
+            'modelClass' => UniAccountModule::class,
+            'exception' => false,
+        ]);
     }
 
     /**

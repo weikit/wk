@@ -32,15 +32,18 @@ abstract class Controller extends \yii\web\Controller
 
     public function init()
     {
-        global $_W;
         if ($this->uniacid === null) {
-            $this->uniacid = $_W['uniacid'];
+            $this->uniacid = $this->module->uniacid;
         }
         if ($this->weid === null) {
-            $this->weid = $_W['uniacid'];
+            $this->weid = $this->module->uniacid;
         }
-        $this->modulename = $this->module->id;
-        $this->service = Yii::createObject(ModuleService::class);
+        if ($this->modulename === null) {
+            $this->modulename = $this->module->id;
+        }
+        if ($this->service === null) {
+            $this->service = $this->module->service;
+        }
         $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $this->modulename);
     }
 
