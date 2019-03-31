@@ -74,6 +74,9 @@ $config = [
                 ],
             ],
         ],
+        'config' => [
+            'class' => 'weikit\core\config\Config'
+        ]
     ],
     'modules' => [
         'app' => [
