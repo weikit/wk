@@ -18,6 +18,8 @@ class Plugin
         WEIKIT_PATH . '/copy/app' => ABSPATH . 'app',
 
         WEIKIT_PATH . '/copy/web' => ABSPATH . 'web',
+
+        WEIKIT_PATH . '/copy/api.php' => ABSPATH . 'api.php'
     ];
 
     public static function activate()
@@ -38,6 +40,7 @@ class Plugin
     public static $delete = [
         ABSPATH . 'app',
         ABSPATH . 'web',
+        ABSPATH . 'api.php',
     ];
 
     public static function deactivate()

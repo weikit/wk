@@ -55,7 +55,7 @@
                 'template' => '{manage}',
                 'buttons' => [
                     'manage' => function ($url, $model) {
-                        return \yii\helpers\Html::a('管理此公众号', ['account/default/switch', 'uniacid' => $model->uniacid], [
+                        return \yii\helpers\Html::a('管理此公众号', ['account/switch', 'uniacid' => $model->uniacid], [
                             'class' => 'text-danger'
                         ]);
                     }

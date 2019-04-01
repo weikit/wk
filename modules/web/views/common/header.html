@@ -43,7 +43,8 @@
                         ]);}
                         <ul class="nav navbar-nav navbar-right">
                             <li><a href="#">系统</a></li>
-                            <li><a target="_blank" href="/web/index.php/gii">Gii</a></li>
+                            <li>{php echo yii\helpers\Html::a('Gii', ['/gii'])}</li>
+                            <li>{php echo yii\helpers\Html::a('微信模拟', ['/web/emulator/wechat'])}</li>
                         </ul>
                     </div>
                 </div>
