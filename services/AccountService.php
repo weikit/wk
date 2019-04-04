@@ -51,7 +51,20 @@ class AccountService extends BaseService
     }
 
     /**
+     * @param string $hash
+     * @param array $options
+     *
+     * @return Account|null
+     * @throws \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findByHash($hash, array $options = [])
+    {
+        return $this->findBy(['hash' => $hash], $options);
+    }
+
+    /**
      * @param int $uniacid
+     * @param array $options
      *
      * @return Account|null
      * @throws \weikit\core\exceptions\ModelNotFoundException

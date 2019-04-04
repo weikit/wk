@@ -25,7 +25,13 @@ class Plugin
     public static function activate()
     {
         foreach(static::$copies as $source => $target) {
-            @symlink($source, $target); // TODO 支持软连接和拷贝
+            if (is_file($source)) {
+                FileHelper::createDirectory(dirname($target));
+                @copy($source, $target);
+            } elseif (is_dir($source)) {
+                @symlink($source, $target); // TODO 支持软连接和拷贝
+            }
+
 //            if (is_file($source)) {
 //                FileHelper::createDirectory(dirname($target));
 //                if (!file_exists($target)) {

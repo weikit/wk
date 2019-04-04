@@ -2,12 +2,24 @@
 
 namespace weikit\controllers;
 
-use yii\web\Controller;
+use yii\rest\Controller;
+use weikit\services\AccountService;
 
 class ApiController extends Controller
 {
-    public function actionIndex()
+    /**
+     * @var AccountService
+     */
+    protected $service;
+
+    public function __construct($id, $module, AccountService $service, $config = [])
     {
-        
+        $this->service = $service;
+        parent::__construct($id, $module, $config);
+    }
+
+    public function actionIndex($hash)
+    {
+        $account = $this->service->findByHash($hash);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+define( 'IN_SYS', true );
 define( 'WP_ADMIN', true );
 define( 'SHORTINIT', true );
 

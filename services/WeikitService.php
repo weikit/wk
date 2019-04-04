@@ -15,6 +15,7 @@ class WeikitService extends BaseService
     public $copies = [
         WEIKIT_PATH . '/copy/app' => ABSPATH . 'app',
         WEIKIT_PATH . '/copy/web' => ABSPATH . 'web',
+        WEIKIT_PATH . '/copy/api.php' => ABSPATH . 'api.php'
     ];
 
     /**
@@ -23,8 +24,13 @@ class WeikitService extends BaseService
     public function activate()
     {
         foreach($this->copies as $source => $target) {
-            if (!is_dir(($target)) && !@symlink($source, $target)) {
-                FileHelper::copyDirectory($source, $target);
+            if (!file_exists($target)) {
+                if (is_dir(($source)) && !@symlink($source, $target)) {
+                    FileHelper::copyDirectory($source, $target);
+                } elseif (is_file($source) && !@symlink($source, $target)) {
+                    FileHelper::createDirectory(dirname($target));
+                    @copy($source, $target);
+                }
             }
         };
 
@@ -37,6 +43,7 @@ class WeikitService extends BaseService
     public $delete = [
         ABSPATH . 'app',
         ABSPATH . 'web',
+        ABSPATH . 'api.php'
     ];
 
     /**
@@ -47,7 +54,12 @@ class WeikitService extends BaseService
     public function deactivate()
     {
         foreach($this->delete as $target) {
-            FileHelper::removeDirectory($target);
+            if (is_dir($target)) {
+                FileHelper::removeDirectory($target);
+            } elseif (is_file($target)) {
+                @unlink($target);
+            }
+
         };
     }
 

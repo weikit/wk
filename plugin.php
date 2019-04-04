@@ -28,12 +28,11 @@ if (is_admin()) {
     // 插件启用
     register_activation_hook(__FILE__, function() {
         do_action('wk_init');
-        return \Yii::createObject(WeikitService::class)->activate();
+        return Yii::createObject(WeikitService::class)->activate();
     });
     // 插件禁用
     register_deactivation_hook(__FILE__, function() {
-        do_action('wk_init');
-        return \Yii::createObject(WeikitService::class)->deactivate();
+        return Yii::createObject(WeikitService::class)->deactivate();
     });
 
     // 注册后台入口菜单
