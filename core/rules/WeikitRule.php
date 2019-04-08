@@ -2,8 +2,9 @@
 
 namespace weikit\core\rules;
 
-use weikit\services\ModuleService;
+use weikit\services\AccountService;
 use Yii;
+use yii\web\Request;
 use yii\base\BaseObject;
 use yii\web\UrlRuleInterface;
 
@@ -13,6 +14,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
      * 模块入口缓存
      */
     const CACHE_ADDON_MODULE_ENTY = 'cache_addon_module_entry';
+    const CACHE_ADDON_ACCOUNT = 'cache_addon_account';
 
     /**
      * @inheritdoc
@@ -24,6 +26,11 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
 
         if ( ! in_array($segments[0], ['web', 'app'])) {
             return false;
+        }
+
+        // TODO 优化API链接
+        if ($segments[0] === 'app' && !empty($segments[1]) && $segments[1] === 'api') {
+            return '../api.php?' . http_build_query($params);
         }
 
         return '?' . http_build_query(array_merge([
@@ -38,56 +45,123 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
      */
     public function parseRequest($manager, $request)
     {
-        if (defined('IN_SYS') || defined('IN_API')) {
-            $c = $request->get('c');
-            $a = $request->get('a');
-            $do = $request->get('do');
-            if ($eid = (int)$request->get('eid')) {
-                $cache = Yii::$app->cache;
-                $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $eid;
-                if ( ! ($data = $cache->get($cacheKey))) {
-                    /* @var $service ModuleService */
-                    $service = Yii::createObject(ModuleService::class);
-                    $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
-                    $data = [
-                        'm'  => $entry->module,
-                        'do' => $entry->do,
-                    ];
-                    // TODO cache dependency
-                    $cache->set($cacheKey, $data);
-                }
-                extract($data);
-            } else {
-                $m = $request->get('m');
-            }
-
-            $c = strtolower($c);
-            $a = strtolower($a);
-            $do = strtolower($do);
-
-            // 路由兼容
-            if (is_admin()) {
-                $rootModule = 'web';
-                if ($c === 'site' && $a === 'entry') { // 自定义功能入口
-                    $a = null;
-                    $c = 'entry';
-                } elseif ($c == 'module' && $a = 'manage-account') { // 模块参数设置入口
-                    $a = null;
-                }
-            } else {
-                $rootModule = 'app';
-                if ($c == 'entry') { // 自定义功能入口
-                    $a = null;
-                }
-            }
-
-            $route = implode('/', array_filter([$rootModule, $m, $c, $a, $do]));
-
-            return [$route, []];
+        if (defined('IN_SYS')) {
+            return $this->parseWeb($request);
         } elseif (defined('IN_MOBILE')) {
-            return [ 'api/index', []];
+            return $this->parseApp($request);
+        } elseif (defined('IN_API')) {
+            return $this->parseApi($request);
+        }
+        return false;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function parseAddonRoute($request)
+    {
+        return [
+            'm' => $request->get('m'),
+            'c' => strtolower($request->get('c')),
+            'a' => strtolower($request->get('a')),
+            'do' => strtolower($request->get('do'))
+        ];
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function parseWeb($request)
+    {
+        ['m' => $m, 'c' => $c, 'a' => $a, 'do' => $do] = $this->parseAddonRoute($request);
+
+        if ($c === 'site' && $a === 'entry' && $eid = $request->get('eid')) {
+            $_GET = array_merge($_GET, ['m' => $m, 'do' => $do] = $this->findEntryDataByEid($eid));
+            $c = null;
         }
 
-        return false;
+        \We8::initWeb();
+        return [implode('/', array_filter(['web', $m, $c, $a, $do])), []];
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function parseApp($request)
+    {
+        ['m' => $m, 'c' => $c, 'a' => $a, 'do' => $do] = $this->parseAddonRoute($request);
+
+        if ($c === 'entry' && $eid = $request->get('eid')) {
+            $_GET = array_merge($_GET, ['m' => $m, 'do' => $do] = $this->findEntryDataByEid($eid));
+        }
+
+        \We8::initApp();
+        return [implode('/', array_filter(['app', $m, $c, $a, $do])), []];
+    }
+
+    protected function parseApi($request)
+    {
+        \We8::initApp();
+        return ['/app/api', []];
+    }
+
+    /**
+     * @param int $eid
+     *
+     * @return array|mixed
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function findEntryDataByEid($eid)
+    {
+        $cache = Yii::$app->cache;
+        $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $eid;
+        if ( ! ($data = $cache->get($cacheKey))) {
+            /* @var $service ModuleService */
+            $service = Yii::createObject(ModuleService::class);
+            $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
+            $data = [
+                'm'  => $entry->module,
+                'do' => $entry->do,
+            ];
+            // TODO cache dependency
+            $cache->set($cacheKey, $data);
+        }
+
+        return $data;
+    }
+
+    protected function findAccountDataByHashOrAcid($hashOrAcid)
+    {
+        $cache = Yii::$app->cache;
+        $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $hashOrAcid;
+        if ( ! ($data = $cache->get($cacheKey))) {
+            /* @var $service AccountService */
+            $service = Yii::createObject(AccountService::class);
+            if (is_numeric($hashOrAcid)) {
+                $account = $service->findByHash($hashOrAcid);
+            } else {
+                $account = $service->findByAcid($hashOrAcid);
+            }
+
+            $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
+            $data = [
+                'm'  => $entry->module,
+                'do' => $entry->do,
+            ];
+            // TODO cache dependency
+            $cache->set($cacheKey, $data);
+        }
+
+        return $data;
+
     }
 }

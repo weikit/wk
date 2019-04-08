@@ -63,6 +63,19 @@ class AccountService extends BaseService
     }
 
     /**
+     * @param int $acid
+     * @param array $options
+     *
+     * @return Account|null
+     * @throws \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findByAcid($acid, array $options = [])
+    {
+        return $this->findBy(['acid' => $acid], $options);
+    }
+
+
+    /**
      * @param int $uniacid
      * @param array $options
      *

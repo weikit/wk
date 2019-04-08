@@ -42,7 +42,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                [ 'class' => 'weikit\core\rules\WeikitRule' ]
+                [ 'class' => 'weikit\core\rules\WeikitRule']
             ],
         ],
         'assetManager' => [
@@ -76,7 +76,7 @@ $config = [
         ],
         'config' => [
             'class' => 'weikit\core\config\Config'
-        ]
+        ],
     ],
     'modules' => [
         'app' => [

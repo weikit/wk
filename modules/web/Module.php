@@ -2,20 +2,15 @@
 
 namespace weikit\modules\web;
 
-use Yii;
-use weikit\services\ModuleService;
+use weikit\core\traits\AddonModuleTrait;
 
 class Module extends \yii\base\Module
 {
-    /**
-     * 模块数据缓存
-     */
-    const CACHE_ADDON_MODULES = 'cache_addon_modules';
+    use AddonModuleTrait;
     /**
      * @var string
      */
     public $controllerNamespace = 'weikit\modules\web\controllers';
-
     /**
      * @inheritdoc
      */
@@ -24,37 +19,5 @@ class Module extends \yii\base\Module
         parent::__construct($id, $parent, array_merge([
             'modules' => $this->defaultModules()
         ], $config));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        \We8::initWeb();
-    }
-
-    /**
-     * 获取扩展模块列表
-     *
-     * @return array|mixed
-     */
-    protected function defaultModules()
-    {
-        $cache = Yii::$app->cache;
-        if (($modules = $cache->get(self::CACHE_ADDON_MODULES)) === false) {
-            /* @var $service ModuleService */
-            $service = Yii::createObject(ModuleService::class);
-            $modules = [];
-            /* @var $model \weikit\models\Module */
-            foreach ($service->findAllBy([]) as $model) {
-                $modules[$model->name] = [
-                    'class' => 'weikit\addon\Module',
-                ];
-            }
-            // TODO cache dependency
-            $cache->set(self::CACHE_ADDON_MODULES, $modules);
-        }
-        return $modules;
     }
 }
