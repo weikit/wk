@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7910237abb38bd5bd58d19c0c1a95226",
+    "content-hash": "6d2beb534842bd5bcf77e49d7c851be1",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -113,12 +113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/callmez/we8.git",
-                "reference": "1998b6c58d63527597d7997cbdfde72ad93276f5"
+                "reference": "68f6548ac9daf5d93dc85e8a85ed2ffd29581aef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/callmez/we8/zipball/1998b6c58d63527597d7997cbdfde72ad93276f5",
-                "reference": "1998b6c58d63527597d7997cbdfde72ad93276f5",
+                "url": "https://api.github.com/repos/callmez/we8/zipball/68f6548ac9daf5d93dc85e8a85ed2ffd29581aef",
+                "reference": "68f6548ac9daf5d93dc85e8a85ed2ffd29581aef",
                 "shasum": ""
             },
             "require": {
@@ -141,7 +141,7 @@
                 }
             ],
             "description": "We8",
-            "time": "2019-03-18T16:26:48+00:00"
+            "time": "2019-03-25T04:10:20+00:00"
         },
         {
             "name": "cebe/markdown",
@@ -249,78 +249,6 @@
                 "html"
             ],
             "time": "2018-02-23T01:58:20+00:00"
-        },
-        {
-            "name": "latte/latte",
-            "version": "v2.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nette/latte.git",
-                "reference": "cf714b94f0759198a3c71361d46d5166cabaaf52"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nette/latte/zipball/cf714b94f0759198a3c71361d46d5166cabaaf52",
-                "reference": "cf714b94f0759198a3c71361d46d5166cabaaf52",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-tokenizer": "*",
-                "php": ">=7.1"
-            },
-            "conflict": {
-                "nette/application": "<2.4.1"
-            },
-            "require-dev": {
-                "nette/tester": "~2.0",
-                "tracy/tracy": "^2.3"
-            },
-            "suggest": {
-                "ext-fileinfo": "to use filter |datastream",
-                "ext-mbstring": "to use filters like lower, upper, capitalize, ...",
-                "nette/utils": "to use filter |webalize"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5-dev"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause",
-                "GPL-2.0",
-                "GPL-3.0"
-            ],
-            "authors": [
-                {
-                    "name": "David Grudl",
-                    "homepage": "https://davidgrudl.com"
-                },
-                {
-                    "name": "Nette Community",
-                    "homepage": "https://nette.org/contributors"
-                }
-            ],
-            "description": "☕ Latte: the intuitive and fast template engine for those who want the most secure PHP sites. Introduces context-sensitive escaping.",
-            "homepage": "https://latte.nette.org",
-            "keywords": [
-                "context-sensitive",
-                "engine",
-                "escaping",
-                "html",
-                "nette",
-                "security",
-                "template",
-                "twig"
-            ],
-            "time": "2019-02-20T10:51:49+00:00"
         },
         {
             "name": "mobiledetect/mobiledetectlib",
@@ -459,7 +387,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v4.2.4",
+            "version": "v4.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
@@ -505,6 +433,48 @@
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
             "time": "2019-02-23T15:42:05+00:00"
+        },
+        {
+            "name": "weikit/wechat-sdk",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/weikit/wechat-sdk.git",
+                "reference": "40071b9c7a262a66b73f61ad86ed5a5f4cf56335"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/weikit/wechat-sdk/zipball/40071b9c7a262a66b73f61ad86ed5a5f4cf56335",
+                "reference": "40071b9c7a262a66b73f61ad86ed5a5f4cf56335",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Weikit\\Wechat\\Sdk\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CallMeZ",
+                    "email": "callme-z@qq.com"
+                }
+            ],
+            "description": "The wechat api SDK for PHP",
+            "keywords": [
+                "sdk",
+                "wechat",
+                "weikit",
+                "weixin"
+            ],
+            "time": "2019-04-14T13:40:19+00:00"
         },
         {
             "name": "yiisoft/yii2",

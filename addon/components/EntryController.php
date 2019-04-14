@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon;
+namespace weikit\addon\components;
 
 abstract class EntryController extends Controller
 {

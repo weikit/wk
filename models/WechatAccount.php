@@ -146,15 +146,14 @@ class WechatAccount extends ActiveRecord
     public function getSdk()
     {
         if ($this->_sdk === null) {
-            Yii::setAlias('@Weikit/Wechat/Sdk', Yii::getAlias('@vendor/weikit/wechat-sdk/src'));
+            // TODO Yii way create instance
             $this->_sdk = Yii::createObject(Wechat::class, [
                 [
-                    'appId' => 'http://baidu.com',
-                    'appSecret' => 'http://baidu.com',
-                    'token' => 'http://baidu.com'
+                    'appId' => $this->key,
+                    'appSecret' => $this->secret,
+                    'token' => $this->token
                 ]
             ]);
-            $a = $this->_sdk->getRequest();
         }
         return $this->_sdk;
     }

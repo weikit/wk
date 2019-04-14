@@ -2,12 +2,14 @@
 
 namespace weikit\modules\app\controllers;
 
+
 use Yii;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
 use weikit\models\Account;
 use weikit\services\AccountService;
-use yii\web\NotFoundHttpException;
+use weikit\addon\components\MessageHandler;
 
 class ApiController extends Controller
 {
@@ -49,25 +51,29 @@ class ApiController extends Controller
     {
         if ($account->type === Account::TYPE_WECHAT) {
             return $this->handleWechatMessage($account);
-        } else {
-            throw new BadRequestHttpException('Only support wechat message.');
         }
+
+        throw new BadRequestHttpException('Only support wechat message.');
     }
 
     protected function handleWechatMessage(Account $account)
     {
         $request = Yii::$app->request;
-        switch ($request->method) {
-            case 'GET':
-                if (!$account->isconnect) { // 激活公众号
-                    $account->isconnect = 1;
-                    $account->save();
-                }
-                return $request->get('echostr');
-            case 'POST':
-                $account->wechatAccount->sdk;
-            default:
-                throw new NotFoundHttpException('The requested page does not exist.');
+        if ($request->isGet) {
+            if (!$account->isconnect) { // 激活公众号
+                $account->isconnect = 1;
+                $account->save();
+            }
+            return $request->get('echostr');
+        } elseif (! $request->isPost) { // 非POST报错
+            throw new NotFoundHttpException('The requested page does not exist.');
         }
+
+        // Parse request
+        $message = $account->wechatAccount->sdk->parseMessage($request->getRawBody());
+        /* @var MessageHandler $handler */
+        $handler = Yii::createObject(MessageHandler::class, [$account, $message]);
+
+        return $handler->process();
     }
 }

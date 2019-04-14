@@ -6,7 +6,7 @@
     "yiisoft/yii2": "~2.0.16.1",
     "yiisoft/yii2-bootstrap": "~2.0.0",
     "yiisoft/yii2-gii": "^2.0",
-    "wekit/wechat-sdk": "^0.0.2",
+    "weikit/wechat-sdk": "^0.0.3",
     "overtrue/pinyin": "^4.0",
     "symfony/finder": "^4.2"
   },

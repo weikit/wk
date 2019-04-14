@@ -44,6 +44,7 @@ class WeikitMigration extends Migration
         $this->createUniTable();
         $this->createAccountTable();
         $this->createModuleTable();
+        $this->createReplyRuleTable();
     }
 
     /**
@@ -54,6 +55,7 @@ class WeikitMigration extends Migration
         $this->dropUniTable();
         $this->dropAccountTable();
         $this->dropModuleTable();
+        $this->drupReplyRuleTable();
     }
 
     protected function createUniTable()
@@ -202,6 +204,44 @@ class WeikitMigration extends Migration
     {
         if ($this->isTableExists('{{%modules}}')) {
             $this->dropTable('{{%modules}}');
+        }
+    }
+
+    protected function createReplyRuleTable()
+    {
+        if ( ! $this->isTableExists('{{%rule}}')) {
+            $this->createTable('{{%rule}}', [
+                'id'          => $this->primaryKey()->comment('Rid'),
+                'uniacid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
+                'name'        => $this->string(50)->notNull()->defaultValue('')->comment('回复规则名'),
+                'module' => $this->string(100)->notNull()->defaultValue('')->comment('关联模块'),
+                'status'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('状态'),
+                'displayorder' => $this->tinyInteger(3)->unsigned()->notNull()->defaultValue(0)->comment('排序'),
+            ], $this->tableOptions);
+        }
+
+        if ( ! $this->isTableExists('{{%rule_keyword}}')) {
+            $this->createTable('{{%rule_keyword}}', [
+                'id'          => $this->primaryKey()->comment(''),
+                'rid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Rid'),
+                'uniacid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
+                'module'       => $this->string(100)->notNull()->defaultValue('')->comment('关联模块'),
+                'content'       => $this->string()->notNull()->defaultValue('')->comment('回复规则内容'),
+                'type'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('类型'),
+                'status'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('状态'),
+                'displayorder' => $this->tinyInteger(3)->unsigned()->notNull()->defaultValue(0)->comment('排序'),
+            ], $this->tableOptions);
+            $this->createIndex('idx_module', '{{%modules_bindings}}', ['module']);
+        }
+    }
+
+    protected function dropReplyRuleTable()
+    {
+        if ($this->isTableExists('{{%rule}}')) {
+            $this->dropTable('{{%rule}}');
+        }
+        if ($this->isTableExists('{{%rule_keyword}}')) {
+            $this->dropTable('{{%rule_keyword}}');
         }
     }
 
