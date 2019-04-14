@@ -2,8 +2,10 @@
 
 namespace weikit\models;
 
-use weikit\core\db\ActiveRecord;
+use Weikit\Wechat\Sdk\Wechat;
 use Yii;
+use weikit\core\db\ActiveRecord;
+
 
 /**
  * This is the model class for table "{{%account_wechats}}".
@@ -28,6 +30,8 @@ use Yii;
  * @property int $styleid
  * @property string $subscribeurl
  * @property string $auth_refresh_token
+ *
+ * @property Wechat $sdk
  */
 class WechatAccount extends ActiveRecord
 {
@@ -128,6 +132,31 @@ class WechatAccount extends ActiveRecord
     public function getRelationAccount()
     {
         return $this->hasOne(Account::class, ['acid' => 'acid']);
+    }
+
+    /**
+     * @var Wechat
+     */
+    private $_sdk;
+
+    /**
+     * 获取实例化后的公众号SDK类
+     * @return mixed|object
+     */
+    public function getSdk()
+    {
+        if ($this->_sdk === null) {
+            Yii::setAlias('@Weikit/Wechat/Sdk', Yii::getAlias('@vendor/weikit/wechat-sdk/src'));
+            $this->_sdk = Yii::createObject(Wechat::class, [
+                [
+                    'appId' => 'http://baidu.com',
+                    'appSecret' => 'http://baidu.com',
+                    'token' => 'http://baidu.com'
+                ]
+            ]);
+            $a = $this->_sdk->getRequest();
+        }
+        return $this->_sdk;
     }
 
     /**

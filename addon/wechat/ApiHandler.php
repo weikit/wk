@@ -17,5 +17,4 @@ class ApiHandler extends BaseObject
         $this->account = $account;
         parent::__construct($config);
     }
-
 }

@@ -15,6 +15,9 @@ use Yii;
  * @property int $isconnect
  * @property int $isdeleted
  * @property int $endtime
+ *
+ * @property WechatAccount $wechatAccount
+ * @property UniAccount $uniAccount
  */
 class Account extends ActiveRecord
 {

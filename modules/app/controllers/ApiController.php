@@ -7,7 +7,7 @@ use yii\web\Controller;
 use yii\web\BadRequestHttpException;
 use weikit\models\Account;
 use weikit\services\AccountService;
-use weikit\addon\wechat\ApiHandler;
+use yii\web\NotFoundHttpException;
 
 class ApiController extends Controller
 {
@@ -35,7 +35,7 @@ class ApiController extends Controller
         $service = Yii::createObject(AccountService::class);
         $options = [
             'query' => function($query) {
-                $query->with('uniAccount')->cache();
+                $query->innerJoinWith(['uniAccount'])->cache();
             }
         ];
         if (is_numeric($hashOrAcid)) {
@@ -48,9 +48,26 @@ class ApiController extends Controller
     protected function handleMessage(Account $account)
     {
         if ($account->type === Account::TYPE_WECHAT) {
-            $handler = Yii::createObject(ApiHandler::class, [$account]);
+            return $this->handleWechatMessage($account);
         } else {
             throw new BadRequestHttpException('Only support wechat message.');
+        }
+    }
+
+    protected function handleWechatMessage(Account $account)
+    {
+        $request = Yii::$app->request;
+        switch ($request->method) {
+            case 'GET':
+                if (!$account->isconnect) { // 激活公众号
+                    $account->isconnect = 1;
+                    $account->save();
+                }
+                return $request->get('echostr');
+            case 'POST':
+                $account->wechatAccount->sdk;
+            default:
+                throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
 }
