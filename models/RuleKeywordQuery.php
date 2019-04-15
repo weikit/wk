@@ -30,6 +30,9 @@ class RuleKeywordQuery extends ActiveQuery
     }
 
     /**
+     * @param int $uniacid
+     * @param int $status
+     *
      * @return $this
      */
     public function withRuleByUniacid($uniacid, $status = Rule::STATUS_ACTIVE)
@@ -37,11 +40,11 @@ class RuleKeywordQuery extends ActiveQuery
         return $this->joinWith([
             'rule' => function($query) use ($uniacid, $status) {
                 /* @var RuleQuery $query */
-                $query->alias('rule');
                 if ($status !== null) {
                     $query->active($status);
                 }
-                $query->andWhere(['{{uniacid}}' => $uniacid]);
+                [, $alias] = $this->getTableNameAndAlias();
+                $query->andWhere([$alias . '.uniacid' => $uniacid]);
             }
         ]);
     }
