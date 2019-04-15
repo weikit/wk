@@ -2,8 +2,8 @@
 
 namespace weikit\models;
 
-use weikit\core\db\ActiveRecord;
 use Yii;
+use weikit\core\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%account}}".
@@ -40,6 +40,14 @@ class Account extends ActiveRecord
     public static function tableName()
     {
         return '{{%account}}';
+    }
+
+    /**
+     * @return AccountQuery
+     */
+    public static function find()
+    {
+        return Yii::createObject(AccountQuery::class, [get_called_class()]);
     }
 
     /**

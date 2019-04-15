@@ -231,7 +231,8 @@ class WeikitMigration extends Migration
                 'status'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('状态'),
                 'displayorder' => $this->tinyInteger(3)->unsigned()->notNull()->defaultValue(0)->comment('排序'),
             ], $this->tableOptions);
-            $this->createIndex('idx_module', '{{%modules_bindings}}', ['module']);
+            $this->createIndex('rid', '{{%rule_keyword}}', ['rid']);
+            $this->createIndex('idx_uniacid_type_content', '{{%rule_keyword}}', ['uniacid', 'type', 'content']);
         }
     }
 

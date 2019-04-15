@@ -5,6 +5,7 @@ namespace weikit\addon\components;
 use Yii;
 use yii\base\Component;
 use weikit\models\Account;
+use weikit\models\RuleKeyword;
 
 class MessageHandler extends Component
 {
@@ -36,7 +37,7 @@ class MessageHandler extends Component
         // TODO 多客服转发处理
         $result = null;
         foreach ($this->match() as $model) {
-            if ($model instanceof ReplyRuleKeyword) {
+            if ($model instanceof RuleKeyword) {
                 $processor = $model->rule->processor;
                 $route = $processor[0] == '/' ? $processor : '/wechat/' . $model->rule->mid . '/' . $model->rule->processor;
             } elseif (isset($model['route'])) { // 直接返回处理route
@@ -51,7 +52,7 @@ class MessageHandler extends Component
                 list($controller, $actionID) = $parts;
 
                 // 微信请求的处理器必须继承callmez\wechat\components\ProcessController
-                if (!($controller instanceof ProcessController)) {
+                if ( ! ($controller instanceof ProcessController)) {
                     throw new InvalidCallException("Wechat process controller must instance of '" . ProcessController::className() . "'");
                 }
                 // 传入当前公众号和微信请求内容
@@ -71,7 +72,7 @@ class MessageHandler extends Component
 
 
         $module = isset($controller) ? $controller->module->id : 'wechat'; // 处理的模块
-        if ($model instanceof ReplyRuleKeyword) {
+        if ($model instanceof RuleKeyword) {
             $kid = $model->id;
             $rid = $model->rid;
         } else {
@@ -79,27 +80,27 @@ class MessageHandler extends Component
         }
         // 记录请求内容
         MessageHistory::add([
-            'wid' => $this->getWechat()->id,
-            'rid' => $rid,
-            'kid' => $kid,
-            'from' => $this->message['FromUserName'],
-            'to' => $this->message['ToUserName'],
-            'module' => $module,
+            'wid'     => $this->getWechat()->id,
+            'rid'     => $rid,
+            'kid'     => $kid,
+            'from'    => $this->message['FromUserName'],
+            'to'      => $this->message['ToUserName'],
+            'module'  => $module,
             'message' => $this->message,
-            'type' => MessageHistory::TYPE_REQUEST
+            'type'    => MessageHistory::TYPE_REQUEST,
         ]);
         // 记录响应内容
         if ($result !== null) {
             // 记录响应内容
             MessageHistory::add([
-                'wid' => $this->getWechat()->id,
-                'rid' => $rid,
-                'kid' => $kid,
-                'from' => $this->message['ToUserName'],
-                'to' => $this->message['FromUserName'],
-                'module' => $module,
+                'wid'     => $this->getWechat()->id,
+                'rid'     => $rid,
+                'kid'     => $kid,
+                'from'    => $this->message['ToUserName'],
+                'to'      => $this->message['FromUserName'],
+                'module'  => $module,
                 'message' => $result,
-                'type' => MessageHistory::TYPE_RESPONSE
+                'type'    => MessageHistory::TYPE_RESPONSE,
             ]);
         }
 
@@ -134,11 +135,10 @@ class MessageHandler extends Component
      */
     protected function matchText()
     {
-        return ReplyRuleKeyword::find()
-                               ->keyword($this->message['Content'])
-                               ->wechatRule($this->getWechat()->id)
-                               ->limitTime(TIMESTAMP)
-                               ->all();
+        return RuleKeyword::find()
+            ->keyword($this->message['Content'])
+            ->withRuleByUniacid($this->account->uniacid)
+            ->all();
     }
 
     /**
@@ -147,11 +147,10 @@ class MessageHandler extends Component
      */
     protected function matchImage()
     {
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => ReplyRuleKeyword::TYPE_IMAGE])
-                               ->wechatRule($this->getWechat()->id)
-                               ->limitTime(TIMESTAMP)
-                               ->all();
+        return RuleKeyword::find()
+            ->andFilterWhere(['type' => RuleKeyword::TYPE_IMAGE])
+            ->withRuleByUniacid($this->account->uniacid)
+            ->all();
     }
 
     /**
@@ -160,8 +159,8 @@ class MessageHandler extends Component
      */
     protected function matchVoice()
     {
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => ReplyRuleKeyword::TYPE_VOICE])
+        return RuleKeyword::find()
+                               ->andFilterWhere(['type' => RuleKeyword::TYPE_VOICE])
                                ->wechatRule($this->getWechat()->id)
                                ->limitTime(TIMESTAMP)
                                ->all();
@@ -173,8 +172,13 @@ class MessageHandler extends Component
      */
     protected function matchVideo()
     {
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => [ReplyRuleKeyword::TYPE_VIDEO, ReplyRuleKeyword::TYPE_SHORT_VIDEO]])
+        return RuleKeyword::find()
+                               ->andFilterWhere([
+                                   'type' => [
+                                       RuleKeyword::TYPE_VIDEO,
+                                       RuleKeyword::TYPE_SHORT_VIDEO,
+                                   ],
+                               ])
                                ->wechatRule($this->getWechat()->id)
                                ->limitTime(TIMESTAMP)
                                ->all();
@@ -186,8 +190,8 @@ class MessageHandler extends Component
      */
     protected function matchLocation()
     {
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => [ReplyRuleKeyword::TYPE_LOCATION]])
+        return RuleKeyword::find()
+                               ->andFilterWhere(['type' => [RuleKeyword::TYPE_LOCATION]])
                                ->wechatRule($this->getWechat()->id)
                                ->limitTime(TIMESTAMP)
                                ->all();
@@ -199,8 +203,8 @@ class MessageHandler extends Component
      */
     protected function matchLink()
     {
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => [ReplyRuleKeyword::TYPE_LINK]])
+        return RuleKeyword::find()
+                               ->andFilterWhere(['type' => [RuleKeyword::TYPE_LINK]])
                                ->wechatRule($this->getWechat()->id)
                                ->limitTime(TIMESTAMP)
                                ->all();
@@ -215,11 +219,13 @@ class MessageHandler extends Component
         // 扫码关注
         if (array_key_exists('Eventkey', $this->message) && strexists($this->message['Eventkey'], 'qrscene')) {
             $this->message['Eventkey'] = explode('_', $this->message['Eventkey'])[1]; // 取二维码的参数值
+
             return $this->matchEventScan();
         }
+
         // 订阅请求回复规则触发
-        return ReplyRuleKeyword::find()
-                               ->andFilterWhere(['type' => [ReplyRuleKeyword::TYPE_SUBSCRIBE]])
+        return RuleKeyword::find()
+                               ->andFilterWhere(['type' => [RuleKeyword::TYPE_SUBSCRIBE]])
                                ->wechatRule($this->getWechat()->id)
                                ->limitTime(TIMESTAMP)
                                ->all();
@@ -231,13 +237,14 @@ class MessageHandler extends Component
      */
     protected function matchEventUnsubscribe()
     {
-        $match = ReplyRuleKeyword::find()
-                                 ->andFilterWhere(['type' => [ReplyRuleKeyword::TYPE_UNSUBSCRIBE]])
+        $match = RuleKeyword::find()
+                                 ->andFilterWhere(['type' => [RuleKeyword::TYPE_UNSUBSCRIBE]])
                                  ->wechatRule($this->getWechat()->id)
                                  ->limitTime(TIMESTAMP)
                                  ->all();
+
         return array_merge([ // 取消关注默认处理
-            ['route' => '/wechat/process/fans/unsubscribe']
+            ['route' => '/wechat/process/fans/unsubscribe'],
         ], $match);
     }
 
@@ -249,8 +256,10 @@ class MessageHandler extends Component
     {
         if (array_key_exists('Eventkey', $this->message)) {
             $this->message['Content'] = $this->message['EventKey'];
+
             return $this->matchText();
         }
+
         return [];
     }
 
@@ -272,8 +281,10 @@ class MessageHandler extends Component
         // 触发作为关键字处理
         if (array_key_exists('EventKey', $this->message)) {
             $this->message['Content'] = $this->message['EventKey']; // EventKey作为关键字Content
+
             return $this->matchText();
         }
+
         return [];
     }
 
@@ -286,8 +297,10 @@ class MessageHandler extends Component
         // 链接内容作为关键字
         if (array_key_exists('EventKey', $this->message)) {
             $this->message['Content'] = $this->message['EventKey']; // EventKey作为关键字Content
+
             return $this->matchText();
         }
+
         return [];
     }
 }
