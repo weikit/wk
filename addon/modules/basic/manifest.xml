@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns="http://weikit.cn" versionCode="0.8,1.0">
+    <application setting="true">
+        <name><![CDATA[基本文字回复]]></name>
+        <identifie><![CDATA[basic]]></identifie>
+        <version><![CDATA[1.0.0]]></version>
+        <type><![CDATA[system]]></type>
+        <ability><![CDATA[基本文字回复]]></ability>
+        <description><![CDATA[基本文字回复]]></description>
+        <author><![CDATA[基本文字回复]]></author>
+        <url><![CDATA[]]></url>
+    </application>
+    <platform>
+        <subscribes>
+        </subscribes>
+        <handles>
+            <message type="text"/>
+        </handles>
+        <rule embed="true"/>
+        <card embed="false"/>
+    </platform>
+    <platform>
+        <subscribes>
+        </subscribes>
+        <handles>
+        </handles>
+        <rule embed="false"/>
+        <card embed="false"/>
+    </platform>
+    <permissions>
+    </permissions>
+    <install><![CDATA[]]></install>
+    <uninstall><![CDATA[]]></uninstall>
+    <upgrade><![CDATA[]]></upgrade>
+</manifest>

@@ -410,6 +410,35 @@ class ModuleService extends BaseService
     }
 
     /**
+     * 检索核心模块
+     *
+     * @param null|string $name
+     *
+     * @return array
+     */
+    protected function scanCore($name = null)
+    {
+        $list = [];
+        $path = Yii::getAlias('@weikit/addon/modules');
+
+        if (is_dir($path)) {
+            /* @var $configFile SplFileInfo */
+            foreach (Finder::create()->in($path)->files()->depth(1)->name($this->configFile) as $configFile) {
+                $manifest = $this->parse($configFile->getContents());
+                if (empty($manifest)) {
+                    continue;
+                }
+                if ($name !== null && $manifest['name'] === $name) {
+                    return $manifest;
+                }
+                $list[] = $manifest;
+            }
+        }
+
+        return $list;
+    }
+
+    /**
      * @param null|string $name
      *
      * @return array
@@ -418,10 +447,11 @@ class ModuleService extends BaseService
     {
         $list = [];
         $path = Yii::getAlias($this->basePath);
+        $corePath = Yii::getAlias('@weikit/addon/modules');
 
         if (is_dir($path)) {
             /* @var $configFile SplFileInfo */
-            foreach (Finder::create()->in($path)->files()->depth(1)->name($this->configFile) as $configFile) {
+            foreach (Finder::create()->in([$path, $corePath])->files()->depth(1)->name($this->configFile) as $configFile) {
                 $manifest = $this->parse($configFile->getContents());
                 if (empty($manifest)) {
                     continue;

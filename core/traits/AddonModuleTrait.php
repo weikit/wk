@@ -26,9 +26,17 @@ trait AddonModuleTrait
                     'class' => 'weikit\addon\Module',
                 ];
             }
+            $modules = array_merge($modules, $this->coreModules());
             // TODO cache dependency
             $cache->set('cache_addon_modules', $modules);
         }
         return $modules;
+    }
+
+    protected function coreModules()
+    {
+        return [
+            'class' => 'weikit\addon\modules\reply\Module',
+        ];
     }
 }
