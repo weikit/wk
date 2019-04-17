@@ -2,12 +2,11 @@
 
 namespace weikit\modules\web\controllers\account;
 
+use Yii;
+use yii\filters\VerbFilter;
 use weikit\models\Module;
 use weikit\models\WechatAccount;
-use weikit\services\AccountService;
-use Yii;
-use yii\web\Controller;
-use yii\filters\VerbFilter;
+use weikit\modules\web\Controller;
 use yii\web\NotFoundHttpException;
 use weikit\services\WechatAccountService;
 

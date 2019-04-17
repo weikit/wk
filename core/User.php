@@ -1,10 +1,10 @@
 <?php
 namespace weikit\core;
 
-use yii\base\Component;
-
-class User extends Component
+class User extends \yii\web\User
 {
+    public $loginUrl = '/wp-login.php';
+    public $identityClass = false;
     private $_identity = false;
 
     /**

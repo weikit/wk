@@ -2,6 +2,8 @@
 
 namespace weikit\addon\components;
 
+use weikit\addon\Controller;
+
 abstract class EntryController extends Controller
 {
     /**

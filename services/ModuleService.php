@@ -252,6 +252,7 @@ class ModuleService extends BaseService
     public function findInactiveByName(string $name)
     {
         $module = $this->findAvailableByName($name);
+
         if ($module === null) {
             throw new AddonModuleNotFoundException($name);
         }
@@ -404,9 +405,7 @@ class ModuleService extends BaseService
      */
     public function findAvailableByName(string $name)
     {
-        $addon = $this->scanAvailable($name);
-
-        return empty($addon) ? null : $addon;
+        return $this->scanAvailable($name);
     }
 
     /**
@@ -441,7 +440,7 @@ class ModuleService extends BaseService
     /**
      * @param null|string $name
      *
-     * @return array
+     * @return array|null
      */
     protected function scanAvailable($name = null)
     {
@@ -456,11 +455,12 @@ class ModuleService extends BaseService
                 if (empty($manifest)) {
                     continue;
                 }
-                if ($name !== null && $manifest['name'] === $name) {
-                    return $manifest;
-                }
-                $list[] = $manifest;
+                $list[$manifest['name']] = $manifest;
             }
+        }
+
+        if ($name !== null) {
+            return array_key_exists($name, $list) ? $list[$name] : null;
         }
 
         return $list;

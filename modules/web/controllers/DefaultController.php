@@ -1,7 +1,7 @@
 <?php
 namespace weikit\modules\web\controllers;
 
-use yii\web\Controller;
+use weikit\modules\web\Controller;
 
 class DefaultController extends Controller
 {

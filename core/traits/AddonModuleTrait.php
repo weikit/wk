@@ -8,6 +8,11 @@ use weikit\services\ModuleService;
 trait AddonModuleTrait
 {
     /**
+     * 缓存模块KEY
+     */
+//    const CACHE_ADDON_MODULES = 'cache_addon_modules'; // TODO 用常量代替defaultModules获取cackeKey
+
+    /**
      * 获取扩展模块列表
      *
      * @return array|mixed
@@ -15,7 +20,7 @@ trait AddonModuleTrait
     protected function defaultModules()
     {
         $cache = Yii::$app->cache;
-        // TODO cacheKey常量
+
         if (($modules = $cache->get('cache_addon_modules')) === false) {
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);

@@ -19,7 +19,7 @@ class Application extends \yii\web\Application
     /**
      * @var string|bool
      */
-    public $layout = false;
+//    public $layout = false;
 
     /**
      * Handles the specified request.

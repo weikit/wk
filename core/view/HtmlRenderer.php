@@ -3,6 +3,7 @@
 namespace weikit\core\view;
 
 use Yii;
+use yii\base\Controller;
 use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
 use yii\base\ViewNotFoundException;
@@ -47,7 +48,14 @@ class HtmlRenderer extends ViewRenderer
      */
     public function render($view, $file, $params)
     {
-        return $view->renderPhpFile($this->getCacheFile($file), $params);
+        $cachedPhpFile = $this->getCacheFile($file);
+
+        // TODO 默认引用不会渲染layout, 移除并使用更灵活的layout设置?
+        if ($view->context instanceof Controller && $view->context->layout === null) {
+            $view->context->layout = false;
+        }
+
+        return $view->renderPhpFile($cachedPhpFile, $params);
     }
 
     /**

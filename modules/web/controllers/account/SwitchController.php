@@ -2,8 +2,7 @@
 
 namespace weikit\modules\web\controllers\account;
 
-
-use yii\web\Controller;
+use weikit\modules\web\Controller;
 use weikit\services\AccountService;
 
 class SwitchController extends Controller

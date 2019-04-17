@@ -12,6 +12,10 @@ class Module extends \yii\base\Module
      */
     public $controllerNamespace = 'weikit\modules\web\controllers';
     /**
+     * @var string
+     */
+    public $layout = 'main';
+    /**
      * @inheritdoc
      */
     public function __construct($id, $parent = null, $config = [])

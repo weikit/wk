@@ -2,10 +2,15 @@
 
 namespace weikit\addon\controllers\web;
 
-use yii\web\Controller;
+use weikit\modules\web\Controller;
 
 class PlatformController extends Controller
 {
+    /**
+     * @var bool 
+     */
+    public $enableAccountManageCheck = true;
+
     /**
      *
      * @return string
@@ -15,5 +20,10 @@ class PlatformController extends Controller
         return $this->render('cover', [
             'module' => $this->module->model,
         ]);
+    }
+
+    public function actionReply()
+    {
+        return $this->render('reply');
     }
 }

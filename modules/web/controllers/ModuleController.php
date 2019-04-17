@@ -2,12 +2,11 @@
 
 namespace weikit\modules\web\controllers;
 
-
 use Yii;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
 use weikit\services\ModuleService;
+use weikit\modules\web\Controller;
 
 /**
  * ModuleController implements the CRUD actions for Module model.

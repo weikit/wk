@@ -2,7 +2,6 @@
 
 namespace weikit\addon;
 
-use Yii;
 use weikit\services\ModuleService;
 
 /**
@@ -11,7 +10,7 @@ use weikit\services\ModuleService;
  * @property boolean $inMobile
  * @property Module|\weikit\models\Module $module
  */
-abstract class Controller extends \yii\web\Controller
+class Controller extends \yii\web\Controller
 {
     /**
      * @var ModuleService
