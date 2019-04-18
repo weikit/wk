@@ -62,7 +62,6 @@ class MenuService extends BaseService
                 ],
             ];
 
-
             return $menu;
 
         });

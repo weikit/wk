@@ -66,6 +66,8 @@ abstract class BaseService extends BaseObject
             'all' => false,
             // 自定义查询
             'query' => null,
+            // 联表冲突时的别名设置
+            'alias' => null,
         ], $options);
 
         if ( ! is_subclass_of($options['modelClass'], ActiveRecord::class)) {
@@ -76,6 +78,10 @@ abstract class BaseService extends BaseObject
         $class = $options['modelClass'];
 
         $query = $class::find();
+
+        if ($options['alias'] !== null) {
+            $query->alias($options['alias']);
+        }
 
         if ( !empty($condition)) {
             // find by primary key

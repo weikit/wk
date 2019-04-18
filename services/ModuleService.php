@@ -29,6 +29,10 @@ class ModuleService extends BaseService
      */
     public $modelClass = Module::class;
     /**
+     * @var string
+     */
+    public $entryModelClass = ModuleBinding::class;
+    /**
      * 插件基本路由
      *
      * @var string
@@ -191,7 +195,7 @@ class ModuleService extends BaseService
     public function findEntryBy($condition, array $options = [])
     {
         return $this->findBy($condition, array_merge($options, [
-            'modelClass' => ModuleBinding::class
+            'modelClass' => $this->entryModelClass
         ]));
     }
 
@@ -205,7 +209,7 @@ class ModuleService extends BaseService
     public function findEntriesBy($condition, array $options = [])
     {
         return $this->findAllBy($condition, array_merge($options, [
-            'modelClass' => ModuleBinding::class
+            'modelClass' => $this->entryModelClass
         ]));
     }
 

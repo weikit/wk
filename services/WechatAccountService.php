@@ -28,7 +28,9 @@ class WechatAccountService extends BaseService
      */
     public function findByAcid($id, array $options = [])
     {
-        return $this->findBy(['acid' => $id], $options);
+        return $this->findBy(['wa.acid' => $id], array_merge($options, [
+            'alias' => 'wa'
+        ]));
     }
 
     /**

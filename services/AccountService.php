@@ -5,6 +5,7 @@ namespace weikit\services;
 use Yii;
 use weikit\models\Account;
 use weikit\core\service\BaseService;
+use yii\db\ActiveQuery;
 
 /**
  * Class AccountService
@@ -71,9 +72,10 @@ class AccountService extends BaseService
      */
     public function findByAcid($acid, array $options = [])
     {
-        return $this->findBy(['acid' => $acid], $options);
+        return $this->findBy(['a.acid' => $acid], array_merge($options, [
+            'alias' => 'a'
+        ]));
     }
-
 
     /**
      * @param int $uniacid
@@ -84,7 +86,9 @@ class AccountService extends BaseService
      */
     public function findByUniacid($uniacid, array $options = [])
     {
-        return $this->findBy(['uniacid' => $uniacid], $options);
+        return $this->findBy(['a.uniacid' => $uniacid], array_merge($options, [
+            'alias' => 'a'
+        ]));
     }
 
     /**
@@ -110,7 +114,16 @@ class AccountService extends BaseService
         if ($this->_managing === false) {
             $uniacid = $this->getManagingUniacid();
             $this->_managing = $uniacid ? $this->findByUniacid($uniacid, [
-                'exception' => false
+                'exception' => false,
+                'query' => function($query) {
+                    /* @var ActiveQuery $query */
+                    $query->innerJoinWith([
+                        'uniAccount' => function($query) {
+                            /* @var ActiveQuery $query */
+                            $query->cache();
+                        }
+                    ])->cache();
+                }
             ]) : null;
         }
         return $this->_managing;
