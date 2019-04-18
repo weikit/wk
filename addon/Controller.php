@@ -3,6 +3,7 @@
 namespace weikit\addon;
 
 use weikit\services\ModuleService;
+use weikit\core\traits\ControllerMessageTrait;
 
 /**
  * Class BaseController
@@ -12,6 +13,9 @@ use weikit\services\ModuleService;
  */
 class Controller extends \yii\web\Controller
 {
+
+    use ControllerMessageTrait;
+
     /**
      * @var ModuleService
      */

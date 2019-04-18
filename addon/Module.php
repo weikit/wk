@@ -204,4 +204,9 @@ class Module extends \yii\base\Module implements ArrayAccess
     {
         return $this->module->getViewPath();
     }
+
+    public function getMenu()
+    {
+        return \Yii::createObject('weikit\services\MenuService')->getMenuByKey('module:' . $this->id);
+    }
 }

@@ -72,7 +72,7 @@ abstract class BaseService extends BaseObject
             throw new InvalidConfigException('The modelClass must be subclass of "Model" or "ActiveRecord"');
         }
 
-        /* @var $class \yii\db\ActiveRecord */
+        /* @var $class \weikit\core\db\ActiveRecord */
         $class = $options['modelClass'];
 
         $query = $class::find();

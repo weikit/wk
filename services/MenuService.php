@@ -32,12 +32,12 @@ class MenuService extends BaseService
      *
      * @return array
      */
-    public function getModuleMenu($mid)
+    public function getModuleMenu($moduleName)
     {
-        return Yii::$app->cache->getOrSet('menu_module:' . $mid, function() use ($mid) {
+        return Yii::$app->cache->getOrSet('menu_module:' . $moduleName, function() use ($moduleName) {
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);
-            $module = $service->findByMid($mid);
+            $module = $service->findByName($moduleName);
             $entries = $module->entries;
 
             $customMenu = [];

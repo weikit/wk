@@ -48,15 +48,4 @@ class Controller extends \yii\web\Controller
 
         return $behaviors;
     }
-
-    /**
-     * flash消息
-     * @param $message
-     * @param string $status
-     * @param null $redirect
-     * @return array|bool|string
-     */
-    public function flash($message, $status = 'error', $redirect = null) {
-        return $this->message($message, $status, $redirect, 'flash');
-    }
 }
