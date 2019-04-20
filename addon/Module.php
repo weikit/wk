@@ -2,10 +2,11 @@
 
 namespace weikit\addon;
 
-use weikit\services\AccountService;
 use Yii;
 use ArrayAccess;
+use weikit\models\ModuleBinding;
 use weikit\services\ModuleService;
+use weikit\services\AccountService;
 use weikit\models\Module as ModuleModel;
 
 // 兼容代码
@@ -21,6 +22,10 @@ require_once __DIR__ . '/compat.php';
  */
 class Module extends \yii\base\Module implements ArrayAccess
 {
+    /**
+     * 扩展模块菜单缓存键
+     */
+    const CACHE_ADDON_MODULE_MENU_PREFIX = 'menu_addon_module';
     /**
      * @var int
      */
@@ -153,24 +158,53 @@ class Module extends \yii\base\Module implements ArrayAccess
         $this->_config = $config;
     }
 
-    public function offsetExists($offset)
+    /**
+     * 默认和web/app模块共享模板路径
+     *
+     * @inheritdoc
+     */
+    public function getViewPath()
     {
-        return isset($this->$offset);
+        return $this->module->getViewPath();
     }
 
-    public function offsetGet($offset)
+    /**
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getMenu()
     {
-        return $this->$offset;
-    }
+        return Yii::$app->cache->getOrSet(self::CACHE_ADDON_MODULE_MENU_PREFIX . ':' . $this->id, function() {
+            /* @var $service ModuleService */
+            $service = Yii::createObject(ModuleService::class);
+            $module = $service->findByName($this->id);
+            $entries = $module->entries;
 
-    public function offsetSet($offset, $item)
-    {
-        $this->$offset = $item;
-    }
+            $customMenu = [];
+            foreach ($entries as $entry) {
+                if ($entry->entry === ModuleBinding::ENTRY_MENU) {
+                    $customMenu[] = [
+                        'label' => $entry->title,
+                        'url' => ['/web/site/entry', 'eid' => $entry->eid]
+                    ];
+                }
+            }
 
-    public function offsetUnset($offset)
-    {
-        $this->$offset = null;
+            $menu = [
+                'entry'  => [
+                    'label' => $module->title,
+                    'items' => [
+                    ],
+                ],
+                'custom' => [
+                    'label' => '自定义',
+                    'items' => $customMenu,
+                ],
+            ];
+
+            return $menu;
+
+        });
     }
 
     /**
@@ -195,18 +229,23 @@ class Module extends \yii\base\Module implements ArrayAccess
         return $this->model->$name;
     }
 
-    /**
-     * 默认和web/app模块共享模板路径
-     *
-     * @inheritdoc
-     */
-    public function getViewPath()
+    public function offsetExists($offset)
     {
-        return $this->module->getViewPath();
+        return isset($this->$offset);
     }
 
-    public function getMenu()
+    public function offsetGet($offset)
     {
-        return \Yii::createObject('weikit\services\MenuService')->getMenuByKey('module:' . $this->id);
+        return $this->$offset;
+    }
+
+    public function offsetSet($offset, $item)
+    {
+        $this->$offset = $item;
+    }
+
+    public function offsetUnset($offset)
+    {
+        $this->$offset = null;
     }
 }

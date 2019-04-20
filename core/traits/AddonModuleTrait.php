@@ -19,9 +19,8 @@ trait AddonModuleTrait
      */
     protected function defaultModules()
     {
-        $cache = Yii::$app->cache;
-
-        if (($modules = $cache->get('cache_addon_modules')) === false) {
+        // TODO cache dependency
+        return Yii::$app->cache->getOrSet('cache_addon_modules', function() {
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);
             $modules = [];
@@ -31,11 +30,8 @@ trait AddonModuleTrait
                     'class' => 'weikit\addon\Module',
                 ];
             }
-            $modules = array_merge($modules, $this->coreModules());
-            // TODO cache dependency
-            $cache->set('cache_addon_modules', $modules);
-        }
-        return $modules;
+            return array_merge($modules, $this->coreModules());
+        });
     }
 
     protected function coreModules()

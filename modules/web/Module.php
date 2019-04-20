@@ -28,6 +28,9 @@ class Module extends \yii\base\Module
         ], $config));
     }
 
+    /**
+     * @return array
+     */
     public function getNavMenu()
     {
         return [
@@ -52,6 +55,10 @@ class Module extends \yii\base\Module
         ];
     }
 
+    /**
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getRightNavMenu()
     {
         $menu = [
@@ -68,7 +75,7 @@ class Module extends \yii\base\Module
                 'url' => ['/web/emulator/wechat'],
             ],
         ];
-        /** @var AccountService $service */
+        /* @var AccountService $service */
         $service = Yii::createObject(AccountService::class);
         if ($service->managingUniacid) {
             $account = $service->managing();
@@ -86,5 +93,10 @@ class Module extends \yii\base\Module
             ];
         }
         return $menu;
+    }
+
+    public function getSideMenu()
+    {
+        return [];
     }
 }

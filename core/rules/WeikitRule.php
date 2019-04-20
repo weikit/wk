@@ -6,6 +6,7 @@ use Yii;
 use yii\web\Request;
 use yii\base\BaseObject;
 use yii\web\UrlRuleInterface;
+use weikit\services\ModuleService;
 
 class WeikitRule extends BaseObject implements UrlRuleInterface
 {
@@ -139,20 +140,16 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
      */
     protected function findEntryDataByEid($eid)
     {
-        $cache = Yii::$app->cache;
-        $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $eid;
-        if ( ! ($data = $cache->get($cacheKey))) {
+        // TODO cache dependency
+        return Yii::$app->cache->getOrSet(self::CACHE_ADDON_MODULE_ENTY . ':' . (int)$eid, function() use ($eid) {
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);
             $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
-            $data = [
+            return [
                 'm'  => $entry->module,
                 'do' => $entry->do,
             ];
-            // TODO cache dependency
-            $cache->set($cacheKey, $data);
-        }
+        });
 
-        return $data;
     }
 }
