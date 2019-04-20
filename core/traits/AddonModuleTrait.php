@@ -41,7 +41,6 @@ trait AddonModuleTrait
     protected function coreModules()
     {
         return [
-            'class' => 'weikit\addon\modules\reply\Module',
         ];
     }
 }

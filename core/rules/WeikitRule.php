@@ -2,7 +2,6 @@
 
 namespace weikit\core\rules;
 
-use weikit\services\AccountService;
 use Yii;
 use yii\web\Request;
 use yii\base\BaseObject;
@@ -29,12 +28,26 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         }
 
         // TODO 优化API链接
-        if ($segments[0] === 'app' && !empty($segments[1]) && $segments[1] === 'api') {
+        if ($segments[0] === 'app' && ! empty($segments[1]) && $segments[1] === 'api') {
             return '../api.php?' . http_build_query($params);
         }
 
+        $c = $segments[1] ?? null;
+        $m = $params['m'] ?? null;
+
+        if (empty($m) && $c) { // 未指定模块从模块中查询$c是否为模块名
+            $rootModule = Yii::$app->getModule($segments[0]);
+            if ($rootModule->hasModule($c)) {
+                $m = $segments[1] ?? null;
+                unset($segments[1]);
+                $segments = array_values($segments);
+                $c = $segments[1] ?? null;
+            }
+        }
+
         return '?' . http_build_query(array_merge([
-            'c'  => $segments[1] ?? null,
+            'm'  => $m,
+            'c'  => $c,
             'a'  => $segments[2] ?? null,
             'do' => $segments[3] ?? null,
         ], $params));
@@ -52,6 +65,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         } elseif (defined('IN_API')) {
             return $this->parseApi($request);
         }
+
         return false;
     }
 
@@ -64,9 +78,9 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
     protected function parseAddonRoute($request)
     {
         return [
-            'm' => $request->get('m'),
-            'c' => strtolower($request->get('c')),
-            'a' => strtolower($request->get('a')),
+            'm'  => $request->get('m'),
+            'c'  => strtolower($request->get('c')),
+            'a'  => strtolower($request->get('a')),
             'do' => strtolower($request->get('do'))
         ];
     }
@@ -87,6 +101,7 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         }
 
         \We8::initWeb();
+
         return [implode('/', array_filter(['web', $m, $c, $a, $do])), []];
     }
 
@@ -105,12 +120,14 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         }
 
         \We8::initApp();
+
         return [implode('/', array_filter(['app', $m, $c, $a, $do])), []];
     }
 
     protected function parseApi($request)
     {
         \We8::initApp();
+
         return ['/app/api', []];
     }
 
@@ -137,31 +154,5 @@ class WeikitRule extends BaseObject implements UrlRuleInterface
         }
 
         return $data;
-    }
-
-    protected function findAccountDataByHashOrAcid($hashOrAcid)
-    {
-        $cache = Yii::$app->cache;
-        $cacheKey = self::CACHE_ADDON_MODULE_ENTY . ':' . $hashOrAcid;
-        if ( ! ($data = $cache->get($cacheKey))) {
-            /* @var $service AccountService */
-            $service = Yii::createObject(AccountService::class);
-            if (is_numeric($hashOrAcid)) {
-                $account = $service->findByHash($hashOrAcid);
-            } else {
-                $account = $service->findByAcid($hashOrAcid);
-            }
-
-            $entry = $service->findEntryByEid($eid);  // TODO 优化统一结构
-            $data = [
-                'm'  => $entry->module,
-                'do' => $entry->do,
-            ];
-            // TODO cache dependency
-            $cache->set($cacheKey, $data);
-        }
-
-        return $data;
-
     }
 }

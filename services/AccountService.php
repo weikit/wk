@@ -43,11 +43,11 @@ class AccountService extends BaseService
     }
 
     /**
-     * @param Account $managing
+     * @param int|string $uniacid
      */
     public function setManagingUniacid($uniacid)
     {
-        Yii::$app->session->set(self::SESSION_MANAGE_ACCOUNT, $uniacid);
+        Yii::$app->session->set(self::SESSION_MANAGE_ACCOUNT, (int) $uniacid);
         $this->_managingUniacid = $uniacid;
     }
 
@@ -92,16 +92,21 @@ class AccountService extends BaseService
     }
 
     /**
-     * 当前正在管理的账号
+     * 设置管理账号
      *
      * @param Account|int $modelOrUniacid
      * @return Account
      */
     public function manage($modelOrUniacid)
     {
-        $model = $modelOrUniacid instanceof Account ? $modelOrUniacid : $this->findByUniacid($modelOrUniacid);
-        $this->setManagingUniacid($model->uniacid);
-        return $this->_managing = $model;
+        if ($modelOrUniacid instanceof Account) {
+            $this->setManagingUniacid($modelOrUniacid->uniacid);
+            $this->_managing = $modelOrUniacid;
+        } else {
+            $this->setManagingUniacid($modelOrUniacid);
+        }
+
+        return $this->managing();
     }
 
     /**
@@ -110,7 +115,7 @@ class AccountService extends BaseService
      * @return Account|null
      */
     public function managing()
-    {   // TODO cache, last manage
+    {   // TODO cache last manage
         if ($this->_managing === false) {
             $uniacid = $this->getManagingUniacid();
             $this->_managing = $uniacid ? $this->findByUniacid($uniacid, [

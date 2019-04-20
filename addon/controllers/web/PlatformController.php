@@ -1,5 +1,4 @@
 <?php
-
 namespace weikit\addon\controllers\web;
 
 use weikit\modules\web\Controller;
