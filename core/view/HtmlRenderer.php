@@ -8,7 +8,7 @@ use yii\base\ViewRenderer;
 use yii\helpers\FileHelper;
 use yii\base\ViewNotFoundException;
 
-class HtmlRenderer extends ViewRenderer
+class HtmlRenderer extends ViewRenderer implements ViewCacheInterface
 {
     /**
      * @var string

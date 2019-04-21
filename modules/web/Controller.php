@@ -10,7 +10,10 @@ use weikit\core\traits\ControllerMessageTrait;
 class Controller extends \yii\web\Controller
 {
     use ControllerMessageTrait;
-
+    /**
+     * @var null
+     */
+    public $frame = null;
     /**
      * @var bool 是否需要检查设置的账号
      */

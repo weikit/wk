@@ -62,16 +62,15 @@ $config = [
             'class' => 'weikit\core\View',
             'defaultExtension' => 'html',
             'renderers' => [
+                'php' => [
+                    'class' => 'weikit\core\view\PhpRenderer',
+                ],
                 'html' => [
                     'class' => 'weikit\core\view\HtmlRenderer',
                 ],
 //                'html' => [
 //                    'class' => 'weikit\core\view\LatteRenderer',
 //                ],
-                'tpl' => [
-                    'class' => 'yii\smarty\ViewRenderer',
-                    //'cachePath' => '@runtime/Smarty/cache',
-                ],
             ],
         ],
         'config' => [

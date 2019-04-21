@@ -4,4 +4,4 @@
         </div>
     </div>
 </div>
-{template 'common/footer-base'}
+<?php include $this->template('common/footer-base', TEMPLATE_INCLUDEPATH) ?>

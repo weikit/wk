@@ -1,7 +1,7 @@
 <?php
 namespace weikit\addon\controllers\web;
 
-use weikit\modules\web\Controller;
+use weikit\addon\Controller;
 
 class PlatformController extends Controller
 {

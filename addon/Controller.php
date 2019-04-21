@@ -3,7 +3,6 @@
 namespace weikit\addon;
 
 use weikit\services\ModuleService;
-use weikit\core\traits\ControllerMessageTrait;
 
 /**
  * Class BaseController
@@ -11,11 +10,12 @@ use weikit\core\traits\ControllerMessageTrait;
  * @property boolean $inMobile
  * @property Module|\weikit\models\Module $module
  */
-class Controller extends \yii\web\Controller
+class Controller extends \weikit\modules\web\Controller
 {
-
-    use ControllerMessageTrait;
-
+    /**
+     * @var string
+     */
+    public $frame = 'module';
     /**
      * @var ModuleService
      */
@@ -47,7 +47,9 @@ class Controller extends \yii\web\Controller
         if ($this->service === null) {
             $this->service = $this->module->service;
         }
-        $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $this->modulename);
+        // TODO 兼容we8模块路径兼容
+//        $this->setViewPath($this->service->basePath . DIRECTORY_SEPARATOR . $this->modulename);
+
     }
 
     /**
@@ -78,13 +80,13 @@ class Controller extends \yii\web\Controller
     {
         /** @var $view \weikit\core\View */
         $view = $this->getView();
-        $viewPath = $this->service->getVirtualPath($this->modulename, 'template/' . ($this->inMobile ? 'mobile/' : '') . $filename . '.html');
+        $viewPath = $this->service->getVirtualPath($this->modulename, 'template/' . ($this->inMobile ? 'mobile/' : '') . $filename);
         $file = $view->getTemplateFile($viewPath);
 
-        if (!is_file($file)) {
+        if (!is_file($file)) { // TODO 做了两次模板路径生成. 优化到一次
             $viewPath = $filename;
         }
 
-        return $view->template($viewPath, TEMPLATE_INCLUDEPATH); // TODO 优化减少viewFile调用次数
+        return $view->template($viewPath, TEMPLATE_INCLUDEPATH);
     }
 }

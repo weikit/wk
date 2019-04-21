@@ -1,13 +1,18 @@
-{php \weikit\modules\web\assets\WebAsset::register($view) }
-{php $view->beginPage() }
+<?php
+use yii\helpers\Html;
+use weikit\modules\web\assets\WebAsset;
+
+WebAsset::register($view);
+?>
+<?php $view->beginPage() ?>
 <!DOCTYPE html>
-<html lang="{php echo Yii::$app->language }">
+<html lang="<?php $app->language ?>">
 <head>
-	<meta charset={php echo \Yii::$app->charset}" />
+	<meta charset="<?php $app->charset ?>" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	{php $view->registerCsrfMetaTags() }
+	<?php $view->registerCsrfMetaTags() ?>
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
-	<title>{php echo $this->title}</title>
+	<title><?= Html::encode( $this->title) ?></title>
 	<script type="text/javascript">
 		var require = { urlArgs: 'v=20190101' };
 		if(navigator.appName == 'Microsoft Internet Explorer'){
@@ -17,10 +22,10 @@
 		}
 
 	</script>
-	{php $view->head() }
+	<?php $view->head() ?>
 </head>
 <body>
-	{php $view->beginBody() }
+	<?php $view->beginBody() ?>
 	<div class="loader" style="display:none">
 		<div class="la-ball-clip-rotate">
 			<div></div>

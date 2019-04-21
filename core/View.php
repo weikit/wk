@@ -4,7 +4,7 @@ namespace weikit\core;
 
 use Yii;
 use weikit\core\view\HtmlRenderer;
-use yii\base\InvalidCallException;
+use weikit\core\view\ViewCacheInterface;
 
 class View extends \yii\web\View
 {
@@ -48,12 +48,11 @@ class View extends \yii\web\View
                     if (is_array($this->renderers[$ext]) || is_string($this->renderers[$ext])) {
                         $this->renderers[$ext] = Yii::createObject($this->renderers[$ext]);
                     }
-                    /* @var $renderer HtmlRenderer */
                     $renderer = $this->renderers[$ext];
-                    if (!$renderer instanceof HtmlRenderer) {
-                        throw new InvalidCallException('Only ' . HtmlRenderer::class . ' support return compiled view file path');
+                    if ($renderer instanceof ViewCacheInterface) {
+                        /* @var $renderer HtmlRenderer */
+                        $viewFile = $renderer->getCacheFile($viewFile);
                     }
-                    $viewFile = $renderer->getCacheFile($viewFile);
                 }
 
                 return $viewFile;
