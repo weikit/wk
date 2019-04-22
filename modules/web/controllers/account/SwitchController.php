@@ -27,7 +27,7 @@ class SwitchController extends Controller
 
         switch ($account->type) {
             case $account::TYPE_WECHAT:
-                return $this->redirect(['account/wechat/manage']);
+                return $this->redirect(['account/wechat/home']);
                 break;
             default:
                 throw new NotFoundHttpException('Account type is incorrect');

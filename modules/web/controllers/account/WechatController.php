@@ -16,6 +16,10 @@ use weikit\services\WechatAccountService;
 class WechatController extends Controller
 {
     /**
+     * @var string
+     */
+    public $frame = 'account';
+    /**
      * @var WechatAccountService
      */
     protected $service;
@@ -44,10 +48,9 @@ class WechatController extends Controller
         ];
     }
 
-    public function actionManage()
+    public function actionHome()
     {
-        return $this->render('manage', [
-            'modules' => Module::find()->all()
+        return $this->render('home', [
         ]);
     }
 
@@ -57,6 +60,7 @@ class WechatController extends Controller
      */
     public function actionIndex()
     {
+        $this->frame = null;
         return $this->render('index', $this->service->search(Yii::$app->getRequest()->queryParams));
     }
 

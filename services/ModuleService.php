@@ -269,7 +269,7 @@ class ModuleService extends BaseService
      *
      * @return array
      */
-    public function search($requestOrData)
+    public function search($requestOrData = [])
     {
         $model = Yii::createObject(ModuleSearch::class);
 

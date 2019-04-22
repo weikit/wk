@@ -1,8 +1,8 @@
 <?php
-use weikit\widgets\NavMenu;
+use weikit\widgets\CategoryMenu;
 ?>
 
-<?= NavMenu::widget([
+<?= CategoryMenu::widget([
     'items' => $app->controller->module->getMenu()
 ]) ?>
 

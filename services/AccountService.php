@@ -126,7 +126,11 @@ class AccountService extends BaseService
                         'uniAccount' => function($query) {
                             /* @var ActiveQuery $query */
                             $query->cache();
-                        }
+                        },
+                        'wechatAccount' => function($query) {
+                            /* @var ActiveQuery $query */
+                            $query->cache();
+                        },
                     ])->cache();
                 }
             ]) : null;

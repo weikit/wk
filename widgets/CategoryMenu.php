@@ -3,17 +3,16 @@
 namespace weikit\widgets;
 
 use Yii;
-use yii\helpers\Json;
 use yii\helpers\Html;
 use yii\widgets\Menu;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\BootstrapPluginAsset;
 
 /**
- * 微信分类菜单
+ * 分类菜单
  * @package weikit\widgets
  */
-class NavMenu extends Menu
+class CategoryMenu extends Menu
 {
     /**
      * @inheritdoc

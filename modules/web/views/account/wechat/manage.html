@@ -1,5 +1,0 @@
-{template 'common/header'}
-    {loop $modules $module}
-        {php echo yii\helpers\Html::a($module->title, ['platform/cover', 'm' => $module->name])}
-    {/loop}
-{template 'common/footer'}
