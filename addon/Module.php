@@ -169,45 +169,6 @@ class Module extends \yii\base\Module implements ArrayAccess
     }
 
     /**
-     * @return array
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function getMenu()
-    {
-        return Yii::$app->cache->getOrSet(self::CACHE_ADDON_MODULE_MENU_PREFIX . ':' . $this->id, function() {
-            /* @var $service ModuleService */
-            $service = Yii::createObject(ModuleService::class);
-            $module = $service->findByName($this->id);
-            $entries = $module->entries;
-
-            $customMenu = [];
-            foreach ($entries as $entry) {
-                if ($entry->entry === ModuleBinding::ENTRY_MENU) {
-                    $customMenu[] = [
-                        'label' => $entry->title,
-                        'url' => ['/web/site/entry', 'eid' => $entry->eid]
-                    ];
-                }
-            }
-
-            $menu = [
-                'entry'  => [
-                    'label' => $module->title,
-                    'items' => [
-                    ],
-                ],
-                'custom' => [
-                    'label' => '自定义',
-                    'items' => $customMenu,
-                ],
-            ];
-
-            return $menu;
-
-        });
-    }
-
-    /**
      * @param string $name
      *
      * @return mixed|object|null

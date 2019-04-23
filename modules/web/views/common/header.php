@@ -1,5 +1,10 @@
 <?php
 use yii\bootstrap\Nav;
+use weikit\services\MenuService;
+
+/* @var MenuService $menuService */
+$menuService = Yii::createObject(MenuService::class);
+
 ?>
 <?php include $this->template('common/header-base', TEMPLATE_INCLUDEPATH) ?>
 <div data-skin="default" class="skin-default">
@@ -22,12 +27,12 @@ use yii\bootstrap\Nav;
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <?= Nav::widget([
                             'options' => ['class' => 'navbar-nav'],
-                            'items'   => $app->getModule('web')->getNavMenu(),
+                            'items'   => Yii::createObject(MenuService::class)->getWebNavMenu(),
                         ]) ?>
 
                         <?= Nav::widget([
                             'options' => ['class' => 'navbar-nav navbar-right'],
-                            'items'   => $app->getModule('web')->getRightNavMenu(),
+                            'items'   => Yii::createObject(MenuService::class)->getWebRightNavMenu(),
                         ]) ?>
                     </div>
                 </div>

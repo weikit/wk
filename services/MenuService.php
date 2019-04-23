@@ -11,6 +11,11 @@ use weikit\core\service\BaseService;
 class MenuService extends BaseService
 {
     /**
+     * 扩展模块菜单缓存键
+     */
+    const CACHE_ADDON_MODULE_MENU_PREFIX = 'menu_addon_module';
+
+    /**
      * 获取Web模块导航菜单
      *
      * @return array
@@ -71,12 +76,11 @@ class MenuService extends BaseService
                     'label' => '微信模拟器',
                     'url' => ['/web/emulator/wechat'],
                 ];
+                $menu['account'] = [
+                    'label' => '管理账号:' . $account->uniAccount->name,
+                    'url' => ['/web/account/wechat/home']
+                ];
             }
-
-            $menu['account'] = [
-                'label' => '管理账号:' . $account->uniAccount->name,
-                'url' => '#'
-            ];
         }
         return $menu;
     }
@@ -88,12 +92,12 @@ class MenuService extends BaseService
      *
      * @return array
      */
-    public function getModuleMenu($moduleName)
+    public function getAddonModuleMenu($moduleId)
     {
-        return Yii::$app->cache->getOrSet('menu_module:' . $moduleName, function () use ($moduleName) {
+        return Yii::$app->cache->getOrSet(self::CACHE_ADDON_MODULE_MENU_PREFIX . ':' . $moduleId, function() use($moduleId) {
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);
-            $module = $service->findByName($moduleName);
+            $module = $service->findByName($moduleId);
             $entries = $module->entries;
 
             $customMenu = [];
@@ -101,7 +105,7 @@ class MenuService extends BaseService
                 if ($entry->entry === ModuleBinding::ENTRY_MENU) {
                     $customMenu[] = [
                         'label' => $entry->title,
-                        'url'   => ['/web/site/entry', 'eid' => $entry->eid],
+                        'url' => ['/web/site/entry', 'eid' => $entry->eid]
                     ];
                 }
             }
@@ -119,7 +123,6 @@ class MenuService extends BaseService
             ];
 
             return $menu;
-
         });
     }
 
@@ -150,7 +153,7 @@ class MenuService extends BaseService
                 'label' => '扩展模块',
                 'items' => array_map(function($module) {
                     /** @var Module $module */
-                    return ['label' => $module->title, 'url' => '#'];
+                    return ['label' => $module->title, 'url' => [$module->name . '/platform/cover']];
                 }, $data['dataProvider']->models),
             ],
             'settings' => [
