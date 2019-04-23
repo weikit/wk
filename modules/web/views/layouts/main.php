@@ -1,5 +1,5 @@
-<?php include $this->template('common/header', TEMPLATE_INCLUDEPATH) ?>
+<?php include $view->template('common/header', TEMPLATE_INCLUDEPATH) ?>
 
 <?= $content ?>
 
-<?php include $this->template('common/footer', TEMPLATE_INCLUDEPATH) ?>
+<?php include $view->template('common/footer', TEMPLATE_INCLUDEPATH) ?>

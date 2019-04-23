@@ -27,20 +27,6 @@ class MenuService extends BaseService
                 'label' => '微信公众号',
                 'url' => ['/web/account/wechat/index'],
             ],
-            'wxapp' => [
-                'label' => '微信小程序',
-                'url' => ['/web/account/wxapp'],
-            ],
-            'aliapp' => [
-                'label' => '支付宝小程序',
-                'url' => ['/web/account/aliapp'],
-                'items' => [
-                    'aliapp' => [
-                        'label' => '支付宝小程序1',
-                        'url' => ['/web/account/aliapp'],
-                    ],
-                ]
-            ],
         ];
     }
 
@@ -55,7 +41,11 @@ class MenuService extends BaseService
         $menu = [
             'system' => [
                 'label' => '系统',
-                'url' => '#',
+                'items' => [
+                    ['label' => '模块管理', 'url' => ['/web/module/index']],
+                    '<li class="divider"></li>',
+                    ['label' => '更新缓存', 'url' => ['/web/system/index']]
+                ]
             ],
             'gii' => [
                 'label' => 'Gii',
@@ -138,9 +128,11 @@ class MenuService extends BaseService
         $data = $service->search();
         return [
             'basic' => [
-                'label' => '基本设置',
+                'label' => '增强功能',
                 'items' => [
-                    ['label' => '自动回复', 'url' => [ '/wechat/simulator/index' ]]
+                    ['label' => '自动回复', 'url' => [ '/web/platform/reply' ]],
+                    ['label' => '自定义菜单', 'url' => [ '/web/platform/menu' ]],
+                    ['label' => '素材管理', 'url' => [ '/web/platform/material' ]]
                 ],
             ],
             'fans' => [
@@ -157,9 +149,9 @@ class MenuService extends BaseService
                 }, $data['dataProvider']->models),
             ],
             'settings' => [
-                'label' => '参数配置',
+                'label' => '基础配置',
                 'items' => [
-                    ['label' => '自动回复', 'url' => [ '/wechat/simulator/index' ]]
+                    ['label' => '参数配置', 'url' => [ '/wechat/profile/remote' ]]
                 ],
             ],
         ];

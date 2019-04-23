@@ -1,0 +1,18 @@
+<?php
+
+namespace weikit\addon\controllers\web\platform;
+
+use weikit\modules\web\Controller;
+
+class ReplyController extends Controller
+{
+    /**
+     * @var string
+     */
+    public $frame = 'account';
+
+    public function actionIndex()
+    {
+        return $this->render('index');
+    }
+}

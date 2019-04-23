@@ -6,7 +6,7 @@ use weikit\services\MenuService;
 $menuService = Yii::createObject(MenuService::class);
 
 ?>
-<?php include $this->template('common/header-base', TEMPLATE_INCLUDEPATH) ?>
+<?php include $view->template('common/header-base', TEMPLATE_INCLUDEPATH) ?>
 <div data-skin="default" class="skin-default">
     <div class="main">
         <div class="container-fluid">
@@ -41,7 +41,7 @@ $menuService = Yii::createObject(MenuService::class);
                 <div class="row">
                 <?php if (property_exists($app->controller, 'frame') && $app->controller->frame): ?>
                     <div class="col-md-2">
-                        <?php include $this->template('common/header-' . $app->controller->frame, TEMPLATE_INCLUDEPATH) ?>
+                        <?php include $view->template('common/header-' . $app->controller->frame, TEMPLATE_INCLUDEPATH) ?>
                     </div>
                     <div class="col-md-10">
                 <?php else: ?>
