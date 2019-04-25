@@ -1,1 +1,0 @@
-<?= include $view->template('platform/reply/_header', TEMPLATE_INCLUDEPATH) ?>

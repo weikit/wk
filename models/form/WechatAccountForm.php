@@ -2,13 +2,11 @@
 
 namespace weikit\models\form;
 
-use yii\base\Model;
+use weikit\core\model\Model;
 use weikit\models\WechatAccount;
-use weikit\core\db\ModelTryTrait;
 
 class WechatAccountForm extends Model
 {
-    use ModelTryTrait;
 
     /**
      * @var string

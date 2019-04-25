@@ -2,7 +2,7 @@
 
 namespace weikit\models\form;
 
-use yii\base\Model;
+use weikit\core\model\Model;
 
 class InactiveModuleForm extends Model
 {

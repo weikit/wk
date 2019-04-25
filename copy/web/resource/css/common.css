@@ -19,7 +19,8 @@ body {
     cursor: pointer;
 }
 
-/* BOOTSTRAP RESET */
+/* =========== BOOTSTRAP RESET =========== */
+/* 链接排序 */
 a.asc:after{
     content: "↑";
     color: #777;
@@ -30,6 +31,7 @@ a.desc:after {
     color: #777;
     margin-left: 3px;
 }
+/* 表单必填 */
 .form-group.required .control-label:after {
     color: #d00;
     content: "*";
@@ -37,12 +39,9 @@ a.desc:after {
     margin-left: 2px;
     top: 8px;
 }
-.list-group-item.active a {
-    color: #fff;
-}
+/* Tab菜单下划线高亮样式 */
 .nav-underline {
     border-bottom: 1px solid #d1d5da;
-    margin-bottom: -1px;
 }
 .nav-underline > li {
     float: left;

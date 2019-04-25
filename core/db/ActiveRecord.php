@@ -2,11 +2,15 @@
 
 namespace weikit\core\db;
 
+use weikit\core\model\ModelTryTrait;
+use weikit\core\model\ModelLoadTrait;
 use weikit\core\exceptions\ModelNotFoundException;
+
 
 class ActiveRecord extends \yii\db\ActiveRecord
 {
     use ModelTryTrait;
+    use ModelLoadTrait;
 
     /**
      * @see ActiveRecord::save

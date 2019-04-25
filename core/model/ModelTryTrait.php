@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\core\db;
+namespace weikit\core\model;
 
 use weikit\core\exceptions\ModelValidationException;
 
