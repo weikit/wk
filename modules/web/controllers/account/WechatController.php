@@ -61,7 +61,10 @@ class WechatController extends Controller
     public function actionIndex()
     {
         $this->frame = null;
-        return $this->render('index', $this->service->search(Yii::$app->getRequest()->queryParams));
+        return $this->render('index', [
+            'searchModel' => $searchModel = $this->service->createSearch(),
+            'dataProvider' => $searchModel->search(Yii::$app->request->queryParams)
+        ]);
     }
 
     /**

@@ -265,58 +265,21 @@ class ModuleService extends BaseService
     }
 
     /**
-     * @param yii\web\Request|array $requestOrData
+     * @param array $options
      *
-     * @return array
+     * @return ModuleSearch
+     * @throws \yii\base\InvalidConfigException
      */
-    public function search($requestOrData = [])
+    public function createSearch(array $options = [])
     {
-        $model = Yii::createObject(ModuleSearch::class);
-
-        $query = Module::find();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-        $this->isModelLoad($model, $requestOrData);
-        if ($model->validate()) {
-            $query->andFilterWhere([
-                'mid'              => $model->mid,
-                'settings'         => $model->settings,
-                'isrulefields'     => $model->isrulefields,
-                'issystem'         => $model->issystem,
-                'target'           => $model->target,
-                'iscard'           => $model->iscard,
-                'wxapp_support'    => $model->wxapp_support,
-                'welcome_support'  => $model->welcome_support,
-                'oauth_type'       => $model->oauth_type,
-                'webapp_support'   => $model->webapp_support,
-                'phoneapp_support' => $model->phoneapp_support,
-                'account_support'  => $model->account_support,
-                'xzapp_support'    => $model->xzapp_support,
-            ])
-                  ->andFilterWhere(['like', 'name', $model->name])
-                  ->andFilterWhere(['like', 'type', $model->type])
-                  ->andFilterWhere(['like', 'title', $model->title])
-                  ->andFilterWhere(['like', 'version', $model->version])
-                  ->andFilterWhere(['like', 'ability', $model->ability])
-                  ->andFilterWhere(['like', 'description', $model->description])
-                  ->andFilterWhere(['like', 'author', $model->author])
-                  ->andFilterWhere(['like', 'url', $model->url])
-                  ->andFilterWhere(['like', 'subscribes', $model->subscribes])
-                  ->andFilterWhere(['like', 'handles', $model->handles])
-                  ->andFilterWhere(['like', 'permissions', $model->permissions])
-                  ->andFilterWhere(['like', 'title_initial', $model->title_initial]);
-        }
-
-        return [
-            'searchModel'  => $model,
-            'dataProvider' => $dataProvider,
-        ];
+        return Yii::createObject(array_merge($options, [
+            'class' => ModuleSearch::class
+        ]));
     }
 
     /**
      * 获取可安装扩展模块列表
-     *
+     * // TODO switch to ModuleSearch
      * @return array
      */
     public function searchInactive()

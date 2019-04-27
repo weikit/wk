@@ -12,7 +12,6 @@ trait ModelLoadTrait
      * @param Request|array $requestOrData
      *
      * @return bool
-     * @throws ModelValidationException
      */
     public function loadFrom($requestOrData)
     {

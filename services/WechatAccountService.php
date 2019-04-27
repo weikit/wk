@@ -34,32 +34,15 @@ class WechatAccountService extends BaseService
     }
 
     /**
-     * @param Request|array $requestOrData
+     * @param array $options2i
      *
-     * @return array
+     * @throws \yii\base\InvalidConfigException
      */
-    public function search($requestOrData)
+    public function createSearch(array $options = [])
     {
-        $model = Yii::createObject(WechatAccountSearch::class);
-
-        $query = WechatAccount::find();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-        $this->isModelLoad($model, $requestOrData);
-        if ($model->validate()) {
-            $query->andFilterWhere([
-                'acid' => $model->acid,
-                'uniacid' => $model->uniacid,
-                'level' => $model->level,
-            ])
-            ->andFilterWhere(['like', 'name', $model->name]);
-        }
-
-        return [
-            'searchModel' => $model,
-            'dataProvider' => $dataProvider
-        ];
+        return Yii::createObject(array_merge($options, [
+            'class' => WechatAccountSearch::class
+        ]));
     }
 
     /**
@@ -67,13 +50,14 @@ class WechatAccountService extends BaseService
      *
      * @param Request|array $requestOrData
      *
-     * @return AccountWechatForm|WechatAccount 添加成功返回Account, 失败返回AccountWechatForm
+     * @return WechatAccountForm|WechatAccount 添加成功返回Account, 失败返回AccountWechatForm
      */
     public function add($requestOrData)
     {
+        /** @var WechatAccountForm $model */
         $model = Yii::createObject(WechatAccountForm::class);
 
-        if ($this->isModelLoad($model, $requestOrData)) {
+        if ($model->loadFrom($requestOrData)) {
             return $this->addWechatAccount($model);
         }
 
@@ -148,7 +132,7 @@ class WechatAccountService extends BaseService
     public function editByAcid($acid, $requestOrData)
     {
         $model = $this->findByAcid($acid);
-        if ($this->isModelLoad($model, $requestOrData)) {
+        if ($model->loadFrom($requestOrData)) {
             $model->trySave();
         }
         return $model;

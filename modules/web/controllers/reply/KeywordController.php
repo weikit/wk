@@ -51,14 +51,9 @@ class KeywordController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('inactive', $this->service->search(Yii::$app->getRequest()->queryParams));
-
-        $searchModel = new RuleSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel = $this->service->createSearch(),
+            'dataProvider' => $searchModel->search(Yii::$app->request->queryParams),
         ]);
     }
 
