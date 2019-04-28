@@ -27,7 +27,7 @@ class RuleSearch extends Rule
      *
      * @return ActiveDataProvider
      */
-    public function search($requestOrData)
+    public function search($requestOrData = [])
     {
         $query = Rule::find();
 

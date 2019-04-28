@@ -5,13 +5,11 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model weikit\models\Rule */
 
-$this->title = 'Create Rule';
-$this->params['breadcrumbs'][] = ['label' => 'Rules', 'url' => ['index']];
+$this->title = '添加关键字回复';
+$this->params['breadcrumbs'][] = ['label' => '关键字回复', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="rule-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
         'model' => $model,

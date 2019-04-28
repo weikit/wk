@@ -12,36 +12,38 @@ trait ControllerMessageTrait
      * 发送消息
      *
      * @param $message
-     * @param string $type
-     * @param null $redirect
+     * @param string $type success|error|warning|info
+     * @param null|false $redirect
      * @param null $resultType
      *
      * @return array|bool|string
      */
     public function message($message, $type = 'error', $redirect = null, $resultType = null)
     {
-        $request = Yii::$app->getRequest();
+        $request = Yii::$app->request;
         if ($resultType === null) {
             $resultType = $request->getIsAjax() ? 'json' : 'html';
         } elseif ($resultType === 'flash') {
-            $resultType = Yii::$app->getRequest()->getIsAjax() ? 'json' : $resultType;
+            $resultType = $request->getIsAjax() ? 'json' : $resultType;
         }
         $data = [
             'type'     => $type,
             'message'  => $message,
-            'redirect' => $redirect === null ? null : Url::to($redirect),
+            'redirect' => $redirect ? Url::to($redirect) : $redirect,
         ];
         switch ($resultType) {
             case 'html':
                 return $this->render(Yii::$app->getModule('wechat')->messageLayout, $data);
             case 'json':
-                Yii::$app->getResponse()->format = Response::FORMAT_JSON;
+                Yii::$app->response->format = Response::FORMAT_JSON;
 
                 return $data;
             case 'flash':
                 Yii::$app->session->setFlash($type, $message);
-                $data['redirect'] == null && $data['redirect'] = $request->getReferrer();
-                Yii::$app->end(0, $this->redirect($data['redirect']));
+                if ($data['redirect'] !== false) {
+                    $data['redirect'] === null && $data['redirect'] = $request->getReferrer();
+                    Yii::$app->end(0, $this->redirect($data['redirect']));
+                }
 
                 return true;
             default:
@@ -52,9 +54,9 @@ trait ControllerMessageTrait
     /**
      * flash消息
      *
-     * @param $message
-     * @param string $status
-     * @param null $redirect
+     * @param string $message
+     * @param string $status success|error|warning|info
+     * @param null|false $redirect
      *
      * @return array|bool|string
      */

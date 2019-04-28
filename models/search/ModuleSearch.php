@@ -23,11 +23,11 @@ class ModuleSearch extends Module
     }
 
     /**
-     * @param $requestOrData
+     * @param \yii\web\Request|array $requestOrData
      *
      * @return ActiveDataProvider
      */
-    public function search($requestOrData)
+    public function search($requestOrData = [])
     {
         $query = Module::find();
 

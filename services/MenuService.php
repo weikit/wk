@@ -125,7 +125,7 @@ class MenuService extends BaseService
     {
         /* @var ModuleService $service */
         $service = Yii::createObject(ModuleService::class);
-        $data = $service->search();
+        $dataProvider = $service->createSearch()->search(); // TODO findAll()?
         return [
             'basic' => [
                 'label' => '增强功能',
@@ -146,7 +146,7 @@ class MenuService extends BaseService
                 'items' => array_map(function($module) {
                     /** @var Module $module */
                     return ['label' => $module->title, 'url' => [$module->name . '/platform/cover']];
-                }, $data['dataProvider']->models),
+                }, $dataProvider->models),
             ],
             'settings' => [
                 'label' => '基础配置',

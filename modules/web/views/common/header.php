@@ -1,5 +1,7 @@
 <?php
 use yii\bootstrap\Nav;
+use weikit\widgets\Alert;
+use yii\widgets\Breadcrumbs;
 use weikit\services\MenuService;
 
 /* @var MenuService $menuService */
@@ -38,12 +40,17 @@ $menuService = Yii::createObject(MenuService::class);
                 </div>
             </nav>
             <div class="content">
+                <?= Alert::widget() ?>
                 <div class="row">
-                <?php if (property_exists($app->controller, 'frame') && $app->controller->frame): ?>
+                <?php if (property_exists($app->controller, 'menu') && $app->controller->menu): ?>
                     <div class="col-md-2">
-                        <?php include $view->template('common/header-' . $app->controller->frame, TEMPLATE_INCLUDEPATH) ?>
+                        <?php include $view->template($app->controller->menu, TEMPLATE_INCLUDEPATH) ?>
                     </div>
                     <div class="col-md-10">
                 <?php else: ?>
                     <div class="col-md-12">
                 <?php endif ?>
+                        <?= !empty($view->params['breadcrumbs']) ? Breadcrumbs::widget([
+                            'homeLink' => false,
+                            'links' => $view->params['breadcrumbs']
+                        ]) : '' ?>

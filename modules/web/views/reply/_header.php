@@ -1,10 +1,6 @@
 <?php
 use yii\bootstrap\Nav;
 ?>
-
-<div class="page-header">
-    <h4>自动回复</h4>
-</div>
 <?= Nav::widget([
     'options' => [
         'class' => 'nav-underline mb20'

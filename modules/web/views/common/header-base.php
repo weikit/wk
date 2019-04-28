@@ -12,7 +12,7 @@ WebAsset::register($view);
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<?php $view->registerCsrfMetaTags() ?>
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
-	<title><?= Html::encode( $this->title) ?></title>
+	<title><?= Html::encode($this->title) ?></title>
 	<script type="text/javascript">
 		var require = { urlArgs: 'v=20190101' };
 		if(navigator.appName == 'Microsoft Internet Explorer'){

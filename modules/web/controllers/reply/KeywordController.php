@@ -17,6 +17,10 @@ use weikit\models\search\RuleSearch;
 class KeywordController extends Controller
 {
     /**
+     * @var string
+     */
+    public $menu = 'common/menu-account';
+    /**
      * @var ReplyService
      */
     protected $service;

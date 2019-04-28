@@ -13,7 +13,7 @@ class Controller extends \yii\web\Controller
     /**
      * @var null
      */
-    public $frame = null;
+    public $menu = null;
     /**
      * @var bool 是否需要检查设置的账号
      */
