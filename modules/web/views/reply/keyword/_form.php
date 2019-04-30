@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use weikit\models\Rule;
 use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -14,13 +15,11 @@ use yii\bootstrap\ActiveForm;
         'layout' => 'horizontal'
     ]); ?>
 
-    <?= $form->field($model, 'uniacid')->textInput() ?>
-
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'module')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'status')->textInput() ?>
+    <?= $form->field($model, 'status', ['inline' => true])->radioList(Rule::$statuses) ?>
 
     <?= $form->field($model, 'displayorder')->textInput() ?>
 

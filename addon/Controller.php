@@ -15,7 +15,7 @@ class Controller extends \weikit\modules\web\Controller
     /**
      * @var string
      */
-    public $frame = 'module';
+    public $menu = 'common/menu-account';
     /**
      * @var ModuleService
      */

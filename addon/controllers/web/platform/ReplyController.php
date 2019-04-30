@@ -9,7 +9,7 @@ class ReplyController extends Controller
     /**
      * @var string
      */
-    public $frame = 'account';
+    public $menu = 'common/menu-account';
 
     public function actionIndex()
     {

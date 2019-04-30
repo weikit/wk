@@ -32,7 +32,7 @@ class Rule extends ActiveRecord
      */
     public static $statuses = [
         self::STATUS_ACTIVE => '启用',
-        self::STATUS_DISABLED => '禁用'
+        self::STATUS_DISABLED => '关闭'
     ];
     /**
      * {@inheritdoc}
@@ -70,10 +70,10 @@ class Rule extends ActiveRecord
         return [
             'id' => 'Rid',
             'uniacid' => 'Uniacid',
-            'name' => '回复规则名',
+            'name' => '规则名称',
             'module' => '关联模块',
             'status' => '状态',
-            'displayorder' => '排序',
+            'displayorder' => '回复优先级',
         ];
     }
 

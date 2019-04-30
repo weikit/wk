@@ -1,7 +1,7 @@
 <?php
 use yii\bootstrap\Nav;
 ?>
-<?= Nav::widget([
+<?= Nav::widget([ // move to MenuService
     'options' => [
         'class' => 'nav-underline mb20'
     ],

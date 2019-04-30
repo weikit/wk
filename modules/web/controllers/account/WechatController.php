@@ -18,7 +18,7 @@ class WechatController extends Controller
     /**
      * @var string
      */
-    public $frame = 'account';
+    public $menu = 'common/menu-account';
     /**
      * @var WechatAccountService
      */
@@ -60,7 +60,7 @@ class WechatController extends Controller
      */
     public function actionIndex()
     {
-        $this->frame = null;
+        $this->menu = null;
         return $this->render('index', [
             'searchModel' => $searchModel = $this->service->createSearch(),
             'dataProvider' => $searchModel->search(Yii::$app->request->queryParams)
