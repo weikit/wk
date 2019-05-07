@@ -91,7 +91,7 @@ class WechatController extends Controller
      */
     public function actionCreate()
     {
-        $model = $this->service->add(Yii::$app->getRequest());
+        $model = $this->service->add(Yii::$app->request);
 
         if ($model instanceof WechatAccount) {
             return $this->redirect(['view', 'acid' => $model->acid]);

@@ -28,11 +28,27 @@ class RuleKeyword extends ActiveRecord
     /**
      * text类型请求 包含关键字
      */
-    const TYPE_REGULAR = 2;
+    const TYPE_INCLUDE = 2;
     /**
      * text类型请求 正则表达式
      */
-    const TYPE_INCLUDE = 3;
+    const TYPE_REGULAR = 3;
+    /**
+     * 启用
+     */
+    const STATUS_ACtiVE = 1;
+    /**
+     * 关闭
+     */
+    const STATUS_DISABLED = 0;
+    /**
+     * @var array
+     */
+    public static $types = [
+        self::TYPE_MATCH => '完全匹配关键字',
+        self::TYPE_INCLUDE => '包含关键字',
+        self::TYPE_REGULAR => '正则匹配关键字',
+    ];
     /**
      * {@inheritdoc}
      */
@@ -55,9 +71,11 @@ class RuleKeyword extends ActiveRecord
     public function rules()
     {
         return [
+            [['rid', 'uniacid', 'type', 'module', 'content'], 'required'],
+            [['status'], 'default', 'value' => self::STATUS_ACtiVE],
             [['rid', 'uniacid', 'type', 'status', 'displayorder'], 'integer'],
             [['module'], 'string', 'max' => 100],
-            [['content'], 'string', 'max' => 255],
+            [['content'], 'string', 'max' => 255]
         ];
     }
 
@@ -71,7 +89,7 @@ class RuleKeyword extends ActiveRecord
             'rid' => 'Rid',
             'uniacid' => 'Uniacid',
             'module' => '关联模块',
-            'content' => '回复规则内容',
+            'content' => '关键字',
             'type' => '类型',
             'status' => '状态',
             'displayorder' => '排序',

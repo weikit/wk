@@ -25,7 +25,7 @@ class ModelValidationException extends \Exception
 
         if ($message === '') {
             $className = get_class($this->model);
-            $message = "Model [{$className}] attributes validate failed";
+            $message = "Model [{$className}] attributes validate failed: \n" . implode("\n", $this->model->getFirstErrors());
         }
 
         parent::__construct($message, $code, $previous);

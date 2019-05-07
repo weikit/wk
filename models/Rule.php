@@ -56,6 +56,8 @@ class Rule extends ActiveRecord
     public function rules()
     {
         return [
+            [['uniacid', 'module', 'name'], 'required'],
+            [['displayorder'], 'default', 'value' => 0],
             [['uniacid', 'status', 'displayorder'], 'integer'],
             [['name'], 'string', 'max' => 50],
             [['module'], 'string', 'max' => 100],

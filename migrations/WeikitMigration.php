@@ -226,7 +226,7 @@ class WeikitMigration extends Migration
                 'rid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Rid'),
                 'uniacid'            => $this->integer()->unsigned()->notNull()->defaultValue(0)->comment('Uniacid'),
                 'module'       => $this->string(100)->notNull()->defaultValue('')->comment('关联模块'),
-                'content'       => $this->string()->notNull()->defaultValue('')->comment('回复规则内容'),
+                'content'       => $this->string()->notNull()->defaultValue('')->comment('关键字'),
                 'type'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('类型'),
                 'status'      => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('状态'),
                 'displayorder' => $this->tinyInteger(3)->unsigned()->notNull()->defaultValue(0)->comment('排序'),

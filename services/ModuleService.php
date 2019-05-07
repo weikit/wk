@@ -7,7 +7,6 @@ use DOMElement;
 use DOMDocument;
 use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
-use yii\data\ActiveDataProvider;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use weikit\models\Module;

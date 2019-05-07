@@ -4,6 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model weikit\models\Rule */
+/* @var $keywordModel \weikit\models\RuleKeyword */
 
 $this->title = 'Update Rule: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Rules', 'url' => ['index']];
@@ -16,6 +17,8 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'keywordModel' => $keywordModel
     ]) ?>
 
 </div>
+/

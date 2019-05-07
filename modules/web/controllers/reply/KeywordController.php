@@ -2,14 +2,15 @@
 
 namespace weikit\modules\web\controllers\reply;
 
-
+use weikit\services\AccountService;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use weikit\models\Rule;
+use weikit\models\RuleKeyword;
 use weikit\services\ReplyService;
 use weikit\modules\web\Controller;
-use weikit\models\search\RuleSearch;
 
 /**
  * KeywordController implements the CRUD actions for Rule model.
@@ -81,14 +82,20 @@ class KeywordController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Rule();
+        /* @var Rule $model */
+        $model = Yii::createObject(Rule::class);
+        $model->populateRelation('keywords', []); // 新创建减少多余的查询
+        /* @var RuleKeyword $keywordModel */
+        $keywordModel = Yii::createObject(RuleKeyword::class);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $request = Yii::$app->request;
+        if ($request->isPost && $this->service->updateRule($model, $request, $keywordModel)) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('create', [
             'model' => $model,
+            'keywordModel' => $keywordModel
         ]);
     }
 
@@ -101,14 +108,17 @@ class KeywordController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->service->findRuleById($id);
+        $keywordModel = Yii::createObject(RuleKeyword::class);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $request = Yii::$app->request;
+        if ($request->isPost && $this->service->updateRule($model, $request, $keywordModel)) {
+            return $this->redirect(['index']);
         }
 
         return $this->render('update', [
             'model' => $model,
+            'keywordModel' => $keywordModel
         ]);
     }
 

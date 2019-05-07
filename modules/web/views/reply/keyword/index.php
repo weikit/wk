@@ -8,7 +8,7 @@ $view->title = '自动回复';
     <h4><?= Html::encode($this->title) ?></h4>
 </div>
 
-<?php include $view->template('reply/_header', TEMPLATE_INCLUDEPATH) ?>
+<?= $view->render('/reply/_header') ?>
 
 <div class="mb20">
     <?= Html::a('添加关键字回复', ['create'], ['class' => 'btn btn-success']) ?>

@@ -3,9 +3,13 @@
 namespace weikit\services;
 
 use Yii;
+use yii\web\Request;
 use weikit\models\Rule;
+use weikit\models\RuleKeyword;
 use weikit\core\service\BaseService;
 use weikit\models\search\RuleSearch;
+use yii\base\InvalidValueException;
+
 
 class ReplyService extends BaseService
 {
@@ -13,6 +17,18 @@ class ReplyService extends BaseService
      * @var string|Rule
      */
     public $modelClass = Rule::class;
+
+    /**
+     * @param $acid
+     * @param array $options
+     *
+     * @return Rule|null
+     * @throws \weikit\core\exceptions\ModelNotFoundException
+     */
+    public function findRuleById($id, array $options = [])
+    {
+        return $this->findBy(['id' => $id], $options);
+    }
 
     /**
      * @param array $options
@@ -28,78 +44,57 @@ class ReplyService extends BaseService
     }
 
     /**
-     * 添加
-     *
+     * @param Rule $model
      * @param Request|array $requestOrData
+     * @param RuleKeyword|null $keywordModel
      *
-     * @return WechatAccountForm|WechatAccount 添加成功返回Account, 失败返回AccountWechatForm
+     * @return bool
+     * @throws \Throwable
      */
-    public function add($requestOrData)
+    public function updateRule(Rule $model, $requestOrData, $keywordModel = null)
     {
-        /** @var WechatAccountForm $model */
-        $model = Yii::createObject(WechatAccountForm::class);
-
         if ($model->loadFrom($requestOrData)) {
-            return $this->addWechatAccount($model);
+            $model::getDb()->transaction(function() use ($requestOrData, $model) {
+                /** @var AccountService $accountServcer */
+                $accountService = Yii::createObject(AccountService::class);
+                /** @var RuleKeyword $keywordModel */
+                $keywordModel = $keywordModel !== null ? $keywordModel : Yii::createObject(RuleKeyword::class);
+                $model->uniacid = $accountService->managingUniacid;
+                $model->trySave();
+                if ($requestOrData instanceof Request) {
+                    $newKeywords = $requestOrData->post($keywordModel->formName());
+                } else {
+                    $newKeywords = $requestOrData['keywords'] ?? [];
+                }
+                if (!is_array($newKeywords) || empty($newKeywords)) {
+                    throw new InvalidValueException('The keywords of rule must be set and be array.');
+                }
+                $oldKeywords = $model->keywords;
+
+                $newKeywordIds = array_filter(ArrayHelper::getColumn($newKeywords, 'id'));
+                $oldKeywordIds = array_filter(ArrayHelper::getColumn($oldKeywords, 'id'));
+
+                $deleteKeywordIds = array_diff($oldKeywordIds, $newKeywordIds);
+                foreach ($newKeywords as $keyword) {
+                    $id = $keyword['id'] ?? 0;
+                    if (!$id) { // 添加新关键字
+                        $_keywordModel = clone $keywordModel;
+                        $_keywordModel->load($keyword, '');
+                        $_keywordModel->setAttributes([
+                            'uniacid' => $model->uniacid,
+                            'rid' => $model->id,
+                            'module' => $model->module,
+                        ]);
+                        $_keywordModel->trySave();
+                    }
+                }
+                if (!empty($deleteKeywordIds)) { // 移除删除的关键字
+                    RuleKeyword::deleteAll(['id' => $deleteKeywordIds]);
+                }
+            });
+
+            return true;
         }
-
-        return $model;
-    }
-
-    /**
-     * @param WechatAccountForm $form
-     *
-     * @return WechatAccount
-     */
-    protected function addWechatAccount(WechatAccountForm $form)
-    {
-        $form->tryValidate();
-
-        /* @var $uniAccount UniAccount */
-        $uniAccount = Yii::createObject(UniAccount::class);
-        return $uniAccount->getDb()->transaction(function() use ($form, $uniAccount) {
-
-            // 1. 创建UniAccount
-            $uniAccount->setAttributes([
-                'name' => $form->name,
-                'description' => $form->description,
-                'title_initial' => $uniAccount->defaultTitleInitial($form->name),
-            ], false);
-            $uniAccount->save(false);
-
-            // 2. 创建Account
-            /* @var $account Account */
-            $account = Yii::createObject(Account::class);
-            $account->setAttributes([
-                'uniacid' => $uniAccount->uniacid,
-                'hash' => Account::generateHash(),
-                'type' => Account::TYPE_WECHAT,
-
-            ], false);
-            $account->save(false);
-
-            // 3. 创建AccountWechat
-            /* @var $wechatAccount WechatAccount */
-            $wechatAccount = Yii::createObject(WechatAccount::class);
-            $wechatAccount->setAttributes([
-                'acid' => $account->acid,
-                'uniacid' => $uniAccount->uniacid,
-                'name' => $form->name,
-                'account' => $form->account,
-                'original' => $form->original,
-                'level' => $form->level,
-                'key' => $form->key,
-                'secret' => $form->secret,
-                'token' => WechatAccount::generateToken(),
-                'encodingaeskey' => WechatAccount::generateEncodingAesKey(),
-            ], false);
-            $wechatAccount->save(false);
-
-            $account->populateRelation('uniAccount', $uniAccount);
-            $account->populateRelation('wechatAccount', $wechatAccount);
-
-            // 成功返回WechatAccount
-            return $wechatAccount;
-        });
+        return false;
     }
 }
