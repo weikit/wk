@@ -26,6 +26,7 @@ WebAsset::register($view);
 </head>
 <body>
 	<?php $view->beginBody() ?>
+
 	<div class="loader" style="display:none">
 		<div class="la-ball-clip-rotate">
 			<div></div>

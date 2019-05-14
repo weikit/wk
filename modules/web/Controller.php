@@ -37,7 +37,8 @@ class Controller extends \yii\web\Controller
                             /** @var AccountService $service */
                             $service = Yii::createObject(AccountService::class);
                             if (!$service->managingUniacid) {
-                                $this->flash('未设置管理平台, 请先选则需要管理的平台', 'error', ['/wechat/wechat']);
+                                // TODO 切换account/index路由
+                                $this->flash('未设置管理平台, 请先选则需要管理的平台', 'error', ['/web/account/wechat/index']);
 
                                 return false;
                             }

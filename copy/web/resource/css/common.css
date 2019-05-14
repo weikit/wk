@@ -70,3 +70,9 @@ a.desc:after {
     color: #555;
     border-bottom: 2px solid #337ab7;
 }
+
+/* =========== CUSTOM STYLE =========== */
+.content > .page-header,
+.content > div > .page-header{
+    margin-top: 0;
+}

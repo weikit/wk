@@ -11,6 +11,10 @@ class SwitchController extends Controller
      * @var AccountService
      */
     protected $service;
+    /**
+     * @var bool
+     */
+    public $enableAccountManageCheck = false;
 
     /**
      * @inheritdoc

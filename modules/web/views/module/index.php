@@ -1,14 +1,20 @@
-{template 'common/header'}
+<?php
+use yii\helpers\Html;
+use yii\grid\GridView;
+$view->title = '模块管理';
+?>
+
+<div class="module-index">
+
+    <div class="page-header">
+        <h4><?= Html::encode($view->title) ?></h4>
+    </div>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        {php echo \yii\helpers\Html::a('Create Module', ['create'], ['class' => 'btn btn-success']) }
-    </p>
+    <?= $view->render('_nav') ?>
 
-    {template 'module/_nav'}
-
-    {php echo \yii\grid\GridView::widget([
+    <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -41,5 +47,6 @@
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
-    ]); }
-{template 'common/footer'}
+    ]) ?>
+
+</div>

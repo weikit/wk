@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Rules', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="rule-view">
+<div class="reply-keyword--view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

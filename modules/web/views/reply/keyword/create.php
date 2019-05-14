@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = ['label' => '关键字回复', 'url' => ['index
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="rule-create" id="app">
+<div class="reply-keyword-create" id="app">
     <?= $this->render('_form', [
         'model' => $model,
         'keywordModel' => $keywordModel

@@ -7,8 +7,17 @@ use yii\helpers\ArrayHelper;
 use weikit\models\Account;
 use weikit\modules\web\Controller;
 
+/**
+ * 模拟器
+ * @package weikit\modules\web\controllers
+ */
 class EmulatorController extends Controller
 {
+    /**
+     * 微信模拟器
+     *
+     * @return string
+     */
     public function actionWechat()
     {
         // TODO 放入service中

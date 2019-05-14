@@ -1,5 +1,8 @@
+<?php
+use yii\bootstrap\Nav;
+?>
 <div class="mb20">
-    {php echo \yii\bootstrap\Nav::widget([
+    <?= Nav::widget([
         'options' => [
             'class' => 'nav-underline',
         ],
@@ -17,5 +20,5 @@
                 'url' => ['/web/module/inactive'],
             ],
         ],
-    ])}
+    ]) ?>
 </div>

@@ -9,7 +9,8 @@ use weikit\services\ModuleService;
 use weikit\modules\web\Controller;
 
 /**
- * ModuleController implements the CRUD actions for Module model.
+ * 模块管理
+ * @package weikit\modules\web\controllers
  */
 class ModuleController extends Controller
 {
