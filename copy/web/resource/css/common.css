@@ -75,4 +75,5 @@ a.desc:after {
 .content > .page-header,
 .content > div > .page-header{
     margin-top: 0;
+    margin-bottom: 0;
 }

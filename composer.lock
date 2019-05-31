@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d2beb534842bd5bcf77e49d7c851be1",
+    "content-hash": "a9223b44e2f374fb8286a0f3c404877d",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -17,8 +17,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/twbs/bootstrap/zipball/68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e",
-                "shasum": null
+                "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "require": {
                 "bower-asset/jquery": ">=1.9.1,<4.0"
@@ -39,8 +38,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/RobinHerbots/Inputmask/zipball/5e670ad62f50c738388d4dcec78d2888505ad77b",
-                "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b",
-                "shasum": null
+                "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "require": {
                 "bower-asset/jquery": ">=1.7"
@@ -61,8 +59,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/jquery/jquery-dist/zipball/9e8ec3d10fad04748176144f108d7355662ae75e",
-                "reference": "9e8ec3d10fad04748176144f108d7355662ae75e",
-                "shasum": null
+                "reference": "9e8ec3d10fad04748176144f108d7355662ae75e"
             },
             "type": "bower-asset",
             "license": [
@@ -80,8 +77,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/bestiejs/punycode.js/zipball/38c8d3131a82567bfef18da09f7f4db68c84f8a3",
-                "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3",
-                "shasum": null
+                "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "type": "bower-asset"
         },
@@ -96,8 +92,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/aef7b953107264f00234902a3880eb50dafc48be",
-                "reference": "aef7b953107264f00234902a3880eb50dafc48be",
-                "shasum": null
+                "reference": "aef7b953107264f00234902a3880eb50dafc48be"
             },
             "require": {
                 "bower-asset/jquery": ">=1.8"
@@ -113,12 +108,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/callmez/we8.git",
-                "reference": "68f6548ac9daf5d93dc85e8a85ed2ffd29581aef"
+                "reference": "08bc6dec37f605c48bcb0ad3dfc4db2e65fdfefa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/callmez/we8/zipball/68f6548ac9daf5d93dc85e8a85ed2ffd29581aef",
-                "reference": "68f6548ac9daf5d93dc85e8a85ed2ffd29581aef",
+                "url": "https://api.github.com/repos/callmez/we8/zipball/08bc6dec37f605c48bcb0ad3dfc4db2e65fdfefa",
+                "reference": "08bc6dec37f605c48bcb0ad3dfc4db2e65fdfefa",
                 "shasum": ""
             },
             "require": {
@@ -141,7 +136,7 @@
                 }
             ],
             "description": "We8",
-            "time": "2019-03-25T04:10:20+00:00"
+            "time": "2019-04-20T04:45:27+00:00"
         },
         {
             "name": "cebe/markdown",
@@ -304,29 +299,32 @@
         },
         {
             "name": "overtrue/pinyin",
-            "version": "4.0.1",
+            "version": "4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/overtrue/pinyin.git",
-                "reference": "1350518c8211332de2f9c40d88b6e290b383bd31"
+                "reference": "b17c9c8be23e89fe3f074025b3c6bc034bfb2a90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/overtrue/pinyin/zipball/1350518c8211332de2f9c40d88b6e290b383bd31",
-                "reference": "1350518c8211332de2f9c40d88b6e290b383bd31",
+                "url": "https://api.github.com/repos/overtrue/pinyin/zipball/b17c9c8be23e89fe3f074025b3c6bc034bfb2a90",
+                "reference": "b17c9c8be23e89fe3f074025b3c6bc034bfb2a90",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "~7.5"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Overtrue\\Pinyin\\": "src/"
-                }
+                },
+                "files": [
+                    "src/const.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -345,7 +343,7 @@
                 "Pinyin",
                 "cn2pinyin"
             ],
-            "time": "2019-01-11T12:52:09+00:00"
+            "time": "2019-04-21T14:33:59+00:00"
         },
         {
             "name": "phpspec/php-diff",
@@ -387,16 +385,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v4.2.5",
+            "version": "v4.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "267b7002c1b70ea80db0833c3afe05f0fbde580a"
+                "reference": "e45135658bd6c14b61850bf131c4f09a55133f69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/267b7002c1b70ea80db0833c3afe05f0fbde580a",
-                "reference": "267b7002c1b70ea80db0833c3afe05f0fbde580a",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/e45135658bd6c14b61850bf131c4f09a55133f69",
+                "reference": "e45135658bd6c14b61850bf131c4f09a55133f69",
                 "shasum": ""
             },
             "require": {
@@ -432,20 +430,20 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23T15:42:05+00:00"
+            "time": "2019-04-06T13:51:08+00:00"
         },
         {
             "name": "weikit/wechat-sdk",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/weikit/wechat-sdk.git",
-                "reference": "40071b9c7a262a66b73f61ad86ed5a5f4cf56335"
+                "reference": "e2ce07f03d00d6fccad5f23421b80670d38c0af6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/weikit/wechat-sdk/zipball/40071b9c7a262a66b73f61ad86ed5a5f4cf56335",
-                "reference": "40071b9c7a262a66b73f61ad86ed5a5f4cf56335",
+                "url": "https://api.github.com/repos/weikit/wechat-sdk/zipball/e2ce07f03d00d6fccad5f23421b80670d38c0af6",
+                "reference": "e2ce07f03d00d6fccad5f23421b80670d38c0af6",
                 "shasum": ""
             },
             "require": {
@@ -474,7 +472,7 @@
                 "weikit",
                 "weixin"
             ],
-            "time": "2019-04-14T13:40:19+00:00"
+            "time": "2019-04-14T14:36:03+00:00"
         },
         {
             "name": "yiisoft/yii2",
@@ -578,21 +576,24 @@
         },
         {
             "name": "yiisoft/yii2-bootstrap",
-            "version": "2.0.9",
+            "version": "2.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-bootstrap.git",
-                "reference": "4677951dda712dd99d5bf2a127eaee118dfea860"
+                "reference": "073c9ab0a4eb71f2485d84c96a1967130300d8fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/4677951dda712dd99d5bf2a127eaee118dfea860",
-                "reference": "4677951dda712dd99d5bf2a127eaee118dfea860",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/073c9ab0a4eb71f2485d84c96a1967130300d8fc",
+                "reference": "073c9ab0a4eb71f2485d84c96a1967130300d8fc",
                 "shasum": ""
             },
             "require": {
                 "bower-asset/bootstrap": "3.4.* | 3.3.* | 3.2.* | 3.1.*",
                 "yiisoft/yii2": "~2.0.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "<7"
             },
             "type": "yii2-extension",
             "extra": {
@@ -634,7 +635,7 @@
                 "bootstrap",
                 "yii2"
             ],
-            "time": "2019-01-29T21:39:45+00:00"
+            "time": "2019-04-23T13:18:43+00:00"
         },
         {
             "name": "yiisoft/yii2-composer",

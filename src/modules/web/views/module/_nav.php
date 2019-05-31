@@ -16,7 +16,7 @@ use yii\bootstrap\Nav;
                 'url' => ['/web/module/disabled' ],
             ],
             'aliapp' => [
-                'label' => '可安装',
+                'label' => '未安装',
                 'url' => ['/web/module/inactive'],
             ],
         ],

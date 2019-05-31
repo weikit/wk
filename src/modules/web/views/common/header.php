@@ -38,6 +38,7 @@ $menuService = Yii::createObject(MenuService::class);
                 </div>
             </div>
         </nav>
+
         <?= Alert::widget() ?>
 
         <div class="row">

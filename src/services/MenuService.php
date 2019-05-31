@@ -138,7 +138,7 @@ class MenuService extends BaseService
             'fans' => [
                 'label' => '粉丝管理',
                 'items' => [
-                    ['label' => '自动回复', 'url' => [ '/wechat/simulator/index' ]]
+                    ['label' => '自动回复', 'url' => [ '/web/wechat/simulator/index' ]]
                 ],
             ],
             'addon' => [
@@ -151,7 +151,7 @@ class MenuService extends BaseService
             'settings' => [
                 'label' => '基础配置',
                 'items' => [
-                    ['label' => '参数配置', 'url' => [ '/wechat/profile/remote' ]]
+                    ['label' => '参数配置', 'url' => [ '/web/wechat/profile/remote' ]]
                 ],
             ],
         ];

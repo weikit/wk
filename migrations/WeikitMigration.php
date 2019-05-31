@@ -45,6 +45,8 @@ class WeikitMigration extends Migration
         $this->createAccountTable();
         $this->createModuleTable();
         $this->createReplyRuleTable();
+
+        $this->installCoreModule();
     }
 
     /**
@@ -244,6 +246,11 @@ class WeikitMigration extends Migration
         if ($this->isTableExists('{{%rule_keyword}}')) {
             $this->dropTable('{{%rule_keyword}}');
         }
+    }
+
+    public function installCoreModule()
+    {
+        
     }
 
     /**

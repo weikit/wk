@@ -6,10 +6,13 @@ use yii\helpers\Json;
 use yii\bootstrap\ActiveForm;
 use weikit\models\RuleKeyword;
 
-/* @var $this \yii\web\View */
+/* @var $view \yii\web\View */
+/* @var $app \yii\web\Application */
 /* @var $model \weikit\models\Rule */
 /* @var $form \yii\widgets\ActiveForm */
 /* @var $keywordModel \weikit\models\RuleKeyword */
+
+$module = $app->controller->module instanceof \weikit\addon\Module ? $app->controller->module : $app->getModule('web')->getModule('core');
 ?>
 
 <div class="rule-form" id="ruleForm" v-cloak>
@@ -58,6 +61,13 @@ use weikit\models\RuleKeyword;
     ]) ?>
 
     <?= $form->field($model, 'displayorder')->textInput() ?>
+
+    <div class="form-group">
+        <label class="control-label col-sm-3">回复内容</label>
+        <div class="col-sm-6">
+            <?= $module->renderReply() ?>
+        </div>
+    </div>
 
     <div class="form-group">
         <div class="col-sm-offset-3 col-sm-6">

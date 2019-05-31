@@ -15,6 +15,9 @@ add_action('wk_init', function() { // 初始化Weikit
 
         require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
 
+        // 加载容器单例设置
+        Yii::$container->setSingletons( require ( __DIR__ . '/config/singletons.php' ) );
+
         new weikit\core\Application(
             apply_filters( 'wk_config', require ( __DIR__ . '/config/web.php' ) )
         );

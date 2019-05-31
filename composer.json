@@ -20,11 +20,8 @@
     }
   },
   "autoload": {
-    "psr-0": {
-      "WeBase": "./core/addon/Base"
-    },
     "psr-4": {
-      "weikit\\": "./"
+      "weikit\\": "./src"
     }
   },
   "scripts": {
