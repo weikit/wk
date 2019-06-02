@@ -2,9 +2,6 @@
 
 namespace weikit\modules\web;
 
-use Yii;
-use weikit\models\Account;
-use weikit\services\AccountService;
 use weikit\core\traits\AddonModuleTrait;
 
 class Module extends \yii\base\Module
