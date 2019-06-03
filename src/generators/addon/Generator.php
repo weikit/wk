@@ -2,8 +2,8 @@
 
 namespace weikit\generators\addon;
 
+use Yii;
 use weikit\services\ModuleService;
-use yii\gii\CodeFile;
 
 class Generator extends \yii\gii\Generator
 {
@@ -54,7 +54,7 @@ class Generator extends \yii\gii\Generator
             [['version'], 'match', 'pattern' => '/^\d+[.\d]+\d+$/', 'message' => '{attribute}只能包含数字和.符号并符合版本命名规则, 例如<code>1.0.0</code>'],
 
             [['author'], 'string', 'max' => 100],
-            [['link'], 'string', 'max' => 255],
+            [['url'], 'string', 'max' => 255],
 //            [['supports']]  // todo
         ]);
     }
@@ -102,10 +102,14 @@ class Generator extends \yii\gii\Generator
     {
         $files = [];
 
-        $files[] = new CodeFile(
-            $this->service->getRealPath($this->identifie, 'mdoule.php'),
-            $this->render('module.php')
-        );
+        $files[] = Yii::createObject(CodeFile::class, [
+            $this->service->getRealPath($this->identifie, '/manifest.xml'),
+            $this->render('manifest.xml.php')
+        ]);
+//        $files[] = new CodeFile(
+//            $this->service->getRealPath($this->identifie, '/manifest.xml'),
+//            $this->render('manifest.xml.php')
+//        );
 
         return $files;
     }
