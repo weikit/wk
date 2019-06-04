@@ -20,8 +20,15 @@
 
     <?= $form->field($generator, 'url') ?>
 
+    <?= $form->field($generator, 'setting')->checkbox(); ?>
+
     <?= $form->field($generator, 'supports')->checkboxList([
           'wechat' => '微信公众号'
     ]); ?>
+
+
+    <?= $form->field($generator, 'install')->textarea(); ?>
+    <?= $form->field($generator, 'uninstall')->textarea(); ?>
+    <?= $form->field($generator, 'upgrade')->textarea(); ?>
 
 </div>

@@ -6,7 +6,7 @@
 
 <?= '<manifest xmlns="http://weikit.cn" versionCode="0.6">' ?>
 
-    <application setting="false">
+    <application setting="<?= $generator->setting ? 'true' : 'false' ?>">
         <name><![CDATA[<?= $generator->name ?>]]></name>
         <identifie><![CDATA[<?= $generator->identifie ?>]]></identifie>
         <version><![CDATA[<?= $generator->version ?>]]></version>
@@ -59,7 +59,7 @@
     </bindings>
     <permissions>
     </permissions>
-    <install><![CDATA[]]></install>
-    <uninstall><![CDATA[]]></uninstall>
-    <upgrade><![CDATA[]]></upgrade>
+    <install><![CDATA[<?= $generator->install ?>]]></install>
+    <uninstall><![CDATA[<?= $generator->uninstall ?>]]></uninstall>
+    <upgrade><![CDATA[<?= $generator->upgrade ?>]]></upgrade>
 </manifest>

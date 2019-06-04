@@ -21,6 +21,12 @@ class Generator extends \yii\gii\Generator
     public $url;
     public $supports = ['wechat'];
 
+    public $setting = false;
+
+    public $install;
+    public $uninstall;
+    public $upgrade;
+
     public function __construct(ModuleService $service, $config = [])
     {
         $this->service = $service;
@@ -56,6 +62,11 @@ class Generator extends \yii\gii\Generator
             [['author'], 'string', 'max' => 100],
             [['url'], 'string', 'max' => 255],
 //            [['supports']]  // todo
+
+            [['setting'], 'boolean'],
+
+
+            [['install', 'uninstall', 'upgrade'], 'safe']
         ]);
     }
 
@@ -73,7 +84,13 @@ class Generator extends \yii\gii\Generator
             'author' => '作者',
             'url' => '模块链接',
 
-            'supports' => '支持类型'
+            'supports' => '支持类型',
+
+            'setting' => '设置项',
+
+            'install' => '安装脚本',
+            'uninstall' => '卸载脚本',
+            'upgrade' => '升级脚本'
         ];
     }
 
@@ -91,15 +108,38 @@ class Generator extends \yii\gii\Generator
             'author' => '模块的开发作者',
             'url' => '模块更多详情链接',
 
-            'supports' => '模块支持的类型'
+            'supports' => '模块支持的类型',
+
+            'setting' => '是否有设置页面, 勾选将创建设置页模板',
+
+            'install' => '可以定义为SQL语句. 也可以指定为单个的php脚本文件, 如: install.php',
+            'uninstall' => '可以定义为SQL语句. 也可以指定为单个的php脚本文件, 如: uninstall.php',
+            'upgrade' => '可以定义为SQL语句. 也可以指定为单个的php脚本文件, 如: upgrade.php'
         ];
     }
 
-    public $generateFiles =  [
-        'manifest.xml' => 'manifest.xml.php',
-        'module.php' => 'module.php',
-        'processor.php' => 'processor.php',
-        'receiver.php' => 'receiver.php'
+    public $generateMap =  [
+        [
+            'target' => 'module.php',
+            'template' => 'module.php',
+        ],
+        [
+            'target' => 'receiver.php',
+            'template' => 'receiver.php',
+        ],
+        [
+            'target' => 'processor.php',
+            'template' => 'processor.php',
+        ],
+        [
+            'target' => 'manifest.xml',
+            'template' => 'manifest.xml.php',
+        ],
+        [
+            'target' => 'template/setting.html',
+            'template' => 'template/setting.html.php',
+            'when' => 'setting'
+        ],
     ];
 
     /**
@@ -109,10 +149,59 @@ class Generator extends \yii\gii\Generator
     {
         $files = [];
 
-        foreach ($this->generateFiles as $source => $template) {
+        // module.php
+        $files[] = Yii::createObject(CodeFile::class, [
+            $this->service->getRealPath($this->identifie, 'module.php'),
+            $this->render('module.php')
+        ]);
+
+        // receiver.php
+        $files[] = Yii::createObject(CodeFile::class, [
+            $this->service->getRealPath($this->identifie, 'receiver.php'),
+            $this->render('receiver.php')
+        ]);
+
+        // processor.php
+        $files[] = Yii::createObject(CodeFile::class, [
+            $this->service->getRealPath($this->identifie, 'processor.php'),
+            $this->render('processor.php')
+        ]);
+
+        // manifest.xml
+        $files[] = Yii::createObject(CodeFile::class, [
+            $this->service->getRealPath($this->identifie, 'manifest.xml'),
+            $this->render('manifest.xml.php')
+        ]);
+
+        // template/setting.html
+        if ($this->setting) {
             $files[] = Yii::createObject(CodeFile::class, [
-                $this->service->getRealPath($this->identifie, $source),
-                $this->render($template)
+                $this->service->getRealPath($this->identifie, 'template/setting.html'),
+                $this->render('template/setting.html.php')
+            ]);
+        }
+
+        // install.php
+        if ($this->install && pathinfo($this->install, PATHINFO_EXTENSION) === 'php') {
+            $files[] = Yii::createObject(CodeFile::class, [
+                $this->service->getRealPath($this->identifie, 'install.php'),
+                $this->render('install.php')
+            ]);
+        }
+
+        // uninstall.php
+        if ($this->uninstall && pathinfo($this->uninstall, PATHINFO_EXTENSION) === 'php') {
+            $files[] = Yii::createObject(CodeFile::class, [
+                $this->service->getRealPath($this->identifie, 'uninstall.php'),
+                $this->render('install.php')
+            ]);
+        }
+
+        // upgrade.php
+        if ($this->upgrade && pathinfo($this->upgrade, PATHINFO_EXTENSION) === 'php') {
+            $files[] = Yii::createObject(CodeFile::class, [
+                $this->service->getRealPath($this->identifie, 'upgrade.php'),
+                $this->render('install.php')
             ]);
         }
 
