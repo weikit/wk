@@ -3,7 +3,7 @@ namespace weikit\generators\addon;
 
 use Yii;
 use weikit\services\ModuleService;
-
+// TODO highlight xml
 class CodeFile extends \yii\gii\CodeFile
 {
     /**
