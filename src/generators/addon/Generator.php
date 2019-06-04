@@ -95,6 +95,13 @@ class Generator extends \yii\gii\Generator
         ];
     }
 
+    public $generateFiles =  [
+        'manifest.xml' => 'manifest.xml.php',
+        'module.php' => 'module.php',
+        'processor.php' => 'processor.php',
+        'receiver.php' => 'receiver.php'
+    ];
+
     /**
      * @inheritdoc
      */
@@ -102,14 +109,12 @@ class Generator extends \yii\gii\Generator
     {
         $files = [];
 
-        $files[] = Yii::createObject(CodeFile::class, [
-            $this->service->getRealPath($this->identifie, '/manifest.xml'),
-            $this->render('manifest.xml.php')
-        ]);
-//        $files[] = new CodeFile(
-//            $this->service->getRealPath($this->identifie, '/manifest.xml'),
-//            $this->render('manifest.xml.php')
-//        );
+        foreach ($this->generateFiles as $source => $template) {
+            $files[] = Yii::createObject(CodeFile::class, [
+                $this->service->getRealPath($this->identifie, $source),
+                $this->render($template)
+            ]);
+        }
 
         return $files;
     }

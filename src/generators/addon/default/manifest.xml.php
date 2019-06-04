@@ -1,3 +1,7 @@
+<?php
+/* @var $this yii\web\View */
+/* @var $generator \weikit\generators\addon\Generator */
+?>
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns="http://www.0516city.com" versionCode="0.6">
     <application setting="false">
