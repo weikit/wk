@@ -44,6 +44,12 @@ class ModuleService extends BaseService
      */
     public $basePath = '@wp/addons';
     /**
+     * 核心插件基本路径
+     *
+     * @var string
+     */
+    public $coreBasePath = '@weikit/addons';
+    /**
      * 插件设置文件名
      *
      * @var string
@@ -277,11 +283,11 @@ class ModuleService extends BaseService
     }
 
     /**
-     * 获取可安装扩展模块列表
+     * 获取未安装扩展模块列表
      * // TODO switch to ModuleSearch
      * @return array
      */
-    public function searchInactive()
+    public function searchAvailable()
     {
         $dataProvider = new ArrayDataProvider([
             'allModels' => $this->findAvailable(),
@@ -412,7 +418,7 @@ class ModuleService extends BaseService
     {
         $list = [];
         $path = Yii::getAlias($this->basePath);
-        $corePath = Yii::getAlias('@weikit/addon/modules');
+        $corePath = Yii::getAlias($this->coreBasePath);
 
         if (is_dir($path)) {
             /* @var $configFile SplFileInfo */

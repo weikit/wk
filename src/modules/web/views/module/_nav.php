@@ -7,17 +7,17 @@ use yii\bootstrap\Nav;
             'class' => 'nav-underline',
         ],
         'items' => [
-            'wechat' => [
+            'active' => [
                 'label' => '已安装',
                 'url' => ['/web/module/index'],
             ],
-            'wxapp' => [
+            'inactive' => [
                 'label' => '已停用',
-                'url' => ['/web/module/disabled' ],
+                'url' => ['/web/module/index', 'status' => 1],
             ],
-            'aliapp' => [
+            'uninstalled' => [
                 'label' => '未安装',
-                'url' => ['/web/module/inactive'],
+                'url' => ['/web/module/uninstalled'],
             ],
         ],
     ]) ?>

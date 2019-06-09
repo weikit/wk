@@ -55,13 +55,13 @@ class ModuleController extends Controller
     }
 
     /**
-     * 可安装模块
+     * 未安装模块
      *
      * @return string
      */
-    public function actionInactive()
+    public function actionUninstalled()
     {
-        return $this->render('inactive', $this->service->searchInactive(Yii::$app->getRequest()->queryParams));
+        return $this->render('uninstalled', $this->service->searchUninstalled(Yii::$app->getRequest()->queryParams));
     }
 
     public function actionActivate($name)
