@@ -130,7 +130,7 @@ class MenuService extends BaseService
             'basic' => [
                 'label' => '增强功能',
                 'items' => [
-                    ['label' => '自动回复', 'url' => [ '/web/keyword/platform/reply' ]],
+                    ['label' => '自动回复', 'url' => [ '/web/reply/keyword' ]],
                     ['label' => '自定义菜单', 'url' => [ '/web/platform/menu' ]],
                     ['label' => '素材管理', 'url' => [ '/web/platform/material' ]]
                 ],
