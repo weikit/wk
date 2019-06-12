@@ -76,11 +76,8 @@ $config = [
         'config' => [
             'class' => 'weikit\core\config\Config'
         ],
-
         'addon' => [
-            'class' => [
-                'class' => 'weikit\core\addon\Manager'
-            ]
+            'class' => 'weikit\addon\ModuleManager'
         ]
     ],
     'modules' => [

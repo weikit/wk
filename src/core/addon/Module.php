@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon;
+namespace weikit\core\addon;
 
 use Yii;
 use ArrayAccess;
@@ -14,7 +14,7 @@ require_once __DIR__ . '/compat.php';
 
 /**
  * Class Module
- * @package weikit\addon
+ * @package weikit\core\addon
  *
  * @property int uniacid
  * @property ModuleModel $model
@@ -50,7 +50,7 @@ class Module extends \yii\base\Module implements ArrayAccess
         $this->service = $service;
         parent::__construct($id, $parent, array_merge([
             'controllerMap' => $this->defaultControllerMap($id, $parent),
-            'controllerNamespace' => 'weikit\addon\controllers\\' . $parent->id, // TODO 切换模块命名空间
+            'controllerNamespace' => 'weikit\core\addon\controllers\\' . $parent->id, // TODO 切换模块命名空间
         ]), $config);
     }
 

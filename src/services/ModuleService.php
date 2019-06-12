@@ -11,7 +11,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use weikit\models\Module;
 use weikit\models\ModuleBinding;
-use weikit\addon\SiteAction;
+use weikit\core\addon\SiteAction;
 use weikit\models\UniAccountModule;
 use weikit\core\service\BaseService;
 use weikit\models\search\ModuleSearch;

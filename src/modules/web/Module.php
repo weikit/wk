@@ -2,10 +2,12 @@
 
 namespace weikit\modules\web;
 
+use weikit\core\addon\ModuleTrait;
 use weikit\core\traits\AddonModuleTrait;
 
 class Module extends \yii\base\Module
 {
+    use ModuleTrait;
     use AddonModuleTrait;
     /**
      * @var string
@@ -21,7 +23,7 @@ class Module extends \yii\base\Module
     public function __construct($id, $parent = null, $config = [])
     {
         parent::__construct($id, $parent, array_merge([
-            'modules' => Yii::$app->addon->getModules(),
+            'modules' => $this->defaultModules()
         ], $config));
     }
 }

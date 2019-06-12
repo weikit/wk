@@ -8,7 +8,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
 use weikit\models\Account;
 use weikit\services\AccountService;
-use weikit\addon\components\MessageHandler;
+use weikit\core\addon\components\MessageHandler;
 
 class ApiController extends Controller
 {

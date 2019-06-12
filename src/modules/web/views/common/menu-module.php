@@ -3,7 +3,7 @@ use yii\helpers\Html;
 use weikit\widgets\CategoryMenu;
 use weikit\services\MenuService;
 
-/** @var \weikit\addon\Module $__module */
+/** @var \weikit\core\addon\Module $__module */
 $__module = $app->controller->module;
 ?>
 <div class="module-info text-center">

@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon\controllers\web\platform;
+namespace weikit\core\addon\controllers\web\platform;
 
 use weikit\modules\web\Controller;
 

@@ -27,7 +27,7 @@ trait AddonModuleTrait
             /* @var $model \weikit\models\Module */
             foreach ($service->findAllBy([]) as $model) {
                 $modules[$model->name] = [
-                    'class' => 'weikit\addon\Module',
+                    'class' => 'weikit\core\addon\Module',
                 ];
             }
             return array_merge($modules, $this->coreModules());

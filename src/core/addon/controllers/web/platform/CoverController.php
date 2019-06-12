@@ -1,7 +1,7 @@
 <?php
-namespace weikit\addon\controllers\web\platform;
+namespace weikit\core\addon\controllers\web\platform;
 
-use weikit\addon\Controller;
+use weikit\core\addon\Controller;
 
 class CoverController extends Controller
 {

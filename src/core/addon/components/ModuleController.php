@@ -1,8 +1,8 @@
 <?php
 
-namespace weikit\addon\components;
+namespace weikit\core\addon\components;
 
-use weikit\addon\Controller;
+use weikit\core\addon\Controller;
 
 abstract class ModuleController extends Controller
 {

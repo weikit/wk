@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon\components;
+namespace weikit\core\addon\components;
 
 use yii\base\Component;
 

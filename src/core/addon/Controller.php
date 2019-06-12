@@ -1,12 +1,12 @@
 <?php
 
-namespace weikit\addon;
+namespace weikit\core\addon;
 
 use weikit\services\ModuleService;
 
 /**
  * Class BaseController
- * @package weikit\addon
+ * @package weikit\core\addon
  * @property boolean $inMobile
  * @property Module|\weikit\models\Module $module
  */

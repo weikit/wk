@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\addon\wechat;
+namespace weikit\core\addon\wechat;
 
 use yii\base\BaseObject;
 use weikit\models\Account;

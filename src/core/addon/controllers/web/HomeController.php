@@ -1,7 +1,7 @@
 <?php
-namespace weikit\addon\controllers\web;
+namespace weikit\core\addon\controllers\web;
 
-use weikit\addon\Controller;
+use weikit\core\addon\Controller;
 
 class HomeController extends Controller
 {
