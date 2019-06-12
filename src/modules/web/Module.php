@@ -21,7 +21,7 @@ class Module extends \yii\base\Module
     public function __construct($id, $parent = null, $config = [])
     {
         parent::__construct($id, $parent, array_merge([
-            'modules' => $this->defaultModules()
+            'modules' => Yii::$app->addon->getModules(),
         ], $config));
     }
 }

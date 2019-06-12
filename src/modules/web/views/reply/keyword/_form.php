@@ -1,18 +1,20 @@
 <?php
 
 use yii\helpers\Html;
-use weikit\models\Rule;
 use yii\helpers\Json;
 use yii\bootstrap\ActiveForm;
+use weikit\models\Rule;
 use weikit\models\RuleKeyword;
+use weikit\services\ModuleService;
 
 /* @var $view \yii\web\View */
 /* @var $app \yii\web\Application */
 /* @var $model \weikit\models\Rule */
 /* @var $form \yii\widgets\ActiveForm */
 /* @var $keywordModel \weikit\models\RuleKeyword */
+/* @var $moduleService \weikit\services\ModuleService */
 
-$module = $app->controller->module instanceof \weikit\addon\Module ? $app->controller->module : $app->getModule('web')->getModule('core');
+$moduleService = Yii::createObject(ModuleService::class);
 ?>
 
 <div class="rule-form" id="ruleForm" v-cloak>
@@ -65,7 +67,7 @@ $module = $app->controller->module instanceof \weikit\addon\Module ? $app->contr
     <div class="form-group">
         <label class="control-label col-sm-3">回复内容</label>
         <div class="col-sm-6">
-            <?= $module->renderReply() ?>
+            <?= $moduleService->renderModuleForm('core') // TODO custom addon module form ?>
         </div>
     </div>
 

@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="reply-keyword-create" id="app">
     <?= $this->render('_form', [
         'model' => $model,
-        'keywordModel' => $keywordModel
+        'keywordModel' => $keywordModel,
     ]) ?>
 
 </div>
