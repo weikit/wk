@@ -67,7 +67,7 @@ $moduleService = Yii::createObject(ModuleService::class);
     <div class="form-group">
         <label class="control-label col-sm-3">回复内容</label>
         <div class="col-sm-6">
-            <?= $moduleService->renderModuleForm('core') // TODO custom addon module form ?>
+            <?= $app->getModule('web')->run // TODO custom addon module form ?>
         </div>
     </div>
 
