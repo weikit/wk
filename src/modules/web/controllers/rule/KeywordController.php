@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\modules\web\controllers\reply;
+namespace weikit\modules\web\controllers\rule;
 
 use Yii;
 use yii\filters\VerbFilter;

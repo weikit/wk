@@ -4,13 +4,13 @@ namespace weikit\modules\web;
 
 use Yii;
 use weikit\models\Rule;
-use weikit\core\traits\AddonModuleTrait;
+use weikit\core\addon\ModuleTrait;
 use weikit\core\addon\Module as AddonModule;
 use weikit\exceptions\AddonModuleNotFoundException;
 
 class Module extends \yii\base\Module
 {
-    use AddonModuleTrait;
+    use ModuleTrait;
     /**
      * @var string
      */
@@ -44,6 +44,6 @@ class Module extends \yii\base\Module
 
         }
 
-        return $module->fieldsFormDisplay($module->rid);
+        return $module->fieldsFormDisplay($model->id);
     }
 }

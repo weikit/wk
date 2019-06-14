@@ -2,11 +2,11 @@
 
 namespace weikit\modules\app;
 
-use weikit\core\traits\AddonModuleTrait;
+use weikit\core\addon\ModuleTrait;
 
 class Module extends \yii\base\Module
 {
-    use AddonModuleTrait;
+    use ModuleTrait;
     /**
      * @var string
      */

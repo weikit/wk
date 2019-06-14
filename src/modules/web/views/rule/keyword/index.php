@@ -11,7 +11,7 @@ $view->title = '自动回复';
         <h4><?= Html::encode($view->title) ?></h4>
     </div>
 
-    <?= $view->render('/reply/_nav') ?>
+    <?= $view->render('/rule/_nav') ?>
 
     <div class="mb20">
         <?= Html::a('添加关键字回复', ['create'], ['class' => 'btn btn-success']) ?>

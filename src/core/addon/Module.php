@@ -9,9 +9,6 @@ use weikit\services\ModuleService;
 use weikit\services\AccountService;
 use weikit\models\Module as ModuleModel;
 
-// 兼容代码
-require_once __DIR__ . '/compat.php';
-
 /**
  * Class Module
  * @package weikit\core\addon
