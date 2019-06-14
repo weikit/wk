@@ -4,6 +4,7 @@ namespace weikit\services;
 
 use Yii;
 use yii\web\Request;
+use yii\helpers\ArrayHelper;
 use weikit\models\Rule;
 use weikit\models\RuleKeyword;
 use weikit\core\service\BaseService;
@@ -51,7 +52,7 @@ class ReplyService extends BaseService
      * @return bool
      * @throws \Throwable
      */
-    public function updateRule(Rule $model, $requestOrData, $keywordModel = null)
+    public function saveRule(Rule $model, $requestOrData, $keywordModel = null)
     {
         if ($model->loadFrom($requestOrData)) {
             $model::getDb()->transaction(function() use ($requestOrData, $model) {

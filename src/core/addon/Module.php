@@ -42,10 +42,11 @@ class Module extends \yii\base\Module implements ArrayAccess
      * @var ModuleService
      */
     public $service;
+
     /**
      * @inheritdoc
      */
-    public function  __construct($id, $parent = null, ModuleService $service, $config = [])
+    public function __construct($id, $parent = null, ModuleService $service, $config = [])
     {
         $this->service = $service;
         parent::__construct($id, $parent, array_merge([
@@ -56,10 +57,10 @@ class Module extends \yii\base\Module implements ArrayAccess
 
     public function init()
     {
-        if ( ! defined('MODULE_ROOT')) {
+        if (!defined('MODULE_ROOT')) {
             define('MODULE_ROOT', $this->service->getRealPath($this->id));
         }
-        if ( ! defined('MODULE_URL')) {
+        if (!defined('MODULE_URL')) {
             define('MODULE_URL', $this->service->getUrl($this->id) . '/');
         }
     }
@@ -114,7 +115,7 @@ class Module extends \yii\base\Module implements ArrayAccess
     {
         if ($this->_model === null) {
             $model = $this->service->findByName($this->id, [
-                'query' => function($query) {
+                'query' => function ($query) {
                     /* @var $query \yii\db\ActiveQuery */
                     $query->cache(); // TODO cache dependency
                 }
@@ -208,5 +209,28 @@ class Module extends \yii\base\Module implements ArrayAccess
     public function offsetUnset($offset)
     {
         $this->$offset = null;
+    }
+
+    public function fieldsFormDisplay($rid = 0)
+    {
+        return '';
+    }
+
+    public function fieldsFormValidate($rid = 0)
+    {
+        return '';
+    }
+
+    public function fieldsFormSubmit($rid)
+    {
+    }
+
+    public function ruleDeleted($rid)
+    {
+        return true;
+    }
+
+    public function settingsDisplay($settings)
+    {
     }
 }

@@ -3,6 +3,7 @@
 namespace weikit\migrations;
 
 use yii\db\Migration;
+use weikit\models\Module;
 
 /**
  * Class WeikitMigration
@@ -250,7 +251,18 @@ class WeikitMigration extends Migration
 
     public function installCoreModule()
     {
-        
+        $model = new Module();
+        $model->setAttributes([
+            'name' => 'reply',
+            'type' => 'system',
+            'title' => 'ReplyModule',
+            'version' => '1.0',
+            'ability' => 'ReplyModule',
+            'description' => 'ReplyModule',
+            'author' => 'Weikit',
+            'url' => 'http://github.com/weikit',
+        ]);
+        $model->save();
     }
 
     /**

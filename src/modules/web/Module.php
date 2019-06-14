@@ -2,7 +2,11 @@
 
 namespace weikit\modules\web;
 
+use Yii;
+use weikit\models\Rule;
 use weikit\core\traits\AddonModuleTrait;
+use weikit\core\addon\Module as AddonModule;
+use weikit\exceptions\AddonModuleNotFoundException;
 
 class Module extends \yii\base\Module
 {
@@ -23,5 +27,23 @@ class Module extends \yii\base\Module
         parent::__construct($id, $parent, array_merge([
             'modules' => $this->defaultModules()
         ], $config));
+    }
+
+    public function runModuleReplyForm(Rule $model)
+    {
+        $name = $model->module;
+        /* @var $module AddonModule */
+        $module = $this->getModule($name);
+
+        if (empty($module)) {
+            throw new AddonModuleNotFoundException($name);
+        }
+
+        $request = Yii::$app->request;
+        if ($request->isPost) {
+
+        }
+
+        return $module->fieldsFormDisplay($module->rid);
     }
 }

@@ -82,12 +82,14 @@ class KeywordController extends Controller
     {
         /* @var Rule $model */
         $model = Yii::createObject(Rule::class);
+        $model->module = 'reply';
+
         $model->populateRelation('keywords', []); // 新创建减少多余的查询
         /* @var RuleKeyword $keywordModel */
         $keywordModel = Yii::createObject(RuleKeyword::class);
 
         $request = Yii::$app->request;
-        if ($request->isPost && $this->service->updateRule($model, $request, $keywordModel)) {
+        if ($request->isPost && $this->service->saveRule($model, $request, $keywordModel)) {
             return $this->redirect(['index']);
         }
 
@@ -110,7 +112,7 @@ class KeywordController extends Controller
         $keywordModel = Yii::createObject(RuleKeyword::class);
 
         $request = Yii::$app->request;
-        if ($request->isPost && $this->service->updateRule($model, $request, $keywordModel)) {
+        if ($request->isPost && $this->service->saveRule($model, $request, $keywordModel)) {
             return $this->redirect(['index']);
         }
 
