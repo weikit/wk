@@ -4,7 +4,10 @@ $config = [
     'id' => 'weikit',
     'name' => 'Weikit',
     'basePath' => WEIKIT_PATH,
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'weikit\core\Bootstrap',
+        'log'
+    ],
     'language' => 'zh-CN',
     'aliases' => [
         '@weikit' => WEIKIT_PATH,

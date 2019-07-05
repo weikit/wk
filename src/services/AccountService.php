@@ -3,16 +3,16 @@
 namespace weikit\services;
 
 use Yii;
-use weikit\models\Account;
-use weikit\core\service\BaseService;
 use yii\db\ActiveQuery;
+use weikit\core\Service;
+use weikit\models\Account;
 
 /**
  * Class AccountService
  * @package weikit\services
  * @property int $managingUniacid
  */
-class AccountService extends BaseService
+class AccountService extends Service
 {
     /**
      * 当前管理账号seesion键值

@@ -5,14 +5,13 @@ namespace weikit\services;
 use Yii;
 use yii\web\Request;
 use yii\helpers\ArrayHelper;
-use weikit\models\Rule;
-use weikit\models\RuleKeyword;
-use weikit\core\service\BaseService;
-use weikit\models\search\RuleSearch;
 use yii\base\InvalidValueException;
+use weikit\models\Rule;
+use weikit\core\Service;
+use weikit\models\RuleKeyword;
+use weikit\models\search\RuleSearch;
 
-
-class ReplyService extends BaseService
+class ReplyService extends Service
 {
     /**
      * @var string|Rule

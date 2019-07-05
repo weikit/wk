@@ -2,12 +2,12 @@
 
 namespace weikit\services;
 
-use weikit\migrations\WeikitMigration;
 use Yii;
 use yii\helpers\FileHelper;
-use weikit\core\service\BaseService;
+use weikit\core\Service;
+use weikit\migrations\WeikitMigration;
 
-class WeikitService extends BaseService
+class WeikitService extends Service
 {
     /**
      * @var array

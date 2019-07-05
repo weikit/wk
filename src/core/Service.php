@@ -1,6 +1,6 @@
 <?php
 
-namespace weikit\core\service;
+namespace weikit\core;
 
 use Closure;
 use yii\base\Model;
@@ -11,7 +11,7 @@ use yii\helpers\ArrayHelper;
 use yii\base\InvalidConfigException;
 use weikit\core\exceptions\ModelNotFoundException;
 
-abstract class BaseService extends BaseObject
+class Service extends BaseObject
 {
     /**
      * @var string

@@ -11,15 +11,12 @@ add_action('wk_init', function() { // 初始化Weikit
         global $timestart;
         define('YII_DEBUG', WP_DEBUG);
         define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
-        define('YII_BEGIN_TIME', $timestart);
+        define('YII_BEGIN_TIME', intval($timestart));
 
-        require_once ( __DIR__ . '/vendor/yiisoft/yii2/Yii.php' );
-
-        // 加载容器单例设置
-        Yii::$container->setSingletons( require ( __DIR__ . '/config/singletons.php' ) );
+        require_once ( WEIKIT_PATH . '/vendor/yiisoft/yii2/Yii.php' );
 
         new weikit\core\Application(
-            apply_filters( 'wk_config', require ( __DIR__ . '/config/web.php' ) )
+            apply_filters( 'wk_config', require ( WEIKIT_PATH . '/config/web.php' ) )
         );
     }
 });

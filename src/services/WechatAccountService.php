@@ -4,15 +4,14 @@ namespace weikit\services;
 
 use Yii;
 use yii\web\Request;
-use yii\data\ActiveDataProvider;
+use weikit\core\Service;
 use weikit\models\Account;
 use weikit\models\UniAccount;
 use weikit\models\WechatAccount;
-use weikit\core\service\BaseService;
 use weikit\models\form\WechatAccountForm;
 use weikit\models\search\WechatAccountSearch;
 
-class WechatAccountService extends BaseService
+class WechatAccountService extends Service
 {
     /**
      * @var string

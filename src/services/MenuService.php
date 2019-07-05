@@ -3,12 +3,13 @@
 namespace weikit\services;
 
 use Yii;
+use weikit\core\Service;
 use weikit\models\Module;
 use weikit\models\Account;
 use weikit\models\ModuleBinding;
-use weikit\core\service\BaseService;
 
-class MenuService extends BaseService
+
+class MenuService extends Service
 {
     /**
      * 扩展模块菜单缓存键
