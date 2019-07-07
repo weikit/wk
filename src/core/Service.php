@@ -8,6 +8,7 @@ use yii\web\Request;
 use yii\base\BaseObject;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\caching\TagDependency;
 use yii\base\InvalidConfigException;
 use weikit\core\exceptions\ModelNotFoundException;
 
@@ -24,7 +25,7 @@ class Service extends BaseObject
      *
      * @return ActiveRecord|null
      */
-    public function findBy($condition, array $options = [])
+    public function findOne($condition = [], array $options = [])
     {
         return $this->powerFind($condition, array_merge($options, [
             'all' => false
@@ -38,7 +39,7 @@ class Service extends BaseObject
      *
      * @return ActiveRecord[]|null
      */
-    public function findAllBy($condition, array $options = [])
+    public function findAll($condition = [], array $options = [])
     {
         return $this->powerFind($condition, array_merge($options, [
             'all' => true
@@ -68,6 +69,10 @@ class Service extends BaseObject
             'query' => null,
             // 联表冲突时的别名设置
             'alias' => null,
+            // int类型 缓存查询记录, 开启并缓存的时间
+            'cache' => false,
+            // 缓存依赖
+            'cacheDependency' => null,
         ], $options);
 
         if ( ! is_subclass_of($options['modelClass'], ActiveRecord::class)) {
@@ -104,8 +109,17 @@ class Service extends BaseObject
             call_user_func($options['query'], $query);
         }
 
+        // query cache
+        if ($options['cache'] !== false) {
+            $duration = is_numeric($query['cache']) ? $query['cache'] : 0;
+            $dependency = is_array($query['cacheDependency']) || is_string($query['cacheDependency']) ? new TagDependency([
+                'tags' => $query['cacheDependency'],
+            ]) : $query['cacheDependency'];
+            $query->cache($duration, $dependency);
+        }
+
         // findAll
-        if ($options['all']) {
+        if (!$options['all']) {
             return $query->all();
         }
 

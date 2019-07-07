@@ -2,10 +2,12 @@
 
 namespace weikit\services;
 
+use weikit\core\addon\ModuleCache;
 use weikit\core\addon\ModuleParser;
 use Yii;
 use DOMElement;
 use DOMDocument;
+use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use Symfony\Component\Finder\Finder;
@@ -105,7 +107,7 @@ class ModuleService extends Service
      */
     public function findByMid($mid, array $options = [])
     {
-        return $this->findBy(['mid' => $mid], $options);
+        return $this->findOne(['mid' => $mid], $options);
     }
 
     /**
@@ -117,7 +119,7 @@ class ModuleService extends Service
      */
     public function findByName($name, array $options = [])
     {
-        return $this->findBy(['name' => $name], $options);
+        return $this->findOne(['name' => $name], $options);
     }
 
     /**
@@ -141,7 +143,7 @@ class ModuleService extends Service
      */
     public function findEntryBy($condition, array $options = [])
     {
-        return $this->findBy($condition, array_merge($options, [
+        return $this->findOne($condition, array_merge($options, [
             'modelClass' => $this->entryModelClass
         ]));
     }
@@ -155,7 +157,7 @@ class ModuleService extends Service
      */
     public function findEntriesBy($condition, array $options = [])
     {
-        return $this->findAllBy($condition, array_merge($options, [
+        return $this->findAll($condition, array_merge($options, [
             'modelClass' => $this->entryModelClass
         ]));
     }
@@ -185,7 +187,7 @@ class ModuleService extends Service
      */
     public function findAccountSettings($module, $uniacid)
     {   // TODO cache?
-        return $this->findBy([
+        return $this->findOne([
             'uniacid' => $uniacid,
             'module' => $module,
         ], [
@@ -296,6 +298,10 @@ class ModuleService extends Service
                 }
             }, $module->getDb());
         });
+        // 标记缓存更新
+        TagDependency::invalidate(Yii::$app->cache,  'addon_modules');
+
+        Yii::createObject(ModuleCache::class)->build();
 
         return $module;
     }

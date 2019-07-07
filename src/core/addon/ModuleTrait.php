@@ -51,7 +51,7 @@ trait ModuleTrait
             /* @var $service ModuleService */
             $service = Yii::createObject(ModuleService::class);
             /** @var $modules \weikit\models\Module[] */
-            $modules = $service->findAllBy([]);
+            $modules = $service->findAll([]);
             return ArrayHelper::getColumn($modules, ['name']);
         });
     }

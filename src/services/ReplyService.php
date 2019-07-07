@@ -27,7 +27,7 @@ class ReplyService extends Service
      */
     public function findRuleById($id, array $options = [])
     {
-        return $this->findBy(['id' => $id], $options);
+        return $this->findOne(['id' => $id], $options);
     }
 
     /**

@@ -60,7 +60,7 @@ class AccountService extends Service
      */
     public function findByHash($hash, array $options = [])
     {
-        return $this->findBy(['hash' => $hash], $options);
+        return $this->findOne(['hash' => $hash], $options);
     }
 
     /**
@@ -72,7 +72,7 @@ class AccountService extends Service
      */
     public function findByAcid($acid, array $options = [])
     {
-        return $this->findBy(['a.acid' => $acid], array_merge($options, [
+        return $this->findOne(['a.acid' => $acid], array_merge($options, [
             'alias' => 'a'
         ]));
     }
@@ -86,7 +86,7 @@ class AccountService extends Service
      */
     public function findByUniacid($uniacid, array $options = [])
     {
-        return $this->findBy(['a.uniacid' => $uniacid], array_merge($options, [
+        return $this->findOne(['a.uniacid' => $uniacid], array_merge($options, [
             'alias' => 'a'
         ]));
     }
