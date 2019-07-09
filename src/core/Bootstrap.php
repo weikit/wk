@@ -2,11 +2,13 @@
 
 namespace weikit\core;
 
+use weikit\core\addon\ModuleBuilder;
+use weikit\services\AppService;
 use Yii;
-use yii\base\BaseObject;
-use yii\base\BootstrapInterface;
 use yii\base\Event;
 use yii\db\Connection;
+use yii\base\BaseObject;
+use yii\base\BootstrapInterface;
 
 /**
  * 应用初始化设置
@@ -72,9 +74,12 @@ class Bootstrap extends BaseObject implements BootstrapInterface
     protected function mergeClasses()
     {
         $file = Yii::getAlias('@runtime/classes.php');
-        if (file_exists($file)) {
-            Yii::$classMap = arary_merge(Yii::$classMap, require $file);
+
+        if (!file_exists($file)) {
+            Yii::createObject(AppService::class)->buildClasses();
         }
+
+        Yii::$classMap = array_merge(Yii::$classMap, require $file);
     }
 
     /**

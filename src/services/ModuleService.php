@@ -2,13 +2,8 @@
 
 namespace weikit\services;
 
-use weikit\core\addon\ModuleCache;
-use weikit\core\addon\ModuleParser;
 use Yii;
-use DOMElement;
-use DOMDocument;
 use yii\caching\TagDependency;
-use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -16,6 +11,8 @@ use weikit\core\Service;
 use weikit\models\Module;
 use weikit\models\ModuleBinding;
 use weikit\core\addon\SiteAction;
+use weikit\core\addon\ModuleBuilder;
+use weikit\core\addon\ModuleParser;
 use weikit\models\UniAccountModule;
 use weikit\models\search\ModuleSearch;
 use weikit\exceptions\AddonModuleNotFoundException;
@@ -26,6 +23,8 @@ use weikit\exceptions\AddonModuleNotFoundException;
  */
 class ModuleService extends Service
 {
+    const CACHE_TAG_ADDON_MODULES = 'addon_modules';
+
     /**
      * @var string
      */
@@ -299,9 +298,9 @@ class ModuleService extends Service
             }, $module->getDb());
         });
         // 标记缓存更新
-        TagDependency::invalidate(Yii::$app->cache,  'addon_modules');
+        TagDependency::invalidate(Yii::$app->cache,  self::CACHE_TAG_ADDON_MODULES);
 
-        Yii::createObject(ModuleCache::class)->build();
+        Yii::createObject(ModuleBuilder::class)->build();
 
         return $module;
     }

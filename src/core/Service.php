@@ -111,15 +111,15 @@ class Service extends BaseObject
 
         // query cache
         if ($options['cache'] !== false) {
-            $duration = is_numeric($query['cache']) ? $query['cache'] : 0;
-            $dependency = is_array($query['cacheDependency']) || is_string($query['cacheDependency']) ? new TagDependency([
-                'tags' => $query['cacheDependency'],
-            ]) : $query['cacheDependency'];
+            $duration = is_numeric($options['cache']) ? $options['cache'] : 0;
+            $dependency = is_array($options['cacheDependency']) || is_string($options['cacheDependency']) ? new TagDependency([
+                'tags' => $options['cacheDependency'],
+            ]) : $options['cacheDependency'];
             $query->cache($duration, $dependency);
         }
 
         // findAll
-        if (!$options['all']) {
+        if ($options['all']) {
             return $query->all();
         }
 
