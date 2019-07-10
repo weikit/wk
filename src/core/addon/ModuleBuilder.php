@@ -2,7 +2,6 @@
 
 namespace weikit\core\addon;
 
-use Yii;
 use yii\base\BaseObject;
 use weikit\services\ModuleService;
 

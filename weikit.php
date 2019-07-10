@@ -11,7 +11,7 @@ add_action('wk_init', function() { // 初始化Weikit
         global $timestart;
         define('YII_DEBUG', WP_DEBUG);
         define('YII_ENV', YII_DEBUG ? 'dev' : 'prod');
-        define('YII_BEGIN_TIME', intval($timestart));
+        define('YII_BEGIN_TIME', $timestart);
 
         require_once ( WEIKIT_PATH . '/vendor/yiisoft/yii2/Yii.php' );
 
