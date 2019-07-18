@@ -61,9 +61,13 @@ class ModuleController extends Controller
      */
     public function actionUninstalled()
     {
-        return $this->render('uninstalled', $this->service->searchUninstalled(Yii::$app->getRequest()->queryParams));
+        return $this->render('uninstalled', $this->service->searchAvailable());
     }
 
+    /**
+     *
+     * @return \yii\web\Response
+     */
     public function actionActivate($name)
     {
         $this->service->activate($name);

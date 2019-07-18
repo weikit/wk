@@ -259,11 +259,14 @@ class ModuleService extends Service
             // 2. 注册扩展模块功能入口
             foreach ($addon['bindings'] as $entry => $bindings) {
                 foreach($bindings as $binding) {
-                    $bindingModel = Yii::createObject(ModuleBinding::class);
-                    $bindingModel->setAttributes(array_merge([
-                        'entry' => $entry,
-                        'module' => $module->name,
-                    ], $binding));
+                    /** @var ModuleBinding $bindingModel */
+                    $bindingModel = Yii::createObject([
+                        'class' => ModuleBinding::class,
+                        'attributes' => array_merge([
+                            'entry' => $entry,
+                            'module' => $module->name,
+                        ], $binding)
+                    ]);
                     $bindingModel->trySave();
                 }
             }
@@ -349,7 +352,19 @@ class ModuleService extends Service
 
                 if ($parser->isValid) {
                     $manifest = $parser->data;
-                    $list[$manifest['name']] = $manifest;
+
+                    // 标记系统模块
+                    if ($configFile->getFilename() == $corePath) {
+                        $manifest['type'] = 'system';
+                    }
+
+//                    $list[$manifest['name']] = $manifest;
+
+                    $list[$manifest['name']] = Yii::createObject([
+                        'class' => Module::class,
+                        'attributes' => $manifest
+                    ]);
+
                 }
             }
         }
