@@ -343,7 +343,7 @@ class ModuleService extends Service
 
         if (is_dir($path)) {
             /* @var $configFile SplFileInfo */
-            foreach (Finder::create()->in([$path, $corePath])->files()->depth(1)->name($this->configFile) as $configFile) {
+            foreach (Finder::create()->in([$corePath, $path])->files()->depth(1)->name($this->configFile) as $configFile) {
                 /** @var ModuleParser $parser */
                 $parser = Yii::createObject([
                     'class' => ModuleParser::class,
@@ -351,20 +351,14 @@ class ModuleService extends Service
                 ]);
 
                 if ($parser->isValid) {
-                    $manifest = $parser->data;
+                    $manifest = $parser->manifest;
 
                     // 标记系统模块
-                    if ($configFile->getFilename() == $corePath) {
+                    if (dirname($configFile->getRealPath(), 2) == $corePath) {
                         $manifest['type'] = 'system';
                     }
 
-//                    $list[$manifest['name']] = $manifest;
-
-                    $list[$manifest['name']] = Yii::createObject([
-                        'class' => Module::class,
-                        'attributes' => $manifest
-                    ]);
-
+                    $list[$manifest['name']] = $manifest;
                 }
             }
         }

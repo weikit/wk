@@ -2,6 +2,7 @@
 
 namespace weikit\core\addon;
 
+use Yii;
 use DOMElement;
 use DOMDocument;
 use yii\base\BaseObject;
@@ -14,7 +15,7 @@ use yii\base\InvalidArgumentException;
  *
  * @property boolean $isValid
  * @property string $content
- * @property array $data
+ * @property ModuleManifest $manifest
  */
 class ModuleParser extends BaseObject
 {
@@ -87,9 +88,9 @@ class ModuleParser extends BaseObject
      */
     private $_isValid;
     /**
-     * @var array
+     * @var array|ModuleManifest
      */
-    private $_data;
+    private $_manifest;
 
     /**
      * @return string
@@ -109,7 +110,7 @@ class ModuleParser extends BaseObject
     {
         $this->_content = $content;
         $this->_isValid = null;
-        $this->_data = null;
+        $this->_manifest = null;
     }
 
     /**
@@ -118,27 +119,30 @@ class ModuleParser extends BaseObject
     public function getIsValid()
     {
         if ($this->_isValid === null) {
-            $this->_isValid = empty($this->_data);
+            $this->_isValid = empty($this->_manifest);
         }
 
         return $this->_isValid;
     }
 
     /**
-     * @return array
+     * @return ModuleManifest|array
      */
-    public function getData()
+    public function getManifest()
     {
-        if ($this->_data === null) {
-            $this->_data = $this->parse();
+        if ($this->_manifest === null) {
+            $this->_manifest = $this->getIsValid() ? Yii::createObject([
+                'class' => ModuleManifest::class,
+                'data' => $this->parse(),
+            ]) : [];
         }
-        return $this->_data;
+        return $this->_manifest;
     }
 
     /**
      * 解析设置
      *
-     * @return array
+     * @return ModuleManifest|array
      */
     protected function parse()
     {
