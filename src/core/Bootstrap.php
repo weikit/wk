@@ -2,13 +2,12 @@
 
 namespace weikit\core;
 
-use weikit\core\addon\ModuleBuilder;
-use weikit\services\AppService;
 use Yii;
 use yii\base\Event;
 use yii\db\Connection;
 use yii\base\BaseObject;
 use yii\base\BootstrapInterface;
+use weikit\core\addon\ModuleBuilder;
 
 /**
  * 应用初始化设置
@@ -19,6 +18,7 @@ use yii\base\BootstrapInterface;
  */
 class Bootstrap extends BaseObject implements BootstrapInterface
 {
+
     /**
      * @var array 默认单例设置
      */
@@ -39,6 +39,9 @@ class Bootstrap extends BaseObject implements BootstrapInterface
         $this->registerSingletons();
         $this->mergeClasses();
         $this->checkDbMode();
+
+        $a = new \WeBase;
+        $a = \weikit\core\addon\Controller::class;
     }
 
     /**
@@ -75,8 +78,18 @@ class Bootstrap extends BaseObject implements BootstrapInterface
     {
         $file = Yii::getAlias('@runtime/classes.php');
 
-        if (!file_exists($file)) {
-            Yii::createObject(AppService::class)->buildClasses();
+        if (!file_exists($file)) { // 构建classes文件缓存
+
+            /* @var ModuleBuilder $moduleBuilder */
+            $moduleBuilder = Yii::createObject(ModuleBuilder::class);
+
+            $classes = array_merge(
+                [],
+                $moduleBuilder->getClasses()
+            );
+
+            file_put_contents(Yii::getAlias('@runtime/classes.php'), "<?php\nreturn " . var_export($classes, true) . ';');
+
         }
 
         Yii::$classMap = array_merge(Yii::$classMap, require $file);

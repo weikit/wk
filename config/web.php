@@ -3,7 +3,7 @@
 $config = [
     'id' => 'weikit',
     'name' => 'Weikit',
-    'basePath' => WEIKIT_PATH,
+    'basePath' => WEIKIT_PLUGIN_PATH,
     'bootstrap' => [
         'weikit\core\Bootstrap',
         'log'
@@ -11,7 +11,6 @@ $config = [
     'language' => 'zh-CN',
     'aliases' => [
         '@weikit' => WEIKIT_PATH,
-        '@weikit_url' => site_url(str_replace(ABSPATH, '', WEIKIT_PATH)),
         '@wp' => ABSPATH,
         '@wp_url' => site_url(),
         '@bower' => '@vendor/bower-asset',

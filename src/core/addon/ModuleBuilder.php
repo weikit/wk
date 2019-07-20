@@ -12,10 +12,18 @@ use weikit\services\ModuleService;
  */
 class ModuleBuilder extends BaseObject
 {
+
     /**
      * @var ModuleService
      */
     protected $service;
+    /**
+     * @var array
+     */
+    public $defaultClasses = [
+        'WeBase' => WEIKIT_PATH . '/core/addon/Controller.php',
+    ];
+
 
     public function __construct(ModuleService $service, $config = [])
     {
@@ -39,7 +47,7 @@ class ModuleBuilder extends BaseObject
 
         $modules = $this->getModules();
 
-        $classes = [];
+        $classes = $this->defaultClasses;
 
         foreach ($modules as $module) {
             $name = strtolower($module->name);

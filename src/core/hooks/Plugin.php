@@ -15,11 +15,11 @@ class Plugin
     }
 
     public static $copies = [
-        WEIKIT_PATH . '/copy/app' => ABSPATH . 'app',
+        WEIKIT_PLUGIN_PATH . '/copy/app' => ABSPATH . 'app',
 
-        WEIKIT_PATH . '/copy/web' => ABSPATH . 'web',
+        WEIKIT_PLUGIN_PATH . '/copy/web' => ABSPATH . 'web',
 
-        WEIKIT_PATH . '/copy/api.php' => ABSPATH . 'api.php'
+        WEIKIT_PLUGIN_PATH . '/copy/api.php' => ABSPATH . 'api.php'
     ];
 
     public static function activate()

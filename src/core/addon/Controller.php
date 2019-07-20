@@ -90,3 +90,5 @@ class Controller extends \weikit\modules\web\Controller
         return $view->template($viewPath, TEMPLATE_INCLUDEPATH);
     }
 }
+
+class_alias(Controller::class, 'WeBase');
