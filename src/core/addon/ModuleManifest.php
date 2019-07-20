@@ -9,6 +9,8 @@ use yii\base\BaseObject;
 
 class ModuleManifest extends BaseObject implements ArrayAccess, IteratorAggregate
 {
+    use ModuleModelTrait;
+
     /**
      * @var array
      */

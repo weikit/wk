@@ -58,7 +58,6 @@ class ModuleService extends Service
      */
     public $configFile = 'manifest.xml';
 
-
     /**
      * 获取插件Url
      *

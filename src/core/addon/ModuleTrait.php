@@ -23,16 +23,10 @@ trait ModuleTrait
      */
     protected function defaultModules()
     {
-        // TODO 把所有扩展模块统一注册到Yii::$classMap中
-
-        /* @var $service ModuleService */
-        $service = Yii::createObject(ModuleService::class);
 
         $modules = [];
         foreach($this->resolveModuleNames() as $name) {
-
             $moduleClass = $name . 'Module';
-            Yii::$classMap[$moduleClass] = $service->getVirtualPath($name, 'module.php');
 
             $modules[$name] = [
                 'class' => $moduleClass

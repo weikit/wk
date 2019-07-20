@@ -70,13 +70,8 @@ class Module extends \yii\base\Module implements ArrayAccess
      */
     protected function defaultControllerMap($name)
     {
-        // TODO 扩展模块的功能(在安装时)放入Yii::$classMap(可优化性能)
-
         $entryClass = $name . 'ModuleSite';
         $moduleClass = $name . 'Module';
-
-        Yii::$classMap[$entryClass] = $this->service->getVirtualPath($name, 'site.php');
-        Yii::$classMap[$moduleClass] = $this->service->getVirtualPath($name, 'module.php');
 
         return [
             'entry' => $entryClass,
