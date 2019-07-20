@@ -52,16 +52,6 @@ class Module extends \yii\base\Module implements ArrayAccess
         ]), $config);
     }
 
-    public function init()
-    {
-        if (!defined('MODULE_ROOT')) {
-            define('MODULE_ROOT', $this->service->getRealPath($this->id));
-        }
-        if (!defined('MODULE_URL')) {
-            define('MODULE_URL', $this->service->getUrl($this->id) . '/');
-        }
-    }
-
     /**
      * @param string $name
      * @param Module $module
