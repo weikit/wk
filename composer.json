@@ -3,7 +3,7 @@
   "require": {
     "php": ">=5.4.0",
     "callmez/we8": "dev-master",
-    "yiisoft/yii2": "~2.0.16.1",
+    "yiisoft/yii2": "~2.0.38",
     "yiisoft/yii2-bootstrap": "~2.0.0",
     "yiisoft/yii2-gii": "^2.0",
     "weikit/wechat-sdk": "^0.0.3",
